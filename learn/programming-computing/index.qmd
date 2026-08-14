@@ -1,0 +1,17 @@
+---
+title: "Programming & Computing"
+---
+
+Notes on the tools used throughout this site — R, Python, SQL, reproducible
+workflows, and version control.
+
+Planned areas:
+
+- R — fundamentals, data manipulation, functions, iteration, ggplot2, testing
+- Python — fundamentals, NumPy, pandas, matplotlib, scikit-learn
+- SQL — queries, joins, aggregation, CTEs, window functions
+- Reproducible workflows — targets, project structure, renv, pipeline design
+- Git & GitHub — fundamentals, commits, branches, merge/rebase, pull requests, Actions
+- Command line — shell basics, files, pipes, scripts
+
+Pages will be added here gradually as topics are written.

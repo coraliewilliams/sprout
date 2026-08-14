@@ -1,0 +1,35 @@
+---
+title: "Technical Learning Notes"
+---
+
+Statistics, machine learning, mathematics, data science and programming — notes
+written while learning, one or two topics at a time.
+
+Use the search box in the sidebar to find a topic quickly.
+
+## Learn
+
+- [Statistics](learn/statistics/index.qmd)
+- [Machine Learning](learn/machine-learning/index.qmd)
+- [Mathematics](learn/mathematics/index.qmd)
+- [Data Science](learn/data-science/index.qmd)
+- [Experimental Design](learn/experimental-design/index.qmd)
+- [Programming & Computing](learn/programming-computing/index.qmd)
+
+## Practise
+
+- [Worked Examples](practise/worked-examples/index.qmd)
+- [Coding Exercises](practise/coding-exercises/index.qmd)
+- [Quizzes](practise/quizzes/index.qmd)
+
+## Track
+
+- [Learning Tracker](track/index.qmd)
+
+## Today's learning
+
+*Placeholder — this will surface the day's active topic(s) once the tracker (Phase 6) is built.*
+
+## Recently updated
+
+*Placeholder — this will list the most recently edited topic pages once there is content to show.*

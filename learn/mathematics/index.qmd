@@ -1,0 +1,14 @@
+---
+title: "Mathematics"
+---
+
+The mathematical foundations behind statistics, machine learning, and data science.
+
+Planned areas:
+
+- Linear algebra
+- Calculus
+- Probability theory
+- Optimisation
+
+Pages will be added here gradually as topics are written.

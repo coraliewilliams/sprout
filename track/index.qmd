@@ -1,0 +1,6 @@
+---
+title: "Learning Tracker"
+---
+
+*Placeholder — the full tracker (Today / Up next / In progress / Review due /
+All topics) will be built in a later phase, driven by topic-page metadata.*

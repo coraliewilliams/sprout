@@ -1,0 +1,15 @@
+---
+title: "Machine Learning"
+---
+
+Notes on supervised and unsupervised learning methods, and how to evaluate them.
+
+Planned areas:
+
+- Foundations
+- Supervised learning
+- Unsupervised learning
+- Model evaluation & validation
+- Practical implementation (R / Python)
+
+Pages will be added here gradually as topics are written.

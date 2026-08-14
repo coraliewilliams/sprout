@@ -1,0 +1,14 @@
+---
+title: "Learn"
+---
+
+Theory, explanations, and reference notes — organised by subject. This is where
+concepts are explained; worked examples, exercises and quizzes live under
+[Practise](../practise/index.qmd) instead.
+
+- [Statistics](statistics/index.qmd) — probability, inference, regression, and modelling.
+- [Machine Learning](machine-learning/index.qmd) — supervised and unsupervised methods, model evaluation.
+- [Mathematics](mathematics/index.qmd) — the mathematical foundations behind the above.
+- [Data Science](data-science/index.qmd) — data wrangling, exploration, and reproducible workflows.
+- [Experimental Design](experimental-design/index.qmd) — designing and analysing experiments.
+- [Programming & Computing](programming-computing/index.qmd) — R, Python, SQL, Git, and the command line.

@@ -1,0 +1,7 @@
+---
+title: "Worked Examples"
+---
+
+Complete, end-to-end worked examples that apply ideas from [Learn](../../learn/index.qmd).
+
+Examples will be added here gradually.

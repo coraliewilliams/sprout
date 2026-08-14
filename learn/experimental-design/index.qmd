@@ -1,0 +1,14 @@
+---
+title: "Experimental Design"
+---
+
+Notes on designing and analysing experiments.
+
+Planned areas:
+
+- Design principles
+- Randomisation & blocking
+- Power & sample size
+- Analysis of designed experiments
+
+Pages will be added here gradually as topics are written.

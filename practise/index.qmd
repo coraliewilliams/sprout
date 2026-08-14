@@ -1,0 +1,10 @@
+---
+title: "Practise"
+---
+
+Applied material that builds on the theory in [Learn](../learn/index.qmd):
+complete worked examples, standalone coding exercises, and short quizzes.
+
+- [Worked Examples](worked-examples/index.qmd)
+- [Coding Exercises](coding-exercises/index.qmd)
+- [Quizzes](quizzes/index.qmd)

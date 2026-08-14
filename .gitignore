@@ -1,0 +1,21 @@
+# Quarto
+/.quarto/
+/_site/
+
+# Do NOT ignore /_freeze/ — it is committed so GitHub Actions can publish
+# without re-executing R/Python code chunks (see execute.freeze in _quarto.yml).
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db

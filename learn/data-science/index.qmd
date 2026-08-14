@@ -1,0 +1,15 @@
+---
+title: "Data Science"
+---
+
+Notes on working with data end-to-end — wrangling, exploration, visualisation,
+and reproducible workflows.
+
+Planned areas:
+
+- Data wrangling
+- Exploratory data analysis
+- Visualisation
+- Workflow & reproducibility
+
+Pages will be added here gradually as topics are written.

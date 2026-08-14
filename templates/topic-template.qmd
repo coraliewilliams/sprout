@@ -1,0 +1,38 @@
+---
+title: "Topic name"
+area: "Statistics"
+status: "todo"
+confidence: 1
+last-reviewed:
+practice: false
+quiz: false
+---
+
+<!-- Standard topic template — sections below are filled out fully in Phase 5. -->
+<!-- Not every topic needs every section (e.g. R or Python); omit what doesn't apply. -->
+
+# Topic name
+
+## In one sentence
+
+## Why does it matter?
+
+## Core idea
+
+## How it works
+
+## Key assumptions or considerations
+
+## Example
+
+## R
+
+## Python
+
+## Common mistakes
+
+## Remember
+
+## Test yourself
+
+## Related topics

@@ -1,0 +1,49 @@
+project:
+  type: website
+
+website:
+  title: "Technical Learning Notes"
+  site-url: "https://coraliewilliams.github.io/my-notebook"
+  description: >
+    A personal technical learning notebook covering statistics, machine learning,
+    mathematics, data science, experimental design, and programming.
+  search:
+    location: sidebar
+    type: overlay
+  page-navigation: true
+  sidebar:
+    style: docked
+    collapse-level: 2
+    contents:
+      - text: "Home"
+        href: index.qmd
+      - section: "Learn"
+        contents:
+          - learn/index.qmd
+          - learn/statistics/index.qmd
+          - learn/machine-learning/index.qmd
+          - learn/mathematics/index.qmd
+          - learn/data-science/index.qmd
+          - learn/experimental-design/index.qmd
+          - learn/programming-computing/index.qmd
+      - section: "Practise"
+        contents:
+          - practise/index.qmd
+          - practise/worked-examples/index.qmd
+          - practise/coding-exercises/index.qmd
+          - practise/quizzes/index.qmd
+      - section: "Track"
+        contents:
+          - track/index.qmd
+  page-footer:
+    center: "Personal technical learning notebook — built with Quarto."
+
+format:
+  html:
+    theme: [cosmo, styles/custom.scss]
+    toc: true
+    code-copy: true
+    code-overflow: wrap
+
+execute:
+  freeze: auto

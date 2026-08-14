@@ -1,0 +1,15 @@
+---
+title: "Statistics"
+---
+
+Notes on probability, inference, and statistical modelling.
+
+Planned areas:
+
+- Foundations — probability, distributions, sampling
+- Statistical inference — estimation, confidence intervals, hypothesis testing
+- Regression — linear models, GLMs, diagnostics
+- Generalised & mixed models
+- Resampling & robust methods — bootstrap, permutation tests
+
+Pages will be added here gradually as topics are written.
