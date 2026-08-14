@@ -1,10 +1,23 @@
 ---
 title: "Page Tracker"
+listing:
+  id: topic-pages
+  contents:
+    - "../../learn/**/*.qmd"
+    - "!../../learn/**/index.qmd"
+  type: table
+  fields: [title, area, status, confidence, last-reviewed]
+  field-display-names:
+    area: "Area"
+    status: "Status"
+    confidence: "Confidence"
+    last-reviewed: "Last reviewed"
+  sort: "status"
+  sort-ui: false
+  filter-ui: false
 ---
 
 Tracks the build-out of this notebook itself: which topic pages exist, which
-are still stubs, and what's planned next.
-
-*Placeholder — this will list topic pages grouped by status (todo / in
-progress / done), driven by the `status` field in each page's frontmatter,
-once the topic template (Phase 5) is in use.*
+are still stubs, and what's planned next. Generated automatically from each
+topic page's frontmatter (`status`, `area`, `confidence`, `last-reviewed`) —
+new topic pages appear here as soon as they're added, no manual updates needed.

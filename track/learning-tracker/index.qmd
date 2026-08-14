@@ -5,6 +5,29 @@ title: "Learning Tracker"
 Tracks areas to focus on based on quiz results and topics reviewed, separate
 from the page-building progress in [Page Tracker](../page-tracker/index.qmd).
 
-*Placeholder — the full tracker (Today / Up next / In progress / Review due)
-will be built in a later phase, driven by quiz results and topic-page
-metadata such as `confidence` and `last-reviewed`.*
+*This section is scaffolded but not yet driven by real data — it needs a
+working quiz system (Practise > Quizzes) before "review due" can be computed
+automatically. For now these are placeholders.*
+
+## Today
+
+*Placeholder — today's active topic(s).*
+
+## Up next
+
+*Placeholder — topics queued to start soon.*
+
+## In progress
+
+*Placeholder — topics with `status: in-progress` currently being worked through.*
+
+## Review due
+
+*Placeholder — once quizzes exist, this will surface topics with low
+confidence or a stale `last-reviewed` date.*
+
+## All topics
+
+*Placeholder — full list of topics with their confidence and last-reviewed
+date. See [Page Tracker](../page-tracker/index.qmd) for a build-status view
+of the same pages in the meantime.*
