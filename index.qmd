@@ -1,5 +1,6 @@
 ---
 title: "Technical Learning Notes"
+toc: false
 ---
 
 Statistics, machine learning, mathematics, data science and programming — notes

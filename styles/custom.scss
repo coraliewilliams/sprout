@@ -1,4 +1,246 @@
 /*-- scss:defaults --*/
-// Placeholder — full palette, typography and component theming built in Phase 4.
+
+// ==========================================================================
+// Colours
+// ==========================================================================
+$page-bg:           #FAF9F6;  // main content background
+$sidebar-bg:        #F1F4EF;  // left sidebar / TOC / table headers
+$surface-bg:        #F3F2ED;  // code blocks, inline code, subtle panels
+$text-primary:      #2F3437;  // body text, headings
+$text-secondary:    #6F7477;  // captions, muted nav labels
+$accent-sage:       #5B7A6B;  // primary accent — links, active nav, tip callouts
+$accent-blue:       #5C7690;  // secondary accent — note callouts
+$accent-terracotta: #B97A5D;  // warm accent — important callouts, sparse highlights
+$accent-ochre:      #B99B5B;  // warning callouts (derived, distinct from terracotta)
+$border-color:      #DFDCD3;  // dividers, table lines, code borders
+
+$body-bg:           $page-bg;
+$body-color:        $text-primary;
+$link-color:        $accent-sage;
+$link-hover-color:  darken($accent-sage, 8%);
+
+// ==========================================================================
+// Typography
+// ==========================================================================
+$font-family-sans-serif: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+$font-family-monospace:  ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+$headings-color:       $text-primary;
+$headings-font-weight: 600;
+
+// ==========================================================================
+// Tables
+// ==========================================================================
+$table-border-color: $border-color;
+
+// ==========================================================================
+// Callouts (Quarto)
+// ==========================================================================
+$callout-color-note:      $accent-blue;
+$callout-color-tip:       $accent-sage;
+$callout-color-important: $accent-terracotta;
+$callout-color-warning:   $accent-ochre;
 
 /*-- scss:rules --*/
+
+// ==========================================================================
+// Sidebar
+// ==========================================================================
+#quarto-sidebar {
+  background-color: $sidebar-bg;
+  width: 260px;
+  font-size: 0.925rem;
+
+  .sidebar-title {
+    font-weight: 600;
+    color: $text-primary;
+
+    a { color: $text-primary; text-decoration: none; }
+  }
+
+  // group headings: Learn / Practise / Track
+  .sidebar-item.sidebar-item-section > .sidebar-item-container > a.sidebar-item-text {
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.07em;
+    font-weight: 600;
+    color: $text-secondary;
+    padding-top: 1rem;
+  }
+
+  .sidebar-item-toggle i.bi {
+    color: $text-secondary;
+    font-size: 0.7rem;
+  }
+
+  // nested items (subjects, practise pages, tracker)
+  ul.sidebar-section.depth1 .sidebar-item-text {
+    font-size: 0.9rem;
+  }
+
+  a.sidebar-item-text {
+    display: block;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0 4px 4px 0;
+    color: $text-primary;
+  }
+
+  a.sidebar-item-text:hover {
+    background-color: rgba($accent-sage, 0.06);
+    text-decoration: none;
+    color: $text-primary;
+  }
+
+  // active page indicator: soft pastel background + left border, no bright fill
+  a.sidebar-item-text.active {
+    background-color: rgba($accent-sage, 0.12);
+    border-left: 3px solid $accent-sage;
+    padding-left: calc(0.6rem - 3px);
+    font-weight: 500;
+    color: darken($text-primary, 4%);
+  }
+}
+
+// ==========================================================================
+// Navigation (right-side page TOC)
+// ==========================================================================
+#quarto-margin-sidebar {
+  #TOC {
+    font-size: 0.85rem;
+
+    #toc-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: $text-secondary;
+      font-weight: 600;
+    }
+
+    .nav-link {
+      color: $text-secondary;
+      padding: 0.2rem 0;
+    }
+
+    .nav-link.active {
+      color: $accent-sage;
+      font-weight: 500;
+      border-left: 2px solid $accent-sage;
+      padding-left: 0.5rem;
+    }
+  }
+}
+
+// ==========================================================================
+// Main content
+// ==========================================================================
+#quarto-document-content {
+  max-width: 46rem; // ~ 75-85 characters per line for body prose
+  line-height: 1.65;
+}
+
+// ==========================================================================
+// Headings
+// ==========================================================================
+#quarto-document-content {
+  h1, h2, h3, h4 {
+    color: $text-primary;
+  }
+
+  h1.title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    margin-top: 2rem;
+  }
+
+  h4 {
+    font-size: 1rem;
+    margin-top: 1.5rem;
+  }
+}
+
+// ==========================================================================
+// Links
+// ==========================================================================
+#quarto-document-content a {
+  color: $accent-sage;
+  text-decoration: underline;
+  text-decoration-color: rgba($accent-sage, 0.35);
+}
+
+#quarto-document-content a:hover {
+  color: $link-hover-color;
+  text-decoration-color: currentColor;
+}
+
+// ==========================================================================
+// Code
+// ==========================================================================
+div.sourceCode, pre.sourceCode {
+  background-color: $surface-bg;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+
+code:not(.sourceCode) {
+  background-color: $surface-bg;
+  color: $text-primary;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+// ==========================================================================
+// Tables
+// ==========================================================================
+.table {
+  border-collapse: collapse;
+
+  thead th {
+    background-color: $sidebar-bg;
+    border-bottom: 2px solid $border-color;
+    font-weight: 600;
+  }
+
+  td, th {
+    border-left: none;
+    border-right: none;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+// ==========================================================================
+// Callouts
+// ==========================================================================
+// Quarto derives callout backgrounds/borders from the $callout-color-* variables
+// above; these rules just keep the fill very pale rather than saturated.
+.callout {
+  border-radius: 6px;
+
+  .callout-header {
+    font-weight: 600;
+  }
+}
+
+// ==========================================================================
+// Responsive rules
+// ==========================================================================
+@media (max-width: 991.98px) {
+  #quarto-sidebar {
+    width: 100%;
+  }
+
+  #quarto-document-content {
+    max-width: 100%;
+  }
+}
