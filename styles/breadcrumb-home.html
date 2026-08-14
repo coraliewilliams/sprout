@@ -1,0 +1,21 @@
+<script>
+// Quarto's auto-generated breadcrumbs start from the current sidebar section
+// (e.g. "Learn > Statistics") but never include the site root — this prepends it.
+document.addEventListener("DOMContentLoaded", function () {
+  var offsetMeta = document.querySelector('meta[name="quarto:offset"]');
+  var homeHref = offsetMeta ? offsetMeta.getAttribute("content") : "./";
+
+  document.querySelectorAll(".quarto-page-breadcrumbs .breadcrumb").forEach(function (list) {
+    var firstLink = list.querySelector(".breadcrumb-item a");
+    if (firstLink && firstLink.getAttribute("href") === homeHref) return; // already on Home
+
+    var li = document.createElement("li");
+    li.className = "breadcrumb-item";
+    var a = document.createElement("a");
+    a.href = homeHref;
+    a.textContent = "Home";
+    li.appendChild(a);
+    list.insertBefore(li, list.firstChild);
+  });
+});
+</script>

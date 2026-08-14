@@ -1,4 +1,4 @@
-# Technical Learning Notes
+# My notebook
 
 A personal technical learning notebook covering statistics, machine learning,
 mathematics, data science, experimental design, and programming. Built with

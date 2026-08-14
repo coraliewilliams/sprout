@@ -1,5 +1,5 @@
 ---
-title: "Technical Learning Notes"
+title: "My notebook"
 toc: false
 ---
 

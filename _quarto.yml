@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "Technical Learning Notes"
+  title: "My notebook"
   site-url: "https://coraliewilliams.github.io/my-notebook"
   description: >
     A personal technical learning notebook covering statistics, machine learning,
@@ -18,8 +18,8 @@ website:
       - text: "Home"
         href: index.qmd
       - section: "Learn"
+        href: learn/index.qmd
         contents:
-          - learn/index.qmd
           - learn/statistics/index.qmd
           - learn/machine-learning/index.qmd
           - learn/mathematics/index.qmd
@@ -27,8 +27,8 @@ website:
           - learn/experimental-design/index.qmd
           - learn/programming-computing/index.qmd
       - section: "Practise"
+        href: practise/index.qmd
         contents:
-          - practise/index.qmd
           - practise/worked-examples/index.qmd
           - practise/coding-exercises/index.qmd
           - practise/quizzes/index.qmd
@@ -44,6 +44,7 @@ format:
     toc: true
     code-copy: true
     code-overflow: wrap
+    include-after-body: styles/breadcrumb-home.html
 
 execute:
   freeze: auto
