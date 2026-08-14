@@ -23,10 +23,7 @@ website:
       - section: "Learn"
         href: learn/index.qmd
         contents:
-          - section: "Statistics"
-            href: learn/statistics/index.qmd
-            contents:
-              - learn/statistics/mean-and-variance.qmd
+          - learn/statistics/index.qmd
           - learn/machine-learning/index.qmd
           - learn/mathematics/index.qmd
           - learn/data-science/index.qmd
