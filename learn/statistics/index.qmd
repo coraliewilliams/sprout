@@ -4,6 +4,10 @@ title: "Statistics"
 
 Notes on probability, inference, and statistical modelling.
 
+Topics:
+
+- [Mean and Variance](mean-and-variance.qmd)
+
 Planned areas:
 
 - Foundations — probability, distributions, sampling

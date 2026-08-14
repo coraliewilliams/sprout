@@ -1,5 +1,5 @@
 ---
-title: "My notebook"
+title: "My Notebook"
 toc: false
 ---
 

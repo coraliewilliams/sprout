@@ -1,0 +1,114 @@
+---
+title: "Mean and Variance"
+area: "Statistics"
+status: "done"
+confidence: 3
+last-reviewed: 2026-08-14
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+The mean is the average value of a dataset; the variance measures how spread
+out the values are around that mean.
+
+## Why does it matter?
+
+Almost every statistical method — from confidence intervals to regression —
+is built on describing a distribution's centre (mean) and spread (variance).
+Get these wrong and everything downstream is wrong too.
+
+## Core idea
+
+The mean summarises "where the data sits"; the variance summarises "how much
+the data disagrees with the mean."
+
+## How it works
+
+For a sample of $n$ values $x_1, \dots, x_n$, the sample mean is:
+
+$$
+\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i
+$$
+
+The sample variance measures the average squared distance from the mean.
+Dividing by $n - 1$ (not $n$) corrects for the bias introduced by estimating
+the mean from the same sample:
+
+$$
+s^2 = \frac{1}{n-1}\sum_{i=1}^{n} (x_i - \bar{x})^2
+$$
+
+The standard deviation $s = \sqrt{s^2}$ puts the spread back in the original
+units of the data.
+
+## Key assumptions or considerations
+
+- The mean is sensitive to outliers — a single extreme value can pull it far
+  from where "most" of the data sits.
+- Variance is in squared units, which is why standard deviation (its square
+  root) is usually reported instead.
+
+::: {.callout-important}
+Population variance divides by $n$; **sample** variance divides by $n - 1$
+(Bessel's correction). Using the wrong one is one of the most common stats
+mistakes.
+:::
+
+## Example
+
+Take the sample: $2, 4, 4, 4, 5, 5, 7, 9$.
+
+| Statistic | Value |
+|---|---|
+| $n$ | 8 |
+| $\bar{x}$ | 5 |
+| $s^2$ | 4.57 |
+| $s$ | 2.14 |
+
+## R
+
+```r
+x <- c(2, 4, 4, 4, 5, 5, 7, 9)
+mean(x)
+var(x)   # sample variance, divides by n - 1
+sd(x)
+```
+
+## Python
+
+```python
+import statistics as st
+
+x = [2, 4, 4, 4, 5, 5, 7, 9]
+st.mean(x)
+st.variance(x)   # sample variance, divides by n - 1
+st.stdev(x)
+```
+
+## Common mistakes
+
+- Reporting variance when standard deviation (same units as the data) is
+  more interpretable.
+- Confusing population variance ($/n$) with sample variance ($/(n-1)$).
+- Treating the mean as a good summary for heavily skewed data — consider the
+  median instead.
+
+## Remember
+
+::: {.callout-tip}
+Mean = centre, variance = spread. Sample variance divides by $n - 1$, not $n$.
+:::
+
+## Test yourself
+
+- Why does sample variance divide by $n - 1$ instead of $n$?
+- If you add a constant $c$ to every value in a dataset, what happens to the
+  mean and the variance?
+
+## Related topics
+
+- Standard deviation
+- Standard error
+- Skewness

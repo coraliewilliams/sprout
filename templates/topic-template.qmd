@@ -8,31 +8,76 @@ practice: false
 quiz: false
 ---
 
-<!-- Standard topic template — sections below are filled out fully in Phase 5. -->
-<!-- Not every topic needs every section (e.g. R or Python); omit what doesn't apply. -->
+<!--
+  Standard topic template.
 
-# Topic name
+  Frontmatter reference:
+    area          — one of: Statistics, Machine Learning, Mathematics,
+                    Data Science, Experimental Design, Programming & Computing
+    status        — todo | in-progress | done
+    confidence    — 1 (shaky) to 5 (solid); your own self-rating
+    last-reviewed — date (YYYY-MM-DD), update whenever you revisit the page
+    practice      — true once a matching Worked Example / Coding Exercise exists
+    quiz          — true once a matching quiz exists
+
+  Not every topic needs every section below (e.g. R or Python) — delete
+  what doesn't apply rather than leaving it empty.
+-->
 
 ## In one sentence
 
+<!-- One plain-English sentence. If you can't do this in one sentence, the
+     topic is probably too big — split it. -->
+
 ## Why does it matter?
+
+<!-- The motivation: what problem this solves, or what breaks without it. -->
 
 ## Core idea
 
+<!-- The one idea to remember even if everything else is forgotten. -->
+
 ## How it works
+
+<!-- The mechanics/derivation. Use LaTeX for notation, e.g. $\bar{x} = \frac{1}{n}\sum x_i$ -->
 
 ## Key assumptions or considerations
 
+<!-- Bullet list of assumptions, edge cases, or "gotchas" that change the answer. -->
+
+::: {.callout-important}
+Call out anything that's easy to get wrong or often assumed incorrectly.
+:::
+
 ## Example
+
+<!-- A small, concrete worked example — numbers, not just theory. -->
 
 ## R
 
+```r
+```
+
 ## Python
+
+```python
+```
 
 ## Common mistakes
 
+<!-- Bullet list of mistakes you (or others) commonly make with this topic. -->
+
 ## Remember
+
+::: {.callout-tip}
+The one-line takeaway to jog your memory next time you review this page.
+:::
 
 ## Test yourself
 
+<!-- One or two questions you should be able to answer without notes. -->
+
 ## Related topics
+
+<!-- Links to other topic pages, once they exist. -->
+
