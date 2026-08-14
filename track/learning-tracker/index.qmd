@@ -1,0 +1,10 @@
+---
+title: "Learning Tracker"
+---
+
+Tracks areas to focus on based on quiz results and topics reviewed, separate
+from the page-building progress in [Page Tracker](../page-tracker/index.qmd).
+
+*Placeholder — the full tracker (Today / Up next / In progress / Review due)
+will be built in a later phase, driven by quiz results and topic-page
+metadata such as `confidence` and `last-reviewed`.*

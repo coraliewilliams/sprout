@@ -25,7 +25,8 @@ Use the search box in the sidebar to find a topic quickly.
 
 ## Track
 
-- [Learning Tracker](track/index.qmd)
+- [Page Tracker](track/page-tracker/index.qmd)
+- [Learning Tracker](track/learning-tracker/index.qmd)
 
 ## Today's learning
 

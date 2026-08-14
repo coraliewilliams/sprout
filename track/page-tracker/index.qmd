@@ -1,0 +1,10 @@
+---
+title: "Page Tracker"
+---
+
+Tracks the build-out of this notebook itself: which topic pages exist, which
+are still stubs, and what's planned next.
+
+*Placeholder — this will list topic pages grouped by status (todo / in
+progress / done), driven by the `status` field in each page's frontmatter,
+once the topic template (Phase 5) is in use.*

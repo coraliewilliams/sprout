@@ -1,6 +1,9 @@
 ---
-title: "Learning Tracker"
+title: "Track"
 ---
 
-*Placeholder — the full tracker (Today / Up next / In progress / Review due /
-All topics) will be built in a later phase, driven by topic-page metadata.*
+Keeping tabs on two different things: progress building this notebook, and
+progress learning the material in it.
+
+- [Page Tracker](page-tracker/index.qmd) — which topic pages exist and their build status.
+- [Learning Tracker](learning-tracker/index.qmd) — which areas need review, based on quizzes.
