@@ -41,6 +41,15 @@ $callout-color-tip:       $accent-sage;
 $callout-color-important: $accent-terracotta;
 $callout-color-warning:   $accent-ochre;
 
+// ==========================================================================
+// Layout
+// ==========================================================================
+// Quarto's docked-sidebar grid (#quarto-content.page-columns) reserves grid
+// track width based on this variable at compile time. It must match the
+// #quarto-sidebar width below, otherwise the sidebar overflows into the main
+// content column at desktop widths (content gets clipped behind the sidebar).
+$grid-sidebar-width: 260px;
+
 /*-- scss:rules --*/
 
 // ==========================================================================
