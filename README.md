@@ -53,4 +53,7 @@ Output is written to `_site/` (not committed).
 
 ## Publishing
 
-*To be finalised once GitHub Actions deployment is set up.*
+Pushing to `main` triggers `.github/workflows/publish.yml`, which renders the
+site with Quarto and deploys `_site/` to GitHub Pages via GitHub Actions.
+Requires the repo's Pages source (Settings > Pages) to be set to
+"GitHub Actions".
