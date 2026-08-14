@@ -11,7 +11,8 @@ learn/       theory, reference notes, worked concepts (Statistics, Machine
              Learning, Mathematics, Data Science, Experimental Design,
              Programming & Computing)
 practise/    worked examples, coding exercises, quizzes
-track/       learning tracker (today's focus, status of all topics)
+track/       page tracker (build status of all topics) and learning tracker
+             (today's focus, review due)
 templates/   standard topic-page template
 styles/      custom SCSS theme
 ```
@@ -44,7 +45,11 @@ Output is written to `_site/` (not committed).
 
 ## Git workflow
 
-*To be finalised in a later phase (commit conventions, branching).*
+- Single `main` branch — no feature branches, this is a personal single-author notebook.
+- Commit directly to `main` after each meaningful, working change (small, frequent commits rather than large batches).
+- Commit messages are short, imperative, and describe what changed (e.g. "Add Mean and Variance topic page").
+- `_site/` and `.quarto/` are never committed (see `.gitignore`); `_freeze/` **is** committed once it exists, so GitHub Actions can publish without re-executing code.
+- Push to the remote only once changes have been previewed locally with `quarto render` or `quarto preview`.
 
 ## Publishing
 
