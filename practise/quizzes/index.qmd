@@ -7,7 +7,9 @@ Short quizzes for checking understanding.
 - [SQL Interview Basics](sql-interview-basics.qmd) — filtering, aggregation,
   joins, NULL, and query interpretation.
 - [SQL Interview: Intermediate Queries](sql-intermediate-queries.qmd) —
-    subqueries, common table expressions (CTEs), set operations, and `EXISTS`.
+  subqueries, common table expressions (CTEs), set operations, and `EXISTS`.
+- [SQL Interview: Window Functions](sql-window-functions.qmd) —
+  ranking, aggregation, and analysis over partitions and frames.
 
 *In a later version, interactive quizzes may move to a separate Astro/Starlight
 application, with this page linking out to it. For now, quizzes live here as

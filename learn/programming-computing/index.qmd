@@ -11,8 +11,8 @@ Planned areas:
 - Python — fundamentals, NumPy, pandas, matplotlib, scikit-learn
 - Structured Query Language (SQL) — [foundations](sql-fundamentals.qmd),
     [aggregation](sql-aggregation.qmd), [joins](sql-joins.qmd),
-    [intermediate queries](sql-intermediate-queries.qmd), common table
-    expressions (CTEs), window functions
+  [intermediate queries](sql-intermediate-queries.qmd),
+  [window functions](sql-window-functions.qmd)
 - Reproducible workflows — targets, project structure, renv, pipeline design
 - Git & GitHub — fundamentals, commits, branches, merge/rebase, pull requests, Actions
 - Command line — shell basics, files, pipes, scripts

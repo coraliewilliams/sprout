@@ -1,0 +1,179 @@
+---
+title: "SQL Window Functions"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Window functions apply operations like ranking, running totals, or offsets to
+rows, partitioned and ordered within a result set, without collapsing rows into
+groups.
+
+## Why does it matter?
+
+Many analysis patterns are awkward or impossible with `GROUP BY`: finding the
+top three orders per customer, calculating a running total by date, or
+comparing each employee to their department average. Window functions make
+these questions straightforward once you understand the partition-order-frame
+recipe.
+
+## Plain-language idea
+
+Imagine ordering the result rows and then placing a sliding window over them.
+The window can focus on a partition (e.g., all orders for one customer) and can
+be ordered (e.g., by date). For each row, the function calculates a result
+using the rows inside the window. The result row itself is not collapsed into a
+group—every input row produces one output row with an additional computed
+value.
+
+## Partition, order, frame
+
+A window function has three components:
+
+```sql
+function() OVER (
+  PARTITION BY column1, column2
+  ORDER BY column3 ASC
+  ROWS BETWEEN 1 PRECEDING AND CURRENT ROW
+)
+```
+
+- `PARTITION BY` divides rows into independent groups (like `GROUP BY` but rows
+  are not collapsed).
+- `ORDER BY` orders rows within each partition. This determines which row is
+  "current" and which rows come before or after.
+- The frame clause (`ROWS`, `RANGE`, `GROUPS`) defines which rows the function
+  sees. Omitting the frame uses a default range that often includes all rows
+  from the partition start to the current row.
+  - `ROWS` uses physical row positions (e.g., 3 rows back).
+  - `RANGE` uses value offsets within the `ORDER BY` column (e.g., within 10
+    units of the current value).
+  - `GROUPS` groups rows by ties in the `ORDER BY` column and frames around
+    those groups.
+
+If `PARTITION BY` is omitted, all rows belong to a single partition. If `ORDER BY`
+is omitted, the frame defaults to all rows in the partition.
+
+## Ranking functions
+
+Common ranking functions are:
+
+- `ROW_NUMBER()` assigns a unique integer to each row within its partition,
+  ordered as specified.
+- `RANK()` assigns the same rank to ties and skips the next rank number.
+- `DENSE_RANK()` assigns the same rank to ties but does not skip.
+- `NTILE(n)` divides the partition into `n` equal-sized buckets.
+
+```sql
+SELECT order_id, customer_id, amount,
+       ROW_NUMBER() OVER (
+         PARTITION BY customer_id
+         ORDER BY amount DESC
+       ) AS rn,
+       RANK() OVER (
+         PARTITION BY customer_id
+         ORDER BY amount DESC
+       ) AS rnk
+FROM orders;
+```
+
+`ROW_NUMBER` and `RANK` differ when amounts are tied. For the same amount,
+`RANK` gives the same rank to all three tied rows, then `DENSE_RANK` would
+assign 1, 1, 1, 4 (skipping 2 and 3), and `DENSE_RANK` would assign 1, 1, 1, 2.
+
+## Aggregate functions as windows
+
+Functions like `SUM`, `AVG`, and `COUNT` become window functions when followed
+by `OVER`. Unlike `GROUP BY`, the row is not removed:
+
+```sql
+SELECT customer_id, amount,
+       SUM(amount) OVER (
+         PARTITION BY customer_id
+       ) AS customer_total,
+       SUM(amount) OVER (
+         PARTITION BY customer_id
+         ORDER BY order_date
+         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+       ) AS running_total
+FROM orders;
+```
+
+The first `SUM` calculates one total per customer (all rows in the partition).
+The second `SUM` uses an explicit frame: from the start of the partition up to
+and including the current row, ordered by date. This is a running total.
+
+## Common frame definitions
+
+- `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — from partition start to
+  current row (common for running totals).
+- `ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING` — a sliding window of the current
+  row and one neighbour on each side.
+- `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` — the entire
+  partition (same as default).
+
+`RANGE` is similar but uses value ranges instead of row offsets. Be cautious:
+if multiple rows have the same date and you specify `RANGE`, the frame often
+includes all rows with that date, which may surprise you.
+
+## Offset functions
+
+`LAG` and `LEAD` return values from other rows in the partition:
+
+```sql
+SELECT order_id, amount,
+       LAG(amount, 1) OVER (
+         PARTITION BY customer_id
+         ORDER BY order_date
+       ) AS previous_amount,
+       LEAD(amount, 1) OVER (
+         PARTITION BY customer_id
+         ORDER BY order_date
+       ) AS next_amount
+FROM orders;
+```
+
+`LAG(column, n)` returns the value of `column` from `n` rows back. `LEAD`
+returns the value from `n` rows ahead. If no such row exists, the result is
+`NULL` (or you can provide a default).
+
+## Common mistakes
+
+- Using a ranking window without an `ORDER BY` clause, producing unpredictable
+  or nondeterministic order.
+- Forgetting that a window function does not collapse rows, so the result has
+  as many rows as the input, not one row per partition.
+- Confusing default frame boundaries. For aggregate functions, the default is
+  `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` (roughly), not all rows.
+- Using `RANGE` when `ROWS` would be clearer, or vice versa, especially when
+  ties or missing values matter.
+- Aggregating across windows at a later stage without being explicit about the
+  grain.
+
+::: {.callout-important}
+For every window function, state the partition, order, and frame clearly.
+If the output has the same grain as the input (one row per input row), you are
+probably not using `GROUP BY`—check whether that is intentional.
+:::
+
+## Key takeaways
+
+- Window functions rank, aggregate, or offset without collapsing rows.
+- `PARTITION BY` groups rows; `ORDER BY` sequences them; the frame defines what
+  the function sees.
+- Ranking functions assign order-based values; aggregate windows compute
+  summaries per partition or frame.
+- Default frames depend on the function and can surprise; use explicit frame
+  clauses.
+- `LAG` and `LEAD` compare each row to its neighbours.
+
+## Related topics
+
+- [SQL Intermediate Queries](sql-intermediate-queries.qmd)
+- [SQL Aggregation and Grouping](sql-aggregation.qmd)
+- [SQL Window Functions Interview](../../practise/quizzes/sql-window-functions.qmd)
