@@ -1,0 +1,162 @@
+---
+title: "SQL Interview: Intermediate Queries"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+Attempt the questions before opening the answer section. These questions test
+whether you can choose an appropriate query shape and predict subtle
+Structured Query Language (SQL) behaviour.
+
+## Questions
+
+### 1. Scalar subquery
+
+You need orders whose amount is greater than the average order amount. Which
+query expresses that question directly?
+
+A.
+
+```sql
+SELECT order_id, amount
+FROM orders
+WHERE amount > (SELECT AVG(amount) FROM orders);
+```
+
+B.
+
+```sql
+SELECT order_id, amount
+FROM orders
+GROUP BY order_id
+HAVING amount > AVG(amount);
+```
+
+C.
+
+```sql
+SELECT order_id, amount
+FROM orders
+WHERE amount > AVG(amount);
+```
+
+D.
+
+```sql
+SELECT order_id, amount
+FROM orders
+WHERE amount IN (SELECT AVG(amount), amount FROM orders);
+```
+
+### 2. Common table expression (CTE) grain
+
+What does the `customer_totals` CTE produce?
+
+```sql
+WITH customer_totals AS (
+  SELECT customer_id, SUM(amount) AS total_amount
+  FROM orders
+  GROUP BY customer_id
+)
+SELECT *
+FROM customer_totals;
+```
+
+A. One row per order  
+B. One row per customer with at least one order  
+C. One row per amount value  
+D. One row for the entire table
+
+### 3. `EXISTS` versus a join
+
+You want each customer listed once if they have at least one paid order. Which
+approach best expresses that requirement without needing `DISTINCT`?
+
+A. `JOIN orders` and select all order columns  
+B. `WHERE EXISTS` with a correlated paid-order subquery  
+C. `CROSS JOIN orders` and filter by status  
+D. `UNION` customers with paid orders
+
+### 4. `NOT IN` and NULL
+
+An analyst writes:
+
+```sql
+SELECT customer_id
+FROM customers
+WHERE customer_id NOT IN (
+  SELECT customer_id
+  FROM orders
+);
+```
+
+The subquery contains at least one `NULL`. What is the main concern?
+
+A. `NOT IN` always ignores `NULL` safely  
+B. The comparison can become unknown, so expected unmatched customers may not
+   be returned  
+C. `NOT IN` returns every customer twice  
+D. The query becomes a many-to-many join
+
+### 5. Set operations
+
+Two queries each return `(customer_id, segment)`. One customer appears in both
+inputs with the same values. Which operation keeps both input rows?
+
+A. `UNION`  
+B. `UNION ALL`  
+C. `INTERSECT`  
+D. `EXCEPT`
+
+### 6. Date and time reasoning
+
+An events table stores timestamps in Coordinated Universal Time (UTC), but the
+business defines a day in the `Australia/Sydney` time zone. What should happen
+before assigning an event to a calendar date?
+
+A. Truncate the raw UTC timestamp and convert later  
+B. Convert the timestamp to the business time zone, then extract or truncate
+   the date  
+C. Ignore the time zone if the timestamp has a date component  
+D. Use `DISTINCT` on the timestamp
+
+### 7. Query design
+
+You need customers whose paid total exceeds 100, then want to attach customer
+names. Which structure is easiest to audit when the total should be calculated
+before the name lookup?
+
+A. A CTE that aggregates paid orders, followed by a join to customers  
+B. A cross join followed by `DISTINCT`  
+C. `UNION ALL` between customers and orders  
+D. A `WHERE` clause containing `SUM(amount)` before grouping
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **A.** The inner query returns one comparison value, the overall average.
+   The outer query then keeps each order above that value.
+2. **B.** `GROUP BY customer_id` creates one summary row for each customer with
+   at least one input order.
+3. **B.** The requirement is a yes/no existence test. `EXISTS` returns each
+   outer customer at most once, regardless of how many paid orders match.
+4. **B.** SQL comparisons involving `NULL` can be unknown rather than true.
+   `NOT EXISTS` is usually safer when the subquery key may contain `NULL`.
+5. **B.** `UNION ALL` preserves duplicates; `UNION` removes duplicate result
+   rows.
+6. **B.** The business timezone defines the calendar boundary, so conversion
+   must happen before date extraction or truncation.
+7. **A.** The CTE makes the intended customer-level aggregate explicit before
+   the dimension lookup, making grain and filtering easier to inspect.
+
+</details>
+
+## Related topic
+
+- [SQL Intermediate Queries](../../learn/programming-computing/sql-intermediate-queries.qmd)

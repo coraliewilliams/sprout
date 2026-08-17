@@ -1,0 +1,233 @@
+---
+title: "SQL Intermediate Queries"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Intermediate SQL uses subqueries, common table expressions, set operations,
+and existence tests to break analytical questions into explicit, testable
+steps.
+
+## Why does it matter?
+
+Real analytical questions rarely fit into one simple `SELECT`. You may need to
+calculate a customer-level summary, filter it, compare two populations, or
+check whether a related event exists. Naming those steps makes the query easier
+to inspect and reduces accidental changes in row grain.
+
+## Plain-language idea
+
+Treat a complex query like a small analysis pipeline. First create a useful
+intermediate result, then use that result in the next step. A subquery puts one
+step inside another query. A common table expression (CTE) gives an intermediate
+step a temporary name. `EXISTS` asks a yes/no question about related rows
+without bringing those rows into the output.
+
+## Subqueries
+
+A subquery is a query nested inside another query. A scalar subquery returns one
+value; a table subquery returns rows and columns that the outer query can use.
+
+To find orders larger than the overall average, first calculate the average and
+then compare each order with it:
+
+```sql
+SELECT order_id, customer_id, amount
+FROM orders
+WHERE amount > (
+  SELECT AVG(amount)
+  FROM orders
+);
+```
+
+The inner query must return one value here. If it returned multiple rows, the
+comparison with `>` would be invalid; use `IN`, `ANY`, or a join when multiple
+values are intended.
+
+A derived table is a table-valued subquery in the `FROM` clause:
+
+```sql
+SELECT customer_id, paid_total
+FROM (
+  SELECT customer_id, SUM(amount) AS paid_total
+  FROM orders
+  WHERE status = 'paid'
+  GROUP BY customer_id
+) AS customer_totals
+WHERE paid_total >= 50;
+```
+
+The inner query produces one row per customer, and the outer query filters
+those summaries. The alias is required in many SQL systems.
+
+## Common table expressions (CTEs)
+
+A CTE is a named temporary result that exists for one statement. It is useful
+when a query has several conceptual stages or when a derived table would be
+difficult to read:
+
+```sql
+WITH customer_totals AS (
+  SELECT customer_id, SUM(amount) AS paid_total
+  FROM orders
+  WHERE status = 'paid'
+  GROUP BY customer_id
+)
+SELECT customer_id, paid_total
+FROM customer_totals
+WHERE paid_total >= 50;
+```
+
+Multiple CTEs make a pipeline visible:
+
+```sql
+WITH paid_orders AS (
+  SELECT *
+  FROM orders
+  WHERE status = 'paid'
+),
+customer_totals AS (
+  SELECT customer_id, SUM(amount) AS paid_total
+  FROM paid_orders
+  GROUP BY customer_id
+)
+SELECT c.name, t.paid_total
+FROM customer_totals AS t
+JOIN customers AS c
+  ON c.customer_id = t.customer_id
+ORDER BY t.paid_total DESC;
+```
+
+A CTE improves organisation, but it is not automatically faster than a
+subquery. The database optimiser decides how the statement is executed, and
+some systems allow or prevent materialisation differently. Use `EXPLAIN` and
+the documentation for performance questions.
+
+## `EXISTS` and correlated subqueries
+
+`EXISTS` asks whether the inner query returns at least one row. It is often the
+clearest choice when the output needs columns from the outer table only:
+
+```sql
+SELECT c.customer_id, c.name
+FROM customers AS c
+WHERE EXISTS (
+  SELECT 1
+  FROM orders AS o
+  WHERE o.customer_id = c.customer_id
+    AND o.status = 'paid'
+);
+```
+
+The inner query refers to `c.customer_id` from the outer query, so this is a
+correlated subquery. Conceptually, the database tests the condition for each
+customer, although the optimiser may execute it more efficiently. Unlike a
+regular join, `EXISTS` does not duplicate a customer because several matching
+orders exist.
+
+`NOT EXISTS` expresses the corresponding anti-join without relying on a
+nullable right-side column:
+
+```sql
+SELECT c.customer_id, c.name
+FROM customers AS c
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM orders AS o
+  WHERE o.customer_id = c.customer_id
+);
+```
+
+For `NOT IN`, a `NULL` in the subquery result can produce surprising unknown
+comparisons. Prefer `NOT EXISTS` when the relationship or nullability is not
+fully controlled.
+
+## `UNION` and `UNION ALL`
+
+Set operations stack compatible result sets vertically. The queries must have
+the same number of columns in corresponding positions, with compatible data
+types.
+
+- `UNION` removes duplicate rows.
+- `UNION ALL` keeps every row and is usually the right choice when the inputs
+  represent separate records or when deduplication is not required.
+
+```sql
+SELECT customer_id, 'paid' AS segment
+FROM orders
+WHERE status = 'paid'
+UNION ALL
+SELECT customer_id, 'pending' AS segment
+FROM orders
+WHERE status = 'pending';
+```
+
+Use `UNION` only when duplicate elimination is part of the question. It can
+hide repeated records and add unnecessary work.
+
+## Dates and strings
+
+Date and string functions vary more across database systems than basic
+`SELECT` syntax. State the intended dialect in production code and check its
+documentation. Common patterns include:
+
+```sql
+-- PostgreSQL-style examples
+SELECT DATE_TRUNC('month', order_date) AS order_month,
+       LOWER(TRIM(region)) AS normalised_region
+FROM orders;
+```
+
+`DATE_TRUNC` groups timestamps at a chosen time boundary. `TRIM` removes
+leading and trailing whitespace, and `LOWER` supports case-normalised matching.
+Other systems may use different names or syntax for date truncation. Time zones
+also matter: truncating a timestamp before converting it to the analysis time
+zone can place an event in the wrong day or month.
+
+## Choosing an approach
+
+- Use a scalar subquery when one comparison value is needed.
+- Use a derived table or CTE when an intermediate table needs its own grain.
+- Use `EXISTS` when the question is whether a related row exists.
+- Use `UNION ALL` when stacking records and preserving duplicates is correct.
+- Use `UNION` only when duplicate removal is intentional.
+- Use multiple CTEs when naming stages makes the query easier to audit; do not
+  assume that more CTEs automatically improve performance.
+
+## Common mistakes
+
+- Writing a scalar comparison against a subquery that returns multiple rows.
+- Forgetting that a CTE exists only for the statement in which it is defined.
+- Using a join when `EXISTS` would avoid duplicate outer rows.
+- Using `NOT IN` when the subquery may contain `NULL`.
+- Using `UNION` when `UNION ALL` is needed to preserve records.
+- Assuming date functions or interval syntax are portable across databases.
+- Treating a CTE as a guaranteed performance optimisation.
+
+::: {.callout-important}
+For every intermediate result, record its intended grain. If a CTE has one row
+per customer, do not join it to another customer-level result without checking
+whether the key is unique on both sides.
+:::
+
+## Key takeaways
+
+- Subqueries and CTEs make multi-step logic explicit.
+- `EXISTS` tests presence without multiplying outer rows.
+- `UNION` removes duplicates; `UNION ALL` preserves them.
+- Date and string functions need dialect and time-zone awareness.
+- Readability improvements are valuable, but query performance still requires
+  an execution plan and database-specific evidence.
+
+## Related topics
+
+- [SQL Foundations](sql-fundamentals.qmd)
+- [SQL Aggregation and Grouping](sql-aggregation.qmd)
+- [SQL Joins](sql-joins.qmd)
+- [SQL Intermediate Query Interview](../../practise/quizzes/sql-intermediate-queries.qmd)
