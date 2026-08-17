@@ -166,8 +166,9 @@ customer, the customer row appears once per matching order. That row
 multiplication is often correct, but it must be understood before calculating
 customer-level totals.
 
-To find customers with no orders, use the left join and test the right-hand
-key:
+To find customers with no orders, use the left join and test a right-hand key
+that is guaranteed to be non-`NULL` for every real order, such as a primary-key
+column:
 
 ```sql
 SELECT c.customer_id, c.name
@@ -228,5 +229,6 @@ and joins can multiply rows. `NULL` needs `IS NULL` or `IS NOT NULL`.
 ## Related topics
 
 - [SQL Interview Basics](../../practise/quizzes/sql-interview-basics.qmd)
-- SQL joins and duplicate rows
+- [SQL Aggregation](sql-aggregation.qmd)
+- [SQL Joins](sql-joins.qmd)
 - SQL window functions

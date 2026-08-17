@@ -1,0 +1,175 @@
+---
+title: "SQL Joins and Row Grain"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+A SQL join combines tables through a matching relationship, and the join type
+and key determine which rows survive and whether rows are multiplied.
+
+## Why does it matter?
+
+Join errors can produce plausible but wrong analytical results. A query may
+run successfully while doubling revenue, dropping customers, or treating a
+many-to-many relationship as if it were one-to-one. The first question after a
+join should be: what does one row now represent?
+
+## Plain-language idea
+
+Think of two lists with a shared identifier. A join looks up matching entries
+and places their information side by side. An inner join keeps only successful
+matches. A left join keeps every item from the first list, even when the second
+list has nothing to contribute. A full join keeps unmatched items from both
+lists, where the missing side is represented by `NULL`.
+
+## Formal mechanics
+
+The `ON` condition defines the matching relationship. The common join types
+are:
+
+| Join | Rows retained |
+|---|---|
+| `INNER JOIN` | Matching rows from both tables only |
+| `LEFT JOIN` | Every left row plus matching right rows |
+| `RIGHT JOIN` | Every right row plus matching left rows |
+| `FULL JOIN` | Every row from either table, matched where possible |
+| `CROSS JOIN` | Every left row paired with every right row |
+
+`FULL JOIN` is standard SQL, but some database systems do not support it
+directly. In those systems, a `UNION` of complementary left-join queries may
+be needed; check the documentation for the database being used.
+
+The row count is governed by match multiplicity. If one left row matches three
+right rows, it produces three joined rows. If three left rows match two right
+rows, the result can contain six combinations for that key.
+
+## Example: customers and orders
+
+The customer table has one row per customer, while the order table has many
+rows per customer. A left join preserves customers with no orders:
+
+```sql
+SELECT c.customer_id, c.name, o.order_id, o.amount
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.customer_id = o.customer_id;
+```
+
+Ana appears once for each of her two orders. A customer with no order appears
+once with `NULL` order columns. The result is therefore at the order grain for
+customers with orders, with a special unmatched row for customers without
+orders; it is not one row per customer.
+
+To keep only matched orders, use an inner join:
+
+```sql
+SELECT c.customer_id, o.order_id, o.amount
+FROM customers AS c
+INNER JOIN orders AS o
+  ON c.customer_id = o.customer_id;
+```
+
+Order 104 is excluded because customer 4 is not present in the displayed
+customer table. This may indicate a legitimate late-arriving customer, a
+referential-integrity problem, or an incomplete extract; do not silently assume
+which explanation is correct.
+
+## Choosing join keys
+
+Join on a key that represents the intended relationship. A key should be
+unique on the side where the data model says it is unique. Joining on a name,
+date, or a non-unique label can create accidental many-to-many matches.
+
+Before joining, check uniqueness:
+
+```sql
+SELECT customer_id, COUNT(*) AS n
+FROM customers
+GROUP BY customer_id
+HAVING COUNT(*) > 1;
+```
+
+An empty result supports uniqueness in the displayed data, but it does not
+prove the rule holds for every future extract.
+
+## Anti-joins and semi-joins
+
+An **anti-join** returns rows with no match. A common SQL pattern is a left join
+followed by an `IS NULL` test on a right-hand key that is guaranteed to be
+non-`NULL` for every real row, such as a primary key:
+
+```sql
+SELECT c.customer_id
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;
+```
+
+A **semi-join** returns rows that have at least one match but does not duplicate
+them once per match. `EXISTS` expresses this intent clearly:
+
+```sql
+SELECT c.customer_id
+FROM customers AS c
+WHERE EXISTS (
+  SELECT 1
+  FROM orders AS o
+  WHERE o.customer_id = c.customer_id
+);
+```
+
+Use `EXISTS` when you need to test whether a related row exists, not to bring
+related columns into the result.
+
+## Many-to-many joins
+
+Suppose an events table has several events per user and a purchases table has
+several purchases per user. Joining both only on `user_id` pairs every event
+with every purchase for that user. A user with two events and three purchases
+creates six rows, so summing purchase revenue after the join counts each
+purchase twice.
+
+Possible repairs include:
+
+1. Aggregate each table to the required grain before joining.
+2. Join through a bridge table when the relationship genuinely has a separate
+   association entity.
+3. Use `EXISTS` when you only need to filter for the presence of a related row.
+4. Validate row counts and totals before and after the join.
+
+## Common mistakes
+
+- Using an inner join when unmatched left rows should be retained.
+- Filtering a right-hand column in `WHERE` after a left join, unintentionally
+  turning it into an inner join.
+- Joining on a label that is not unique.
+- Aggregating after a many-to-many join without accounting for multiplication.
+- Assuming `DISTINCT` repairs incorrect join logic.
+- Selecting a join type before defining the desired output grain.
+
+::: {.callout-important}
+For every join, state the expected relationship: one-to-one, one-to-many, or
+many-to-many. Then test the actual match counts before trusting an aggregate.
+:::
+
+## Key takeaways
+
+- Join type controls which unmatched rows survive; join keys control matches.
+- One-to-many joins multiply the parent row, usually changing the output grain.
+- `EXISTS` is useful for semi-joins, while a left join plus `IS NULL` is a
+  common anti-join pattern.
+- Aggregate before joining when independent one-to-many tables would otherwise
+  create a many-to-many multiplication.
+
+## Related topics
+
+- [SQL Foundations](sql-fundamentals.qmd)
+- [SQL Aggregation and Grouping](sql-aggregation.qmd)
+- SQL window functions

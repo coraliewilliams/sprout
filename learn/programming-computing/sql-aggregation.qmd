@@ -1,0 +1,152 @@
+---
+title: "SQL Aggregation and Grouping"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+SQL aggregation turns detailed rows into summaries, while `GROUP BY` defines
+which rows belong to the same summary group.
+
+## Why does it matter?
+
+Most analytical questions ask for a change in level: total revenue by month,
+average order value by customer, or the number of active users by region. The
+main risk is not remembering function names; it is losing track of what one
+output row represents and which rows were included in the summary.
+
+## Plain-language idea
+
+Imagine placing rows into labelled buckets. `GROUP BY` chooses the labels, and
+`SUM`, `COUNT`, or `AVG` calculates one result for each bucket. `WHERE` removes
+individual rows before they enter the buckets. `HAVING` removes buckets after
+their summaries have been calculated.
+
+## Formal mechanics
+
+Aggregate functions map a set of input values to one value per group:
+
+- `COUNT(*)` counts rows, including rows whose columns contain `NULL`.
+- `COUNT(column)` counts only non-`NULL` values in that column.
+- `SUM(column)` adds non-`NULL` values.
+- `AVG(column)` averages non-`NULL` values.
+- `MIN` and `MAX` return the smallest and largest non-`NULL` values.
+
+Every selected expression must either be aggregated or be compatible with the
+`GROUP BY` columns. This prevents the database from pretending that one value
+represents a group when several values are possible.
+
+## Example: revenue by region
+
+Using the `customers` and `orders` tables from [SQL Foundations](sql-fundamentals.qmd),
+the following query calculates paid revenue by region:
+
+```sql
+SELECT c.region,
+       COUNT(o.order_id) AS paid_orders,
+       SUM(o.amount) AS paid_revenue,
+       AVG(o.amount) AS average_paid_order
+FROM customers AS c
+JOIN orders AS o
+  ON c.customer_id = o.customer_id
+WHERE o.status = 'paid'
+GROUP BY c.region
+ORDER BY c.region;
+```
+
+The result has one row per region represented by a paid order. The `WHERE`
+clause removes pending orders before the groups are formed. `COUNT(o.order_id)`
+counts matched paid orders. If this were changed to a `LEFT JOIN` while keeping
+the right-side filter in `WHERE`, unmatched rows would still be removed before
+aggregation. If the filter moved into the `ON` clause, `COUNT(*)` would count
+the preserved null-extended customer row, whereas `COUNT(o.order_id)` would
+still count only matched orders.
+
+## `WHERE` versus `HAVING`
+
+Use `WHERE` when the question is about individual rows:
+
+```sql
+SELECT customer_id, SUM(amount) AS paid_total
+FROM orders
+WHERE status = 'paid'
+GROUP BY customer_id;
+```
+
+Use `HAVING` when the question is about a calculated group:
+
+```sql
+SELECT customer_id, SUM(amount) AS paid_total
+FROM orders
+WHERE status = 'paid'
+GROUP BY customer_id
+HAVING SUM(amount) >= 50;
+```
+
+The second query first removes non-paid orders, then forms customer groups,
+then keeps only groups whose paid total reaches 50.
+
+## Conditional aggregation
+
+Conditional aggregation answers several related questions in one pass. The
+condition is inside the aggregate rather than in `WHERE`, so rows remain
+available for other summaries:
+
+```sql
+SELECT customer_id,
+       SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS paid_total,
+       SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS pending_total,
+       COUNT(CASE WHEN status = 'paid' THEN 1 END) AS paid_order_count
+FROM orders
+GROUP BY customer_id;
+```
+
+This is especially useful when the result must retain groups with no matching
+rows for one category. Check whether the desired result for an empty category
+is zero, `NULL`, or an absent row; those communicate different meanings.
+
+## Aggregation and `NULL`
+
+Missing values need an explicit interpretation. For values `10`, `NULL`, and
+`20`, `COUNT(*)` is 3, `COUNT(amount)` is 2, and `AVG(amount)` is 15. The
+average is based on the two known amounts, not on treating the missing value as
+zero.
+
+Replacing `NULL` with zero can be appropriate when missing means no activity,
+but it is wrong when missing means unknown. Decide this from the data
+definition, not from convenience.
+
+## Common mistakes
+
+- Filtering rows in `WHERE` when the condition depends on an aggregate; use
+  `HAVING` instead.
+- Using `COUNT(*)` when the question is how many non-missing values exist.
+- Treating missing amounts as zero without checking what `NULL` means.
+- Forgetting that a join can multiply rows before an aggregate runs.
+- Reporting an average without stating its unit of analysis and denominator.
+- Grouping by a label that is not unique, such as a name instead of an ID.
+
+::: {.callout-important}
+Always write down the intended grain first: "one row per customer", "one row
+per region and month", or similar. Then check that the `GROUP BY` columns and
+joins produce that grain.
+:::
+
+## Key takeaways
+
+- `GROUP BY` forms buckets; aggregate functions summarise each bucket.
+- `WHERE` filters rows before aggregation and `HAVING` filters groups after it.
+- Conditional aggregation keeps several categories available in one result.
+- `NULL` handling changes counts, sums, and averages, so its meaning must be
+  decided explicitly.
+
+## Related topics
+
+- [SQL Foundations](sql-fundamentals.qmd)
+- [SQL Joins](sql-joins.qmd)
+- SQL window functions
