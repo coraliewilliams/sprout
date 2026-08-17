@@ -230,4 +230,4 @@ whether the key is unique on both sides.
 - [SQL Foundations](sql-fundamentals.qmd)
 - [SQL Aggregation and Grouping](sql-aggregation.qmd)
 - [SQL Joins](sql-joins.qmd)
-- [SQL Intermediate Query Interview](../../practise/quizzes/sql-intermediate-queries.qmd)
+- [SQL Window Functions](sql-window-functions.qmd)
