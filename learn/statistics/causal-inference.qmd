@@ -1,0 +1,197 @@
+---
+title: "Causal Inference"
+area: "Statistics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-17
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Causal inference asks what would happen to an outcome if a treatment or
+exposure were changed, using assumptions that connect observed data to those
+unobserved counterfactual outcomes.
+
+## Association is not causation
+
+An association describes how outcomes differ across observed exposure groups.
+A causal effect compares outcomes under two different exposure levels for the
+same target population, under a specified intervention or contrast.
+
+For example, people who receive a treatment may differ from untreated people
+in disease severity, access to care, or age. A difference in their observed
+outcomes combines the treatment effect with those pre-treatment differences.
+
+::: {.callout-important}
+The causal question must be stated before choosing an adjustment set or model.
+"Does treatment work?" is incomplete without a population, treatment contrast,
+time horizon, outcome, and estimand.
+:::
+
+## Treatment, outcome, and potential outcomes
+
+### Plain-language view
+
+Imagine copying one person into two versions: in one version they receive the
+treatment, and in the other they do not. The two outcomes are the outcomes we
+would like to compare. In real data, we observe only one version for each
+person, so causal analysis uses study design and assumptions to estimate the
+missing comparison.
+
+### Formal definition
+
+Let $A$ denote treatment or exposure, $Y$ the outcome, and $X$ measured
+pre-treatment covariates. For a binary treatment, $Y^1$ is the outcome a unit
+would have under treatment and $Y^0$ the outcome under no treatment. Only one
+of these is observed for each unit, which is the fundamental problem of causal
+inference.
+
+The individual effect is $Y^1 - Y^0$, but it is not directly observable because
+we cannot observe both potential outcomes for the same unit at the same time.
+Population-level estimands average or otherwise summarise these potential
+outcomes.
+
+## Causal estimands
+
+### Plain-language view
+
+An estimand is the precise quantity a study is trying to learn. It specifies
+whose outcomes are being compared and how the comparison is summarised. The
+average treatment effect asks about the average change if everyone in the
+target population received treatment instead of control. Other estimands focus
+on people who received treatment, people who did not, or particular subgroups.
+
+### Formal definition
+
+The average treatment effect (ATE) is
+
+$$
+\operatorname{ATE} = E[Y^1 - Y^0] = E[Y^1] - E[Y^0].
+$$
+
+Other choices answer different questions:
+
+| Estimand | Question |
+|---|---|
+| Average treatment effect (ATE) | What is the average effect if the whole target population received treatment rather than control? |
+| Average treatment effect among the treated (ATT) | What is the average effect among those who actually received treatment? |
+| Average treatment effect among the controls (ATC) | What is the average effect among those who did not receive treatment? |
+| Conditional average treatment effect (CATE) | How does the effect vary for units with covariates $X=x$? |
+
+For continuous or multi-level exposures, the estimand might be a contrast
+between two doses, a dose-response curve, or an effect per unit increase. For
+time-varying treatment, treatment strategies and longitudinal estimands are
+usually more appropriate than a single treatment indicator.
+
+## Confounding and identification
+
+### Plain-language view
+
+Confounding occurs when a difference in outcomes between treatment groups
+reflects both the treatment and pre-existing differences between the groups.
+If people who receive treatment are systematically different from those who do
+not, their outcome difference may reflect those pre-existing differences rather
+than the treatment. Identification means that, given the study design and
+assumptions, the causal comparison can be recovered from the observed data.
+
+### Formal definition
+
+Confounding occurs when a common cause of treatment and outcome creates a
+non-causal path between them. A standard identification strategy assumes that,
+after conditioning on suitable pre-treatment covariates $X$, treatment is as
+good as random:
+
+$$
+Y^a \perp A \mid X.
+$$
+
+Together with consistency and positivity, this supports the adjustment formula
+
+$$
+E[Y^a] = E_X\{E[Y \mid A=a, X]\}.
+$$
+
+The inner expectation is conditional on covariates; the outer expectation
+averages over the target population's covariate distribution. This distinction
+will matter again when comparing conditional and marginal effects.
+
+### Directed acyclic graphs (DAGs) as a design aid
+
+A DAG is a diagram with arrows that represent assumed causal directions. It is
+useful because it makes the routes by which variables may be related visible
+before a statistical model is fitted.
+
+Formally, a directed acyclic graph (DAG) has directed edges and no directed
+cycle. If $X$ causes both $A$ and $Y$, the path $A \leftarrow X \rightarrow Y$
+is a backdoor path. Conditioning on an appropriate set that blocks all such
+paths can identify the treatment effect.
+
+Do not automatically adjust for every measured variable. Conditioning on a
+mediator can remove part of the effect; conditioning on a collider can create
+an association that was not present. A DAG helps distinguish confounders,
+mediators, colliders, and precision variables.
+
+## What identification does not guarantee
+
+### Plain-language view
+
+Adjusting for measured variables is not a magic conversion from association to
+causation. We need to believe that the relevant confounders were measured,
+that treatment versions are sufficiently comparable, and that every kind of
+person being studied could plausibly have received each treatment.
+
+### Formal assumptions
+
+Adjustment identifies a causal estimand only under assumptions that are partly
+untestable from the observed data:
+
+- **Consistency:** the observed outcome under the received treatment agrees
+  with the corresponding potential outcome, and treatment versions are well
+  defined.
+- **Conditional exchangeability:** no unmeasured confounding remains after
+  conditioning on the chosen covariates.
+- **Positivity:** every relevant covariate pattern has a positive probability
+  of receiving each treatment being compared.
+
+Randomised trials support exchangeability through design. Observational studies
+must defend it using subject-matter knowledge, study design, diagnostics, and
+sensitivity analysis. A well-fitting predictive model does not by itself prove
+causal identification.
+
+## Estimation after identification
+
+### Plain-language view
+
+Once the causal question and assumptions are clear, a statistical method can
+fill in the missing counterfactual comparisons. Different methods make that
+calculation in different ways, but none of them changes the causal question.
+
+### Formal description
+
+Regression adjustment, standardisation, inverse probability weighting,
+doubly-robust estimators, and targeted methods can estimate identified effects.
+The model is a tool for estimating a defined contrast; it does not determine
+the scientific question on its own.
+
+For a nonlinear outcome model, it is especially important to state whether the
+reported result is a coefficient, a contrast at specified covariates, or an
+average of individual predicted contrasts. These are not interchangeable.
+
+## Key takeaways
+
+- Causal effects compare potential outcomes under alternative treatments.
+- ATE, ATT, ATC, and CATE describe different target populations or effect
+  patterns.
+- Confounding adjustment requires assumptions about exchangeability,
+  consistency, and positivity.
+- DAGs help choose variables for adjustment, but do not replace substantive
+  causal knowledge.
+- A model can estimate an effect only after the causal estimand and its
+  identification assumptions have been made explicit.
+
+## Related topics
+
+- [Marginal and Conditional Effects](marginal-and-conditional-effects.qmd)
+- [Mean and Variance](mean-and-variance.qmd)

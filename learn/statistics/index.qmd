@@ -7,6 +7,8 @@ Notes on probability, inference, and statistical modelling.
 Topics:
 
 - [Mean and Variance](mean-and-variance.qmd)
+- [Causal Inference](causal-inference.qmd)
+- [Marginal and Conditional Effects](marginal-and-conditional-effects.qmd)
 
 Planned areas:
 
@@ -15,5 +17,3 @@ Planned areas:
 - Regression — linear models, GLMs, diagnostics
 - Generalised & mixed models
 - Resampling & robust methods — bootstrap, permutation tests
-
-Pages will be added here gradually as topics are written.

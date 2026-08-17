@@ -49,7 +49,7 @@ $callout-color-warning:   $accent-ochre;
 // #quarto-sidebar width below, plus a small gutter — a flush 0px gap causes
 // subpixel rounding to clip the leading character of any wrapped line that
 // starts at the content column's left edge.
-$grid-sidebar-width: 276px; // 260px sidebar + 16px gutter
+$grid-sidebar-width: 300px; // 260px sidebar + 40px desktop gutter
 
 /*-- scss:rules --*/
 

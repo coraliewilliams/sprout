@@ -1,0 +1,268 @@
+---
+title: "Marginal and Conditional Effects"
+area: "Statistics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-17
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+A conditional effect describes a contrast at specified covariate or random-
+effect values, whereas a marginal effect averages the contrast over a target
+population or random-effects distribution.
+
+## Two questions that sound similar
+
+### Plain-language view
+
+Suppose a treatment is being compared across patients or clinics. A conditional
+effect describes the comparison for a specified kind of patient or a specified
+clinic context. A marginal effect describes the average comparison you would
+expect across the population that matters for the decision. Neither is
+automatically more correct; they answer different questions.
+
+### Formal definition
+
+Suppose $A$ is treatment, $Y$ is an outcome, and $X$ are baseline covariates.
+
+- A **conditional effect** asks: what is the treatment contrast for units with
+  a particular $X=x$? It may be written $E[Y \mid A=1,X=x] - E[Y \mid A=0,X=x]$.
+- A **marginal effect** asks: what is the average contrast if treatment were
+  set to 1 rather than 0 across the target population?
+
+For a causal analysis, the marginal contrast is typically obtained by predicting
+each unit under both treatment values and averaging the difference:
+
+$$
+E_X\left[ E(Y \mid A=1,X) - E(Y \mid A=0,X) \right].
+$$
+
+The two questions differ when effects vary with $X$, when the outcome scale is
+nonlinear, or when the target population changes. A coefficient in a regression
+model is not automatically either a causal effect or a marginal effect.
+
+## Linear versus nonlinear models
+
+### Plain-language view
+
+In an ordinary additive linear model, the treatment difference is the same
+amount for everyone, so averaging does not change it. In models for
+probabilities, rates, or other nonlinear outcomes, averaging predictions and
+then taking a difference is generally not the same as taking a model
+coefficient and transforming it. That is why two legitimate summaries can
+have different numerical values.
+
+### Formal explanation
+
+In a linear model with an additive treatment term,
+
+$$
+E[Y \mid A,X] = \beta_0 + \beta_A A + \beta_X X,
+$$
+
+$\beta_A$ is the same difference at every $X$. Under the model, averaging over
+$X$ leaves the difference unchanged, so the conditional and marginal mean
+differences coincide (provided the same target population and estimand are
+being used).
+
+For a logistic model,
+
+$$
+\operatorname{logit}\{P(Y=1 \mid A,X)\} = \beta_0 + \beta_A A + \beta_X X,
+$$
+
+$\beta_A$ is a conditional log-odds ratio. It is not generally the population-
+average risk difference, risk ratio, or odds ratio. Averaging probabilities
+after applying the inverse-logit is different from applying the inverse-logit
+to an averaged linear predictor. This is one form of non-collapsibility: even
+without confounding, marginal and conditional odds ratios can differ.
+
+The same issue appears in other nonlinear generalised linear models (GLMs).
+Always name the outcome scale
+(mean, probability, rate, risk difference, ratio, or log scale) and the
+population over which averaging occurs.
+
+## Mixed models and random effects
+
+### Plain-language view
+
+Measurements from the same clinic or person tend to resemble one another. A
+mixed model represents this by allowing each clinic or person to have its own
+baseline level, while estimating an overall treatment pattern. A
+cluster-specific result describes treatment in the context of a particular
+cluster effect. A population-level result averages or otherwise removes that
+cluster context, depending on the prediction definition.
+
+### Formal explanation
+
+Consider repeated binary outcomes for patients nested in clinics:
+
+$$
+\operatorname{logit}\{P(Y_{ij}=1 \mid A_{ij},X_{ij},b_j)\}
+ = \beta_0 + b_j + \beta_A A_{ij} + \beta_X X_{ij},
+$$
+
+where $b_j$ is a clinic-specific random intercept. The treatment coefficient
+$\beta_A$ describes a treatment log-odds ratio in the conditional model for a
+given covariate pattern and cluster context. Because the random intercept is an
+additive term, it shifts baseline log odds but does not itself change the
+coefficient $\beta_A$. This coefficient is often called a subject-specific,
+cluster-specific, or conditional effect.
+
+A fully population-level prediction integrates over the random-effects
+distribution:
+
+$$
+P(Y=1 \mid A=a,X=x) = \int P(Y=1 \mid A=a,X=x,b)\,dF(b).
+$$
+
+The corresponding average treatment contrast averages predictions under
+$A=1$ and $A=0$ over the target observations and the random-effects
+distribution. It is a population-average effect on the probability scale. In a
+logistic mixed model, it will generally not equal $\beta_A$ transformed into a
+probability difference, because both the inverse-logit and the averaging matter.
+
+Software often offers a related but different shortcut: setting random effects
+to zero in a population-level prediction. That describes an average or typical
+cluster on the model's latent scale; it is not always the same as integrating
+the nonlinear response over the random-effects distribution. Check the
+prediction method's documentation and state which operation was used.
+
+Terminology varies. Some authors use *conditional* for conditioning on fixed
+covariates and use *subject-specific* for conditioning on random effects;
+others use conditional for the full model prediction given both. State exactly
+what is held fixed and what is integrated out.
+
+## Worked example: clinics with different baselines
+
+The code below creates a small repeated-outcome dataset and fits a logistic
+random-intercept model. The random intercept allows clinics to have different
+baseline event rates while estimating a common treatment contrast.
+
+```r
+library(lme4)
+library(marginaleffects)
+
+set.seed(42)
+trial_data <- expand.grid(
+  patient = 1:60,
+  visit = 1:2
+)
+trial_data$clinic <- factor((trial_data$patient - 1) %% 6 + 1)
+trial_data$treatment <- rbinom(nrow(trial_data), 1, 0.5)
+trial_data$age <- rnorm(nrow(trial_data), 55, 10)
+linear_predictor <- -1 + 0.8 * trial_data$treatment +
+  0.02 * (trial_data$age - 55)
+trial_data$improved <- rbinom(
+  nrow(trial_data), 1, plogis(linear_predictor)
+)
+
+fit <- glmer(
+  improved ~ treatment + age + (1 | clinic),
+  data = trial_data,
+  family = binomial
+)
+
+fixef(fit)["treatment"]
+avg_comparisons(
+  fit,
+  variables = "treatment",
+  type = "response",
+  re.form = NA
+)
+```
+
+`fixef(fit)["treatment"]` is the estimated conditional log-odds ratio for
+treatment, conditional on the model structure and for a fixed age profile. It
+is useful when the scientific question concerns a treatment contrast on the
+model's linear-predictor scale for a particular cluster context. The coefficient
+is not itself a risk difference or a population-average probability contrast.
+
+`avg_comparisons(..., type = "response", re.form = NA)` predicts each
+observation under both treatment values on the probability scale, with random
+effects excluded from the prediction, takes the within-observation difference,
+and averages those differences. It targets a fixed-effects population-level
+risk difference for the observed covariate distribution. In `lme4`, `re.form =
+NULL` instead includes estimated random effects for observed clusters, while
+`re.form = NA` sets them to zero; neither option by itself integrates the
+nonlinear response over the random-effects distribution.
+
+An integrated population-average effect requires an additional averaging or
+simulation step over the assumed random-effects distribution. That distinction
+is substantive, not just a software argument.
+
+Representative output might look like this:
+
+```text
+conditional treatment coefficient: 0.82  (log-odds ratio)
+average probability contrast:     0.16  (risk difference)
+```
+
+These numbers are deliberately different scales and estimands. The first says
+how the treatment coefficient changes conditional log odds. The second says
+how much the average predicted probability changes under the treatment
+contrast. The exact treatment of random effects in predictions should be
+checked in the package documentation and stated in the analysis report.
+
+For a binary outcome, an odds ratio may be scientifically less intuitive than a
+risk difference. `marginaleffects` can also report ratios or comparisons at
+chosen ages, allowing the analyst to show both effect heterogeneity and a
+population summary.
+
+::: {.callout-tip}
+Do not describe a conditional log-odds ratio as a population-average risk
+difference. The model, scale, averaging operation, and target population all
+need to be named.
+:::
+
+## Which effect should I report?
+
+Use the estimand that matches the decision or scientific question:
+
+1. Define the intervention, outcome scale, time horizon, and target population.
+2. Report a marginal effect when the question is about expected population
+   impact, policy, service planning, or average change in risk or outcome.
+3. Report a conditional or cluster-specific effect when the question concerns
+   within-cluster comparison, individual prognosis, or how treatment operates
+   after accounting for a particular baseline profile.
+4. If effect modification is scientifically important, report marginal effects
+   for meaningful subgroups or covariate profiles rather than only one overall
+   average.
+5. For mixed models, state whether random effects are conditioned on, set to
+   zero, or integrated over. Give the outcome scale and target population.
+
+There is no universal rule that one effect is the correct one. A strong applied
+report may present both: a model-based conditional parameter for the data-
+generating interpretation and a marginal contrast for practical decisions.
+
+## Common mistakes
+
+- Exponentiating a logistic mixed-model coefficient and calling it a marginal
+  odds ratio without checking the estimand.
+- Averaging predictions instead of averaging contrasts when the desired effect
+  is an average treatment effect.
+- Treating a random effect estimated for an observed cluster as a fixed truth
+  for a new cluster.
+- Comparing effects from different populations or outcome scales as if they
+  answered the same question.
+- Using “conditional” and “marginal” without saying what is conditioned on or
+  averaged over.
+
+## Key takeaways
+
+- Conditional effects hold specified covariates or random effects fixed;
+  marginal effects average over a target distribution.
+- Linear additive mean models can make the two effects numerically coincide;
+  nonlinear links generally do not.
+- Mixed-model coefficients are commonly cluster-specific, while integrated
+  predictions support population-level summaries.
+- Report the estimand, scale, target population, and random-effects treatment,
+  not just the model coefficient.
+
+## Related topics
+
+- [Causal Inference](causal-inference.qmd)
+- Generalised & mixed models
