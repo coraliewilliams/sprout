@@ -1,0 +1,232 @@
+---
+title: "SQL Foundations"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+SQL (Structured Query Language) is a declarative language for selecting,
+filtering, combining, and summarising data stored in relational tables.
+
+## Why does it matter?
+
+Data-science work often begins with data that already lives in a database.
+Good SQL lets you define the analytical dataset clearly, reduce unnecessary
+data movement, and catch row-count and missing-value problems before modelling.
+
+## Core idea
+
+Think of a query as a request for a new table. First decide which rows and
+columns the result should contain; then use filters, sorting, grouping, or
+joins to produce that result. SQL describes the result rather than prescribing
+the exact order in which the database must execute every step.
+
+## A small dataset
+
+The examples use two tables:
+
+`customers`
+
+| customer_id | name | region |
+|---:|---|---|
+| 1 | Ana | East |
+| 2 | Ben | West |
+| 3 | Chen | East |
+
+`orders`
+
+| order_id | customer_id | amount | status |
+|---:|---:|---:|---|
+| 101 | 1 | 40 | paid |
+| 102 | 1 | 25 | pending |
+| 103 | 2 | 80 | paid |
+| 104 | 4 | 15 | paid |
+
+Order 104 has no matching customer in the displayed `customers` table. That
+small imperfection is useful for understanding joins.
+
+## Selecting and filtering
+
+To a person, `SELECT` means "show me these columns" and `WHERE` means "keep
+only rows meeting this condition".
+
+```sql
+SELECT customer_id, name
+FROM customers
+WHERE region = 'East';
+```
+
+| customer_id | name |
+|---:|---|
+| 1 | Ana |
+| 3 | Chen |
+
+`FROM` identifies the source table. An alias gives a table or column a shorter
+name, which becomes especially useful when joining tables:
+
+```sql
+SELECT c.name AS customer_name, o.amount AS order_amount
+FROM customers AS c
+JOIN orders AS o
+  ON c.customer_id = o.customer_id;
+```
+
+`DISTINCT` removes duplicate result rows. In SQL dialects that support it,
+`LIMIT` caps the number of rows returned; other systems use alternatives such
+as `FETCH FIRST` or `TOP`. Neither should be used to hide an unintended join or
+missing ordering.
+
+```sql
+SELECT DISTINCT region
+FROM customers
+ORDER BY region
+LIMIT 2;
+```
+
+Without `ORDER BY`, a database does not promise which rows appear first.
+
+## NULL and CASE
+
+In plain terms, `NULL` means that a value is missing, unknown, or not
+applicable. It is not the same as zero, an empty string, or the text `'NULL'`.
+Because an unknown value cannot be compared normally, use `IS NULL` or
+`IS NOT NULL`:
+
+```sql
+SELECT order_id
+FROM orders
+WHERE status IS NOT NULL;
+```
+
+`CASE` creates a value conditionally, similar to an if/else expression:
+
+```sql
+SELECT order_id,
+       CASE
+         WHEN amount >= 50 THEN 'large'
+         ELSE 'small'
+       END AS order_size
+FROM orders;
+```
+
+Comparisons involving `NULL` evaluate to an unknown logical result, not true.
+This is why `WHERE amount = NULL` does not find missing amounts. In a `WHERE`
+clause, only rows for which the condition is true are kept.
+
+## Aggregation
+
+Aggregation turns many rows into summaries. `COUNT` counts, `SUM` adds,
+`AVG` takes an average, and `MIN` and `MAX` find extremes.
+
+```sql
+SELECT status,
+       COUNT(*) AS number_of_orders,
+       SUM(amount) AS total_amount,
+       AVG(amount) AS average_amount
+FROM orders
+GROUP BY status;
+```
+
+`GROUP BY` defines the groups. `HAVING` filters groups after aggregation,
+whereas `WHERE` filters individual rows before aggregation:
+
+```sql
+SELECT customer_id, SUM(amount) AS paid_total
+FROM orders
+WHERE status = 'paid'
+GROUP BY customer_id
+HAVING SUM(amount) >= 50;
+```
+
+`COUNT(*)` counts rows. `COUNT(amount)` counts only rows where `amount` is
+not `NULL`. This difference is often important in data-quality checks.
+
+## Joins
+
+A join combines rows from tables using a matching condition. An `INNER JOIN`
+keeps only rows with a match on both sides. A `LEFT JOIN` keeps every row from
+the left table and adds matching values from the right table; unmatched right-
+hand values become `NULL`.
+
+```sql
+SELECT c.customer_id, c.name, o.order_id, o.amount
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.customer_id = o.customer_id;
+```
+
+This returns every customer, including customers with no orders. If the left
+table has one row per customer and the right table has many orders per
+customer, the customer row appears once per matching order. That row
+multiplication is often correct, but it must be understood before calculating
+customer-level totals.
+
+To find customers with no orders, use the left join and test the right-hand
+key:
+
+```sql
+SELECT c.customer_id, c.name
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;
+```
+
+## Query thinking order
+
+Although SQL is written starting with `SELECT`, it is useful to reason about a
+query in this conceptual order:
+
+1. `FROM` and `JOIN` determine the rows available.
+2. `WHERE` removes rows.
+3. `GROUP BY` forms groups and aggregate functions summarise them.
+4. `HAVING` removes groups.
+5. `SELECT` chooses and computes output columns.
+6. `DISTINCT` removes duplicate output rows.
+7. `ORDER BY` sorts the final result.
+8. `LIMIT` keeps only the requested number of rows.
+
+The database may use a different physical execution plan for efficiency. The
+logical order helps you predict results and diagnose errors.
+
+## Common mistakes
+
+- Using `= NULL` instead of `IS NULL`.
+- Filtering an aggregate in `WHERE` instead of `HAVING`.
+- Assuming a join preserves one row per entity when the relationship is
+  one-to-many.
+- Using `DISTINCT` to conceal duplicate rows caused by an incorrect join key.
+- Selecting a non-aggregated column that is not included in `GROUP BY`.
+- Assuming a query has a stable order without `ORDER BY`.
+- Treating an `INNER JOIN` and a `LEFT JOIN` as interchangeable.
+
+::: {.callout-important}
+Before trusting an analytical query, check the row count and the unit of
+observation after every join or aggregation. Ask: "What does one output row
+represent?"
+:::
+
+## Remember
+
+::: {.callout-tip}
+`WHERE` filters rows, `GROUP BY` forms summaries, `HAVING` filters summaries,
+and joins can multiply rows. `NULL` needs `IS NULL` or `IS NOT NULL`.
+:::
+
+## Test yourself
+
+- Why might `COUNT(*)` and `COUNT(amount)` return different values?
+- What happens to customers with no orders in an `INNER JOIN` versus a
+  `LEFT JOIN`?
+- Why can adding `DISTINCT` make a query look correct while hiding a join bug?
+
+## Related topics
+
+- [SQL Interview Basics](../../practise/quizzes/sql-interview-basics.qmd)
+- SQL joins and duplicate rows
+- SQL window functions

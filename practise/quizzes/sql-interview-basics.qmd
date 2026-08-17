@@ -1,0 +1,222 @@
+---
+title: "SQL Interview Basics"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+Attempt each question before opening its answer. The questions focus on
+predicting results, spotting bugs, and choosing an analytical approach rather
+than recalling definitions.
+
+## Shared tables
+
+Use these tables for Questions 1--4:
+
+`customers`
+
+| customer_id | region |
+|---:|---|
+| 1 | East |
+| 2 | West |
+| 3 | East |
+
+`orders`
+
+| order_id | customer_id | amount | status |
+|---:|---:|---:|---|
+| 101 | 1 | 40 | paid |
+| 102 | 1 | 25 | pending |
+| 103 | 2 | 80 | paid |
+| 104 | 4 | 15 | paid |
+
+## Questions
+
+### 1. Predict the output
+
+What rows are returned?
+
+```sql
+SELECT c.region, COUNT(*) AS n
+FROM customers AS c
+JOIN orders AS o
+  ON c.customer_id = o.customer_id
+GROUP BY c.region
+ORDER BY c.region;
+```
+
+A. East: 2; West: 1  
+B. East: 1; West: 1  
+C. East: 2; West: 1; missing: 1  
+D. East: 1; West: 2
+
+### 2. Find the bug
+
+An analyst wants customers whose paid order total exceeds 50. What is wrong
+with this query?
+
+```sql
+SELECT customer_id, SUM(amount) AS paid_total
+FROM orders
+WHERE status = 'paid'
+  AND SUM(amount) > 50
+GROUP BY customer_id;
+```
+
+A. `SUM` cannot be used in a query with `GROUP BY`  
+B. The aggregate condition belongs in `HAVING`  
+C. `status` must be in the `GROUP BY` clause  
+D. `WHERE` should be replaced with `ON`
+
+### 3. Reason about NULL
+
+Which query correctly finds customers who have no matching orders?
+
+A.
+
+```sql
+SELECT c.customer_id
+FROM customers AS c
+LEFT JOIN orders AS o ON c.customer_id = o.customer_id
+WHERE o.order_id = NULL;
+```
+
+B.
+
+```sql
+SELECT c.customer_id
+FROM customers AS c
+INNER JOIN orders AS o ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;
+```
+
+C.
+
+```sql
+SELECT c.customer_id
+FROM customers AS c
+LEFT JOIN orders AS o ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;
+```
+
+D.
+
+```sql
+SELECT c.customer_id
+FROM customers AS c
+LEFT JOIN orders AS o ON c.customer_id = o.customer_id
+WHERE c.customer_id IS NULL;
+```
+
+### 4. Choose the safer analytical query
+
+You need one row per customer containing total paid order amount. Which query
+is the best starting point if customers with no paid orders should remain?
+
+A.
+
+```sql
+SELECT c.customer_id, SUM(o.amount) AS paid_total
+FROM customers AS c
+LEFT JOIN orders AS o ON c.customer_id = o.customer_id
+WHERE o.status = 'paid'
+GROUP BY c.customer_id;
+```
+
+B.
+
+```sql
+SELECT c.customer_id,
+       SUM(CASE WHEN o.status = 'paid' THEN o.amount ELSE 0 END) AS paid_total
+FROM customers AS c
+LEFT JOIN orders AS o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id;
+```
+
+C.
+
+```sql
+SELECT c.customer_id, SUM(o.amount) AS paid_total
+FROM customers AS c
+INNER JOIN orders AS o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id;
+```
+
+D.
+
+```sql
+SELECT DISTINCT c.customer_id, o.amount AS paid_total
+FROM customers AS c
+LEFT JOIN orders AS o ON c.customer_id = o.customer_id
+WHERE o.status = 'paid';
+```
+
+### 5. Aggregation and NULL
+
+For this independent scenario, suppose a table has three rows in one group:
+amounts `10`, `NULL`, and `20`. Which result is correct?
+
+A. `COUNT(*) = 2`, `COUNT(amount) = 2`, `AVG(amount) = 15`  
+B. `COUNT(*) = 3`, `COUNT(amount) = 2`, `AVG(amount) = 15`  
+C. `COUNT(*) = 3`, `COUNT(amount) = 3`, `AVG(amount) = NULL`  
+D. `COUNT(*) = 2`, `COUNT(amount) = 3`, `AVG(amount) = 10`
+
+### 6. Choose the right tool
+
+You need the three most recent orders for every customer, while retaining the
+order rows and their dates. Assume the table has `customer_id`, `order_id`, and
+`order_date`. Which approach is most appropriate?
+
+A. `GROUP BY customer_id` with `MAX(order_date)` only  
+B. Calculate `ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY
+   order_date DESC, order_id DESC)` in a subquery or common table expression
+   (CTE), then filter the row number to 3 or less  
+C. `DISTINCT customer_id` with `ORDER BY order_date DESC`  
+D. `COUNT(*) OVER (ORDER BY order_date)`
+
+### 7. Diagnose a many-to-many join
+
+An events table contains multiple rows per user, and a purchases table also
+contains multiple rows per user. An analyst joins them only on `user_id` and
+then sums purchase revenue. What is the main risk?
+
+A. The join will remove users without events  
+B. Each event may pair with each purchase for the same user, multiplying
+   revenue  
+C. `SUM` cannot be used after a join  
+D. The database will automatically deduplicate the result
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **A.** Only orders belonging to a displayed customer are included. The inner
+   join excludes order 104 because customer 4 is absent. Ana
+   contributes two rows to East, and Ben contributes one to West.
+2. **B.** The total must be checked after each customer's orders have been
+   grouped. `WHERE` filters rows before grouping, while `HAVING` filters groups
+   after `SUM(amount)` has been calculated.
+3. **C.** The left join preserves every customer, and an unmatched order key is
+   `NULL`. SQL uses `IS NULL`, not `= NULL`, for this test.
+4. **B.** Customers with no paid orders must remain in the result with a zero
+   total. The conditional aggregation keeps the left join intact and assigns
+   zero to non-paid orders; filtering `o.status` in `WHERE` would remove them.
+5. **B.** Three rows exist, but only two have an amount. `COUNT(*)` counts all
+   rows, while `COUNT(amount)` and `AVG(amount)` ignore the `NULL` amount.
+6. **B.** The required result is the top three complete order rows within each
+   customer. `ROW_NUMBER()` ranks those rows within each customer, and the
+   subquery or CTE makes the rank available for filtering without collapsing
+   the order-level detail. The `order_id` tiebreaker makes equal dates
+   deterministic.
+7. **B.** If a user has two events and three purchases, the join can create six
+   pairs, causing each purchase to be counted once per matching event.
+
+</details>
+
+## Related topic
+
+- [SQL Foundations](../../learn/programming-computing/sql-fundamentals.qmd)

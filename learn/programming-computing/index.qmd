@@ -9,9 +9,8 @@ Planned areas:
 
 - R — fundamentals, data manipulation, functions, iteration, ggplot2, testing
 - Python — fundamentals, NumPy, pandas, matplotlib, scikit-learn
-- SQL — queries, joins, aggregation, CTEs, window functions
+- Structured Query Language (SQL) — [foundations](sql-fundamentals.qmd), joins,
+  aggregation, common table expressions (CTEs), window functions
 - Reproducible workflows — targets, project structure, renv, pipeline design
 - Git & GitHub — fundamentals, commits, branches, merge/rebase, pull requests, Actions
 - Command line — shell basics, files, pipes, scripts
-
-Pages will be added here gradually as topics are written.
