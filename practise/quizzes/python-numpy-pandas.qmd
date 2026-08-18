@@ -1,0 +1,109 @@
+﻿---
+title: "Python Interview: NumPy and pandas"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions cover array
+shape, broadcasting, pandas filtering, grouping, missing values, and joins.
+
+## Questions
+
+### 1. Array shape
+
+What is the shape of `np.array([[1, 2], [3, 4], [5, 6]])`?
+
+A. `(2, 3)`  
+B. `(3, 2)`  
+C. `(6,)`  
+D. `(3, 2, 1)`
+
+### 2. Broadcasting
+
+What does this produce?
+
+```python
+np.array([[1, 2], [3, 4]]) + np.array([10, 100])
+```
+
+A. `[[11, 102], [13, 104]]`  
+B. `[[11, 12], [103, 104]]`  
+C. A `ValueError` because the arrays differ in shape  
+D. `[[10, 100], [10, 100]]`
+
+### 3. pandas filtering
+
+Which expression selects rows where `status` is `paid` and `amount` exceeds 10?
+
+A. `df.loc[(df["status"] == "paid") & (df["amount"] > 10)]`  
+B. `df.loc[df["status"] == "paid" and df["amount"] > 10]`  
+C. `df[df["status"] = "paid"]`  
+D. `df.loc[df["status"] == "paid" or df["amount"] > 10]`
+
+### 4. Grouping grain
+
+If `df.groupby("customer")["amount"].sum()` is run, what does the result contain?
+
+A. One row per original order  
+B. One value per customer  
+C. One value per distinct amount  
+D. The original table plus a total row
+
+### 5. Missing values
+
+`NaN` means "Not a Number" and commonly marks missing numeric data. Before filling
+`NaN` in an amount column with zero, what should you establish?
+
+A. That missing amount means no amount in the domain  
+B. That zero is always the safest replacement  
+C. That every missing value is an error  
+D. That `NaN` is the same as an empty string
+
+### 6. Merge validation
+
+Why use `validate="many_to_one"` when merging orders to customers?
+
+A. It sorts both tables automatically  
+B. It checks that each order matches no more than one customer row  
+C. It removes all duplicate orders  
+D. It fills missing customer rows
+
+### 7. NumPy views
+
+Why use `.copy()` when taking a NumPy slice that you plan to modify independently?
+
+A. A slice may be a view, so changing it can change the original array  
+B. `.copy()` converts all values to strings  
+C. A slice is always read-only  
+D. `.copy()` sorts the array
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **B.** There are three rows and two values per row, so the shape is `(3, 2)`.
+2. **A.** The length-two vector is broadcast across each row: 10 is added to
+   the first column and 100 to the second.
+3. **A.** pandas conditions are elementwise, so use `&` and parenthesize each
+   comparison. `and` and `or` do not express a row-wise pandas filter.
+4. **B.** Grouping by customer produces one aggregate value per customer; the
+   output grain is no longer one row per original order.
+5. **A.** Replacing missing values with zero encodes a domain assumption. Make
+   sure that assumption is correct before changing the data.
+6. **B.** The validation checks that each left-side order matches at most one
+   customer row, protecting against accidental row multiplication.
+7. **A.** NumPy slices commonly share storage with the original array. `.copy()`
+   creates independent data before modification.
+
+</details>
+
+## Related topics
+
+- [Python NumPy Arrays](../../learn/programming-computing/python-numpy.qmd)
+- [Python pandas DataFrames](../../learn/programming-computing/python-pandas.qmd)
+

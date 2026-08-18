@@ -1,0 +1,155 @@
+---
+title: "Python pandas DataFrames"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+pandas provides labelled tabular objects and tools for filtering, transforming,
+combining, and summarising data in Python.
+
+## Why does it matter?
+
+Raw arrays are useful for numerical operations, but data analysis also needs
+column names, row labels, missing-value handling, grouping, and joins. pandas
+adds those table-oriented operations while using NumPy underneath for many
+numerical tasks.
+
+## Plain-language idea
+
+A pandas DataFrame is a table with named columns. A Series is one labelled
+column. Most analysis follows a repeatable flow: inspect the table, select the
+rows and columns needed, transform values, summarise groups, and validate the
+result.
+
+## Creating and inspecting tables
+
+```python
+import pandas as pd
+
+orders = pd.DataFrame({
+    "customer": ["A", "A", "B"],
+    "amount": [10.0, 20.0, 15.0],
+    "status": ["paid", "pending", "paid"],
+})
+
+orders.head()
+orders.info()
+orders.describe()
+```
+
+`head` previews rows, `info` shows columns and missingness, and `describe`
+provides summary statistics for numeric columns. Inspect before transforming so
+that assumptions about types and missing values are visible.
+
+## Selecting and filtering
+
+Select one column as a Series or several columns as a DataFrame:
+
+```python
+amounts = orders["amount"]
+small_table = orders[["customer", "amount"]]
+paid = orders.loc[orders["status"] == "paid", ["customer", "amount"]]
+```
+
+Use `.loc` for label-based row and column selection. Use `.iloc` when positions,
+rather than labels, are the intended rule. Parenthesize each condition when
+combining filters:
+
+```python
+paid_large = orders.loc[
+    (orders["status"] == "paid") & (orders["amount"] > 10)
+]
+```
+
+Use `&`, `|`, and `~` for elementwise pandas conditions, not Python's `and`,
+`or`, and `not`.
+
+## Transforming columns
+
+Create derived columns with vectorized expressions:
+
+```python
+orders["amount_with_tax"] = orders["amount"] * 1.1
+orders["customer"] = orders["customer"].str.strip().str.upper()
+```
+
+Avoid row-by-row `apply` when a built-in vectorized operation expresses the rule.
+Built-in operations are often clearer and faster, and they handle aligned
+indices more predictably.
+
+## Grouping and aggregation
+
+`groupby` splits rows into groups, applies an aggregate, and combines the
+results:
+
+```python
+revenue = (
+    orders.loc[orders["status"] == "paid"]
+    .groupby("customer", as_index=False)["amount"]
+    .sum()
+    .rename(columns={"amount": "paid_revenue"})
+)
+```
+
+The result has one row per customer with at least one paid order. State the
+resulting grain explicitly; grouping changes the number of rows.
+
+## Missing values
+
+Inspect missingness before choosing a repair:
+
+```python
+orders.isna().sum()
+orders["amount"] = orders["amount"].fillna(0)
+```
+
+Filling a missing amount with zero means "missing means no amount," which may be
+wrong. Alternatives include retaining missing values, dropping rows under a
+clear rule, or imputing from domain knowledge. Document the choice.
+
+## Combining tables
+
+Use `merge` when matching rows by keys:
+
+```python
+customers = pd.DataFrame({"customer": ["A", "B"], "region": ["East", "West"]})
+joined = orders.merge(customers, on="customer", how="left", validate="many_to_one")
+```
+
+`validate="many_to_one"` checks that each order matches at most one customer.
+This catches duplicate dimension keys that could multiply rows unexpectedly.
+Use `concat` to stack tables with the same columns, and check row counts after
+combining.
+
+## Common mistakes
+
+- Filtering with `and` instead of `&` or forgetting parentheses.
+- Chained assignment that may update a temporary view instead of the source.
+- Grouping without checking the output grain or duplicate keys.
+- Filling every missing value with zero without a domain justification.
+- Merging without validating key uniqueness and accidentally multiplying rows.
+
+::: {.callout-important}
+After every filter, group, or merge, check row count, columns, key uniqueness,
+and missing values. A plausible-looking table can still have the wrong grain.
+:::
+
+## Key takeaways
+
+- DataFrames are labelled tables; Series are labelled columns.
+- Inspect before transforming and use `.loc` for explicit selection.
+- Use vectorized operations and parenthesized elementwise filters.
+- Grouping changes the grain; merging can multiply rows.
+- Treat missing-value handling and key validation as analytical decisions.
+
+## Related topics
+
+- [Python NumPy Arrays](python-numpy.qmd)
+- [Python Project Structure](python-project-structure.qmd)
+- [Python Interview: NumPy and pandas](../../practise/quizzes/python-numpy-pandas.qmd)

@@ -6,6 +6,8 @@ Short quizzes for checking understanding.
 
 - [Python Interview: Basics](python-interview-basics.qmd) — virtual
   environments, package management, and testing.
+- [Python Interview: NumPy and pandas](python-numpy-pandas.qmd) — arrays,
+  filtering, grouping, missing values, and table joins.
 - [SQL Interview Basics](sql-interview-basics.qmd) — filtering, aggregation,
   joins, NULL, and query interpretation.
 - [SQL Interview: Intermediate Queries](sql-intermediate-queries.qmd) —
@@ -16,4 +18,5 @@ Short quizzes for checking understanding.
 *In a later version, interactive quizzes may move to a separate Astro/Starlight
 application, with this page linking out to it. For now, quizzes live here as
 simple Quarto pages.*
+
 

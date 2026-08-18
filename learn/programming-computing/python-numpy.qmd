@@ -1,0 +1,141 @@
+﻿---
+title: "Python NumPy Arrays"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+NumPy (Numerical Python) provides fast, multidimensional arrays and operations
+for numerical computing.
+
+## Why does it matter?
+
+Python lists are flexible, but numerical work becomes slow and memory-heavy when
+large calculations run element by element in Python. NumPy arrays store values
+compactly and apply operations to whole arrays, giving scientific and data
+workflows a fast numerical foundation.
+
+## Plain-language idea
+
+A NumPy array is a grid of values with a known shape and data type. Instead of
+writing a loop that adds 10 to every value, you ask NumPy to add 10 to the whole
+array. The operation is expressed once and applied consistently to every
+matching element.
+
+## Creating arrays
+
+```python
+import numpy as np
+
+values = np.array([10, 20, 30])
+zeros = np.zeros((2, 3))
+sequence = np.arange(0, 10, 2)
+```
+
+`array` converts compatible data into an array. `zeros` creates a 2-by-3 array
+of zeros. `arange` creates values from the start up to, but not including, the
+stop value. Check an array's structure with `shape`, `ndim`, and `dtype`:
+
+```python
+values.shape   # (3,)
+values.ndim    # 1
+values.dtype   # an integer dtype
+```
+
+## Vectorized operations
+
+Operations on arrays apply element by element without an explicit Python loop:
+
+```python
+prices = np.array([10.0, 20.0, 30.0])
+with_tax = prices * 1.1
+```
+
+`with_tax` contains `[11.0, 22.0, 33.0]`. This style is called vectorization.
+It is concise and often faster than repeatedly appending to a Python list.
+
+## Indexing and slicing
+
+NumPy uses zero-based indexing, like Python sequences:
+
+```python
+matrix = np.array([[1, 2, 3], [4, 5, 6]])
+first_row = matrix[0, :]
+last_column = matrix[:, -1]
+```
+
+The first expression selects row 0. The second selects every row in the last
+column. Slices usually return a view into the original array, so modifying a
+slice may modify the original data. Use `.copy()` when an independent array is
+needed.
+
+## Shape and broadcasting
+
+Arrays must have compatible shapes for elementwise operations. Broadcasting lets
+NumPy align a smaller shape with a larger one when the dimensions are
+compatible:
+
+```python
+matrix = np.array([[1, 2], [3, 4]])
+offset = np.array([10, 100])
+result = matrix + offset
+```
+
+The offset is applied to each row, producing `[[11, 102], [13, 104]]`. When
+shapes do not align, NumPy raises a `ValueError` rather than silently guessing.
+
+## Aggregation and missing values
+
+```python
+scores = np.array([80, 90, 70])
+mean_score = scores.mean()
+total_score = scores.sum()
+```
+
+`NaN` means "Not a Number" and is commonly used as a marker for missing
+numeric data. For arrays containing `np.nan`, ordinary aggregates may return
+`nan`. Use the `nan*` variants when ignoring missing values is the intended rule:
+
+```python
+scores = np.array([80.0, np.nan, 70.0])
+scores.mean()       # nan
+np.nanmean(scores)  # 75.0
+```
+
+Ignoring missing values is a decision about the analysis, not an automatic
+repair. Record that decision and check how much data is missing.
+
+## Common mistakes
+
+- Mixing arrays with incompatible shapes and assuming broadcasting will work.
+- Confusing an array view with an independent copy.
+- Using `np.nanmean` without checking whether missingness is meaningful.
+- Assuming integer arrays can store fractional results without changing dtype.
+- Replacing every Python loop with vectorization even when the operation is
+  stateful or difficult to read.
+
+::: {.callout-important}
+Before a numerical operation, check the array's shape, dtype, and missing-value
+rule. Most confusing NumPy errors become clearer when those three facts are
+explicit.
+:::
+
+## Key takeaways
+
+- NumPy arrays have a shape and data type.
+- Vectorized operations work across arrays without explicit Python loops.
+- Broadcasting applies compatible smaller shapes across larger arrays.
+- Slices can be views; use `.copy()` when isolation matters.
+- Missing-value aggregates require an explicit rule.
+
+## Related topics
+
+- [Python pandas DataFrames](python-pandas.qmd)
+- [Python Project Structure](python-project-structure.qmd)
+- [Python Interview: NumPy and pandas](../../practise/quizzes/python-numpy-pandas.qmd)
+
