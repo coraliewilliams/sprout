@@ -1,0 +1,151 @@
+﻿---
+title: "Python Error Handling"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Error handling lets a program respond deliberately when an operation cannot
+complete, while preserving useful context for debugging.
+
+## Why does it matter?
+
+Inputs can be missing, files can disappear, and external services can fail. A
+program that ignores errors may produce silently wrong results; one that catches
+everything may hide the real bug. Good error handling distinguishes expected
+recoverable problems from programming defects.
+
+## Plain-language idea
+
+An exception is Python's way of interrupting normal execution to report a
+problem. Code near the operation can catch a specific expected exception,
+recover or explain the problem, and then either continue or raise a clearer
+error. Unexpected defects should remain visible rather than being swallowed.
+
+## Catching specific exceptions
+
+```python
+def parse_count(text):
+    try:
+        return int(text)
+    except ValueError:
+        return None
+```
+
+The `try` block contains the operation that may fail. The `except` block handles
+the specific conversion error. Catching `Exception` broadly here would also
+catch unrelated programming errors and make them harder to diagnose.
+
+## Multiple cases and else
+
+Use separate handlers when different failures need different responses:
+
+```python
+def read_first_line(path):
+    try:
+        with open(path, encoding="utf-8") as file:
+            line = file.readline()
+    except FileNotFoundError:
+        return None
+    except PermissionError as error:
+        raise RuntimeError(f"Cannot read {path}") from error
+    else:
+        return line.rstrip("\n")
+```
+
+The `else` block runs only when the `try` block succeeds. Keeping successful
+processing there limits the code covered by the exception handler.
+
+## Cleanup with finally
+
+Use `finally` for cleanup that must happen whether an operation succeeds or
+fails:
+
+```python
+connection = open_connection()
+try:
+    process(connection)
+finally:
+    connection.close()
+```
+
+A context manager sets up a resource for a block and guarantees cleanup when
+the block exits, including when an exception occurs. Prefer context managers
+such as `with open(...)` when the resource supports one; they make ownership
+clearer.
+
+## Raising useful errors
+
+Raise an exception when a function cannot honour its contract:
+
+```python
+def percentage(part, whole):
+    if whole == 0:
+        raise ValueError("whole must not be zero")
+    return part / whole * 100
+```
+
+Use a specific built-in exception when it describes the problem. Include a
+message that explains the invalid condition, not just that something failed.
+
+## Exception chaining
+
+When translating a low-level error into a domain-level error, use `from` to keep
+the original cause:
+
+```python
+class InvalidAgeError(ValueError):
+    pass
+
+try:
+    value = int(user_text)
+except ValueError as error:
+    raise InvalidAgeError("age must be a whole number") from error
+```
+
+The chained traceback preserves the original diagnostic while presenting a
+clearer message to the caller.
+
+## Logging and boundaries
+
+Handle an exception at the boundary where you can make a useful decision. A
+library function may raise a specific exception; a command-line entry point may
+log it and return a non-zero exit status. Do not both log and re-raise at every
+layer, which can duplicate messages.
+
+Never put secrets, tokens, or full sensitive input values into error messages or
+logs. Record enough context to investigate without exposing private data.
+
+## Common mistakes
+
+- Catching `Exception` or using a bare `except` around an entire program.
+- Returning a default value that makes corrupted data look valid.
+- Ignoring an exception with `pass` without a documented reason.
+- Using `finally` as a place to return a value, which can mask an exception.
+- Raising a vague error without preserving the original cause.
+- Logging private values while trying to diagnose a failure.
+
+::: {.callout-important}
+Catch the narrowest expected exception, make a deliberate recovery decision, and
+let unexpected programming errors remain visible.
+:::
+
+## Key takeaways
+
+- Exceptions interrupt normal execution when an operation fails.
+- Catch specific expected exceptions close to the operation that may fail.
+- Use `else` for success-only processing and `finally` for guaranteed cleanup.
+- Raise clear errors when a function's contract cannot be met.
+- Preserve causes with exception chaining and keep sensitive data out of logs.
+
+## Related topics
+
+- [Python Functions and Iteration](python-functions.qmd)
+- [Python Testing](python-testing.qmd)
+- [Python Interview: Functions and Error Handling](../../practise/quizzes/python-functions-errors.qmd)
+

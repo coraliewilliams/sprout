@@ -1,0 +1,106 @@
+---
+title: "Python Interview: Functions and Error Handling"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions cover function
+interfaces, iteration, generators, exceptions, cleanup, and error boundaries.
+
+## Questions
+
+### 1. Mutable defaults
+
+Why is `items=[]` usually a poor default parameter?
+
+A. Lists cannot be passed to functions  
+B. The same list can be reused and mutated across calls  
+C. Python converts the list to a tuple  
+D. It makes the function recursive
+
+### 2. Return values
+
+What does a function return when it reaches the end without a `return` statement?
+
+A. The last local variable  
+B. `False`  
+C. `None`  
+D. A `ValueError`
+
+### 3. zip behaviour
+
+What happens when `zip([1, 2, 3], ["a", "b"])` is iterated?
+
+A. It raises an error immediately  
+B. It repeats the shorter input  
+C. It stops after the shortest input is exhausted  
+D. It pads the result with `None`
+
+### 4. Specific exceptions
+
+Which handler is the best choice when converting user text to an integer?
+
+A. `except:` around the whole program  
+B. `except Exception:` for every possible problem  
+C. `except ValueError:` around the conversion  
+D. Ignore all conversion errors
+
+### 5. Successful try work
+
+When does an `else` block attached to `try`/`except` run?
+
+A. Always, before `try`  
+B. Only when the `try` block completes without an exception  
+C. Only when an exception is raised  
+D. Only during cleanup
+
+### 6. Guaranteed cleanup
+
+Which construct is intended for cleanup that must happen whether an operation
+succeeds or fails?
+
+A. `else`  
+B. `finally`  
+C. `yield`  
+D. `assert`
+
+### 7. Exception translation
+
+Why use `raise NewError("message") from error`?
+
+A. It deletes the original traceback  
+B. It preserves the original cause while presenting a clearer higher-level error  
+C. It catches every future exception automatically  
+D. It converts the error into a warning
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **B.** Default objects are created when the function is defined. A mutable
+   default can therefore retain changes from an earlier call; use `None` and
+   create a new list inside the function.
+2. **C.** Reaching the end of a function without returning a value returns
+   `None` implicitly.
+3. **C.** `zip` stops at the shortest input by default, so the unmatched third
+   value is not included.
+4. **C.** `int` raises `ValueError` for text that is not a valid integer. Catching
+   that specific expected error avoids hiding unrelated defects.
+5. **B.** The `else` block runs only if the `try` suite completes successfully;
+   it does not run when the handler catches an exception.
+6. **B.** `finally` runs whether the operation succeeds or raises, making it
+   appropriate for cleanup. Context managers are often an even clearer option.
+7. **B.** Exception chaining retains the original traceback and cause while
+   allowing the caller to receive an error that matches the current abstraction.
+
+</details>
+
+## Related topics
+
+- [Python Functions and Iteration](../../learn/programming-computing/python-functions.qmd)
+- [Python Error Handling](../../learn/programming-computing/python-error-handling.qmd)

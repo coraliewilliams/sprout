@@ -1,0 +1,149 @@
+---
+title: "Python Functions and Iteration"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Functions package a named piece of logic with clear inputs and outputs, while
+iteration processes collections without duplicating code.
+
+## Why does it matter?
+
+Repeated code is difficult to fix consistently and hard to test. A focused
+function gives a rule one name, one place to change, and one interface that
+other code can call. Iteration then applies that rule to many values.
+
+## Plain-language idea
+
+Treat a function like a small machine: provide inputs, let it perform one job,
+and receive a result. A good function has a clear purpose, avoids hidden state,
+and does not surprise its caller with unrelated side effects.
+
+## Defining and calling functions
+
+```python
+def area(width, height):
+    return width * height
+
+rectangle_area = area(4, 3)
+```
+
+`def` defines the function. The parameters `width` and `height` name the inputs;
+the `return` statement sends a result back to the caller. Calling a function
+runs its body with the supplied arguments.
+
+## Parameters and defaults
+
+Use keyword arguments when names make a call clearer, and use defaults for
+optional behavior:
+
+```python
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}"
+
+greet("Ada")
+greet("Ada", greeting="Welcome")
+```
+
+Avoid mutable objects such as lists as default values. A default is created once
+when the function is defined, so mutations can persist across calls:
+
+```python
+def add_item(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+```
+
+## Scope and side effects
+
+Variables created inside a function are local by default. Prefer passing data in
+and returning results rather than changing global variables:
+
+```python
+def add_tax(amount, rate):
+    return amount * (1 + rate)
+```
+
+A function that writes a file, sends a request, or changes shared state has a
+side effect. Side effects are sometimes necessary, but keep them explicit and
+separate from pure calculations where practical.
+
+## Iteration patterns
+
+Use a `for` loop when the operation is clearer as a sequence of steps:
+
+```python
+squared = []
+for value in [1, 2, 3]:
+    squared.append(value * value)
+```
+
+A list comprehension expresses the same simple transformation compactly:
+
+```python
+squared = [value * value for value in [1, 2, 3]]
+```
+
+Use `enumerate` when you need both position and value, and `zip` when walking
+through corresponding elements:
+
+```python
+for position, name in enumerate(["Ada", "Grace"], start=1):
+    print(position, name)
+
+for name, score in zip(["Ada", "Grace"], [95, 88]):
+    print(name, score)
+```
+
+`zip` stops when the shortest input is exhausted. If unequal lengths signal bad
+data, check them rather than silently dropping values.
+
+## Generators
+
+A generator produces values one at a time instead of storing the complete result:
+
+```python
+def positive_numbers(values):
+    for value in values:
+        if value > 0:
+            yield value
+```
+
+Generators are useful for large or streaming inputs. They are consumed as you
+iterate, so a generator usually cannot be restarted without creating it again.
+
+## Common mistakes
+
+- Writing one large function that handles unrelated responsibilities.
+- Returning nothing accidentally when a caller expects a value.
+- Using a mutable default argument such as `items=[]`.
+- Hiding important behavior in global variables or unexpected side effects.
+- Using a comprehension for complicated logic that would be clearer as a loop.
+- Assuming `zip` reports unequal input lengths automatically.
+
+::: {.callout-important}
+Give each function one clear job, make its inputs and outputs visible, and keep
+side effects explicit. That makes the function easier to test and reuse.
+:::
+
+## Key takeaways
+
+- Functions give repeated logic a named, testable interface.
+- Parameters, defaults, and return values should be explicit.
+- Avoid mutable defaults and unnecessary global state.
+- Use comprehensions for simple transformations and loops for complex logic.
+- Generators produce values lazily and are useful for large inputs.
+
+## Related topics
+
+- [Python Error Handling](python-error-handling.qmd)
+- [Python Testing](python-testing.qmd)
+- [Python Interview: Functions and Error Handling](../../practise/quizzes/python-functions-errors.qmd)
