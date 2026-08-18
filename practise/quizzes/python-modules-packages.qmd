@@ -1,0 +1,103 @@
+---
+title: "Python Interview: Modules and Packages"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions cover imports,
+packages, module execution, command-line interfaces, and circular dependencies.
+
+## Questions
+
+### 1. Module meaning
+
+What is a Python module?
+
+A. A Python file that can be imported  
+B. Only a compiled executable  
+C. A database table  
+D. A virtual environment folder
+
+### 2. Import side effects
+
+Why use `if __name__ == "__main__":` around command-line behavior?
+
+A. To run the application whenever another module imports it  
+B. To prevent direct-execution behavior from running during import  
+C. To hide all functions from the importer  
+D. To install the package automatically
+
+### 3. Explicit dependencies
+
+Which import makes the origin of `Path` clear and avoids a wildcard namespace?
+
+A. `from pathlib import *`  
+B. `import everything from pathlib`  
+C. `from pathlib import Path`  
+D. `pathlib.*`
+
+### 4. Package import
+
+Given `weather_app/forecast.py` defines `daily_summary`, which is a clear absolute
+import from application code?
+
+A. `from weather_app.forecast import daily_summary`  
+B. `from * import daily_summary`  
+C. `import ../forecast`  
+D. `load weather_app.forecast`
+
+### 5. Wildcard imports
+
+Why are wildcard imports usually discouraged?
+
+A. They make Python unable to import modules  
+B. They obscure dependencies and can overwrite existing names  
+C. They always make programs slower  
+D. They prevent functions from returning values
+
+### 6. Circular imports
+
+What does a circular import often indicate?
+
+A. The code has no dependencies  
+B. Module responsibilities or boundaries may be tangled  
+C. Python has automatically formatted the files  
+D. The package has too many tests
+
+### 7. Command-line parsing
+
+Why keep `argparse` parsing inside a `main()` function?
+
+A. It makes import-time behavior safe and the command-line logic testable  
+B. It prevents users from passing arguments  
+C. It converts arguments into database rows  
+D. It removes the need for a package
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **A.** A module is an importable Python file containing definitions and
+   executable statements.
+2. **B.** The guard runs the command-line behavior when the file is executed
+   directly, but not when another module imports it.
+3. **C.** The explicit import names the source module and the imported object;
+   wildcard imports make dependencies harder to inspect.
+4. **A.** The package-qualified path clearly identifies the module and function.
+5. **B.** Wildcard imports make it unclear where names came from and may overwrite
+   names already defined in the importing module.
+6. **B.** A circular import often means responsibilities should be separated or
+   shared definitions moved to a third module.
+7. **A.** Keeping parsing inside `main()` avoids reading command-line arguments
+   during import and gives the logic a function that can be tested directly.
+
+</details>
+
+## Related topic
+
+- [Python Modules and Packages](../../learn/programming-computing/python-modules-packages.qmd)

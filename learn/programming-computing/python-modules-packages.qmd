@@ -1,0 +1,165 @@
+---
+title: "Python Modules and Packages"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Modules and packages split Python code into reusable units with explicit import
+boundaries, making larger projects easier to understand and maintain.
+
+## Why does it matter?
+
+One large script becomes difficult to test, reuse, and navigate. Modules give
+related functions and classes a home; packages group modules into a coherent
+project namespace. Clear imports make dependencies visible instead of relying on
+whatever happens to be loaded globally.
+
+## Plain-language idea
+
+A module is a Python file that can be imported. A package is a directory that
+organises related modules under a shared name. Importing a module gives your
+code access to its public names without copying the implementation.
+
+## Importing modules
+
+```python
+import math
+
+radius = 3
+area = math.pi * radius**2
+```
+
+`import math` binds the module name `math`; use `math.pi` to access a name in
+that module. Importing the module rather than copying individual names makes the
+origin of `pi` clear.
+
+You can import a specific name or give a module a local alias:
+
+```python
+from pathlib import Path
+import pandas as pd
+```
+
+Use aliases that are conventional and recognisable. Avoid aliases that hide
+where a name came from.
+
+## Module execution and `__name__`
+
+Every module has a `__name__` value. When a file is run directly, its name is
+`"__main__"`; when imported, its name is the package-qualified module name. Use
+the guard to keep command-line behavior out of imports:
+
+```python
+def main():
+    print("Application started")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+This lets another module import `main` or other helpers without starting the
+application as a side effect.
+
+## Packages and absolute imports
+
+A package groups modules beneath a directory:
+
+```text
+src/
+└── weather_app/
+    ├── __init__.py
+    ├── forecast.py
+    └── cli.py
+```
+
+A package-qualified import makes the dependency explicit:
+
+```python
+from weather_app.forecast import daily_summary
+```
+
+In application code, prefer absolute imports from the package name. Relative
+imports such as `from .forecast import daily_summary` can be useful inside a
+package, but they depend on the module being imported as part of that package.
+
+## Public and private conventions
+
+A leading underscore communicates that a name is intended for internal use:
+
+```python
+def _normalise_label(label):
+    return label.strip().lower()
+```
+
+The underscore is a convention, not a security boundary. `__all__` can document
+names intended for wildcard import, but explicit imports are usually clearer:
+
+```python
+from weather_app.forecast import daily_summary
+```
+
+Avoid `from module import *`; it obscures dependencies and can overwrite names.
+
+## Command-line interfaces
+
+The standard-library `argparse` module parses command-line arguments:
+
+```python
+import argparse
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("name")
+    args = parser.parse_args()
+    print(f"Hello, {args.name}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Keeping parsing in `main()` makes the function testable and avoids reading the
+user's command line during import.
+
+## Circular imports
+
+A circular import occurs when module A imports module B while module B imports A.
+It often signals that responsibilities are tangled. Move shared definitions to
+a third module, pass dependencies into functions, or redesign the boundaries
+rather than hiding the problem with import-time tricks.
+
+## Common mistakes
+
+- Using wildcard imports that hide where names came from.
+- Running application work at module import time.
+- Depending on the current working directory instead of package imports.
+- Creating circular imports by mixing unrelated responsibilities.
+- Naming a local file `json.py`, `typing.py`, or another standard-library module
+  and accidentally shadowing it.
+
+::: {.callout-important}
+Keep modules focused, make imports explicit, and ensure importing a module is
+safe: definitions may load, but the application should not unexpectedly run.
+:::
+
+## Key takeaways
+
+- A module is an importable Python file; a package groups related modules.
+- Prefer explicit absolute imports and conventional aliases.
+- Use the `__name__` guard for command-line entry points.
+- Avoid wildcard and circular imports.
+- Keep import-time behavior free of unexpected side effects.
+
+## Related topics
+
+- [Python Project Structure](python-project-structure.qmd)
+- [Python Functions and Iteration](python-functions.qmd)
+- [Python Interview: Modules and Packages](../../practise/quizzes/python-modules-packages.qmd)

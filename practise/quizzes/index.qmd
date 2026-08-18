@@ -10,6 +10,10 @@ Short quizzes for checking understanding.
   filtering, grouping, missing values, and table joins.
 - [Python Interview: Functions and Error Handling](python-functions-errors.qmd) —
   function interfaces, iteration, exceptions, and cleanup.
+- [Python Interview: Modules and Packages](python-modules-packages.qmd) — imports,
+  package boundaries, and command-line entry points.
+- [Python Interview: Command-Line Workflows](python-cli-workflows.qmd) — exit
+  statuses, logging, configuration, and reproducible commands.
 - [Python Interview: Visualisation and Machine Learning](python-visualisation-ml.qmd) —
   chart choice, metrics, validation, and leakage.
 - [SQL Interview Basics](sql-interview-basics.qmd) — filtering, aggregation,
@@ -22,6 +26,7 @@ Short quizzes for checking understanding.
 *In a later version, interactive quizzes may move to a separate Astro/Starlight
 application, with this page linking out to it. For now, quizzes live here as
 simple Quarto pages.*
+
 
 
 

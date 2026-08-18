@@ -1,0 +1,146 @@
+﻿---
+title: "Python Command-Line Workflows"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+A disciplined command-line workflow makes Python programs easy to run,
+diagnose, automate, and integrate with other tools.
+
+## Why does it matter?
+
+A script that only works from one directory or requires undocumented manual
+steps is difficult to reproduce. Clear commands, exit statuses, logging, and
+configuration boundaries let people and automation run the same program
+reliably.
+
+## Plain-language idea
+
+Treat a command-line program as a small service: it accepts explicit inputs,
+performs a known action, reports useful results, and signals success or failure.
+Keep user-facing output separate from diagnostic logs and document the command
+in the project README.
+
+## Exit statuses
+
+A command should return a successful exit status when it completes and a
+non-zero status when it fails. Python's `sys.exit` can signal failure:
+
+```python
+import sys
+
+
+def main():
+    try:
+        run_job()
+    except RuntimeError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+`stdout` (standard output) is normally for results, while `stderr` (standard
+error) is for diagnostics. Separating them lets a shell pipeline consume
+results without also consuming error messages.
+
+## Logging
+
+The standard-library `logging` module provides levels and consistent formatting:
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+logger.info("Starting import")
+logger.warning("Skipped %d rows", skipped)
+
+try:
+    run_import()
+except RuntimeError:
+    logger.exception("Import failed")
+```
+
+Configure logging at the application boundary, not in an importable library:
+
+```python
+logging.basicConfig(level=logging.INFO)
+```
+
+`logger.exception` includes the current exception traceback and belongs inside
+an exception handler. Avoid logging secrets or complete sensitive records.
+
+## Configuration
+
+Separate stable code from environment-specific values. Command-line arguments,
+environment variables, and configuration files are useful inputs, but define a
+clear precedence rule and validate values at the boundary.
+
+Never put passwords or tokens in source code or command history. Use environment
+variables or a secret-management system, and document safe placeholder names in
+an example file.
+
+## Idempotent jobs
+
+An idempotent job can be run more than once without producing incorrect repeated
+side effects. For example, write output to a known temporary path and replace
+the final file only after the job succeeds. Use stable identifiers and record
+which inputs were processed when duplicate work would be harmful.
+
+Not every operation can be idempotent, but explicitly identifying retries and
+partial failure makes automation safer.
+
+## Reproducible commands
+
+Document the exact setup and commands:
+
+```text
+python -m venv .venv
+python -m pip install -r requirements.txt
+python -m my_project.cli --input data/input.csv
+python -m pytest
+```
+
+Calling `python -m pip` ties pip to the selected interpreter, reducing confusion
+when several Python installations exist. Run commands from the project root or
+make the expected working directory explicit.
+
+## Common mistakes
+
+- Printing errors to standard output instead of standard error.
+- Returning success after a job failed or silently skipped important input.
+- Configuring logging inside a reusable library and overriding the application.
+- Retrying a non-idempotent operation without considering duplicate side effects.
+- Relying on an undocumented current working directory.
+- Putting secrets in command arguments, source code, or logs.
+
+::: {.callout-important}
+A reliable command-line workflow defines inputs, outputs, errors, exit status,
+configuration, and retry behavior. Document the command so another person can
+run it without guessing.
+:::
+
+## Key takeaways
+
+- Use exit statuses to communicate success or failure to automation.
+- Keep results on `stdout` and diagnostics on `stderr`.
+- Configure logging at the application boundary.
+- Validate configuration and keep secrets out of code and logs.
+- Document reproducible commands and consider idempotency before adding retries.
+
+## Related topics
+
+- [Python Modules and Packages](python-modules-packages.qmd)
+- [Python Error Handling](python-error-handling.qmd)
+- [Python Project Structure](python-project-structure.qmd)
+

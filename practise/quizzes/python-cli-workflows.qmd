@@ -1,0 +1,103 @@
+---
+title: "Python Interview: Command-Line Workflows"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions cover exit
+statuses, logging, streams, configuration, reproducibility, and retries.
+
+## Questions
+
+### 1. Exit status
+
+What should a command normally do after an unrecoverable failure?
+
+A. Return a non-zero exit status  
+B. Return success so automation continues  
+C. Print nothing and exit successfully  
+D. Delete its input files
+
+### 2. Output streams
+
+Where should diagnostic error messages normally go?
+
+A. `stdout`  
+B. `stderr`  
+C. A random temporary file  
+D. The Python import cache
+
+### 3. Logging configuration
+
+Where should an application normally configure logging?
+
+A. At the application boundary  
+B. In every imported library  
+C. Inside every function call  
+D. Only after the program exits
+
+### 4. Exception logging
+
+What is special about `logger.exception("Import failed")` inside an exception handler?
+
+A. It includes the current exception traceback  
+B. It retries the import automatically  
+C. It hides all errors  
+D. It writes passwords securely
+
+### 5. Reproducible interpreter
+
+Why use `python -m pip` instead of an unqualified `pip` command?
+
+A. It ties pip to the selected Python interpreter  
+B. It disables package installation  
+C. It always installs globally  
+D. It removes the virtual environment
+
+### 6. Idempotency
+
+What does it mean for a job to be idempotent?
+
+A. Repeating it does not create incorrect repeated side effects  
+B. It must run forever  
+C. It can never fail  
+D. It always deletes previous output
+
+### 7. Secrets
+
+Which practice is safest for a production API token?
+
+A. Put it in source code for easy reuse  
+B. Put it in a log message for diagnosis  
+C. Supply it through a secret-management system or protected environment variable  
+D. Add it to the README
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **A.** A non-zero exit status tells shells and automation that the command
+   failed, so downstream steps can stop or respond.
+2. **B.** `stderr` is intended for diagnostics, while `stdout` can carry clean
+   results into another command.
+3. **A.** The application boundary owns output policy and can configure logging
+   consistently without a reusable library overriding the caller.
+4. **A.** Inside an exception handler, `logger.exception` records the message and
+   the current traceback, which preserves debugging context.
+5. **A.** `python -m pip` uses pip associated with the interpreter selected by
+   `python`, reducing confusion when multiple installations exist.
+6. **A.** Repeating an idempotent job does not introduce incorrect duplicate
+   effects, which makes retries safer.
+7. **C.** Protected environment variables or a secret manager keep credentials out
+   of source, documentation, command history, and ordinary logs.
+
+</details>
+
+## Related topic
+
+- [Python Command-Line Workflows](../../learn/programming-computing/python-cli-workflows.qmd)
