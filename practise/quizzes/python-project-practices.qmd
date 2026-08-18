@@ -1,0 +1,111 @@
+---
+title: "Python Interview: Project Practices"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions cover project
+layout, imports, configuration, and type hints.
+
+## Questions
+
+### 1. Source layout
+
+Where should importable application code usually live in a `src`-layout project?
+
+A. In the project root beside `README.md`  
+B. In `src/<package_name>/`  
+C. In `.git/`  
+D. In the virtual-environment folder
+
+### 2. Import-time side effects
+
+Why put command-line behavior behind `if __name__ == "__main__":`?
+
+A. It makes Python run the module twice  
+B. It prevents the behavior from running when another module imports it  
+C. It converts the module into a package  
+D. It automatically installs dependencies
+
+### 3. Secrets
+
+Which item should normally be excluded from version control?
+
+A. `README.md`  
+B. `.env.example` containing placeholder names  
+C. A file containing a production API token  
+D. `pyproject.toml`
+
+### 4. Type-hint meaning
+
+What does this annotation communicate?
+
+```python
+def total(values: list[float]) -> float:
+    return sum(values)
+```
+
+A. Python will convert every input to a float  
+B. The function is expected to receive a list of floats and return a float  
+C. The function can only be called once  
+D. The function always validates its input at runtime
+
+### 5. Optional values
+
+What is the clearest annotation for a function that returns either a string or
+no value on Python 3.10 or later?
+
+A. `str`  
+B. `str | None`  
+C. `Any`  
+D. `None | str | int`
+
+### 6. Type checking and tests
+
+Which statement best describes static type checking?
+
+A. It replaces all runtime tests  
+B. It inspects annotations and code without executing every path  
+C. It converts Python into a statically typed language at runtime  
+D. It guarantees that external API data is valid
+
+### 7. Project configuration
+
+Where should a modern Python project declare its metadata and dependencies?
+
+A. Only in the developer's shell history  
+B. In `pyproject.toml`  
+C. In `__pycache__/`  
+D. In a generated HTML report
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **B.** The `src/<package_name>/` directory contains the importable package,
+   while tests and project metadata remain separate.
+2. **B.** The guard runs `main()` when the file is executed directly, but not
+   when another module imports it. This prevents unexpected side effects during
+   imports.
+3. **C.** Production tokens are secrets and should stay outside version control.
+   An example file may document variable names with safe placeholder values.
+4. **B.** The annotation describes the intended interface. It does not convert
+   values or enforce runtime validation by itself.
+5. **B.** `str | None` explicitly represents a string or the absence of a value
+   on Python 3.10 and later.
+6. **B.** A static checker examines code and annotations without running every
+   execution path. It complements tests and does not replace runtime validation.
+7. **B.** `pyproject.toml` is the modern standard location for project metadata,
+   dependencies, build settings, and tool configuration.
+
+</details>
+
+## Related topics
+
+- [Python Project Structure](../../learn/programming-computing/python-project-structure.qmd)
+- [Python Type Hints](../../learn/programming-computing/python-type-hints.qmd)

@@ -1,0 +1,156 @@
+---
+title: "Python Type Hints"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Type hints describe the kinds of values functions expect and return, helping
+people and static analysis tools find mistakes before runtime.
+
+## Why does it matter?
+
+Python remains dynamically typed: the interpreter does not require annotations
+to run a function. But a function with unclear inputs and outputs is harder to
+use and refactor. Type hints make the intended interface visible in editors,
+documentation, and code review.
+
+## Plain-language idea
+
+A type hint is a label attached to a value or function. It says, "this function
+expects a list of numbers and returns one number." The label does not usually
+change what Python does at runtime; a type checker can inspect it and warn when
+code uses the interface inconsistently.
+
+## Basic annotations
+
+```python
+def square(value: float) -> float:
+    return value * value
+
+
+def greet(name: str) -> str:
+    return f"Hello, {name}"
+```
+
+The annotations describe the expected argument and return types. They do not
+convert a string to a number and do not automatically validate input.
+
+## Collections and optional values
+
+Use generic collection types to describe their contents:
+
+```python
+from collections.abc import Sequence
+
+
+def average(values: Sequence[float]) -> float:
+    return sum(values) / len(values)
+```
+
+`Sequence[float]` means a sequence whose elements are expected to be floats.
+For a value that may be absent, use `| None`:
+
+```python
+def find_name(user_id: int) -> str | None:
+    if user_id == 1:
+        return "Alice"
+    return None
+```
+
+This syntax requires Python 3.10 or later. On older supported versions, use
+`Optional[str]` from `typing`.
+
+## Type aliases and data structures
+
+A type alias gives a meaningful name to a repeated type:
+
+```python
+type UserId = int
+
+
+def load_user(user_id: UserId) -> str:
+    return "Alice"
+```
+
+The `type` alias syntax requires Python 3.12 or later. For earlier versions,
+write `UserId = int` or use a compatible typing form.
+
+For structured records, `dataclass` combines a clear shape with less boilerplate:
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class User:
+    name: str
+    age: int
+```
+
+## Static checking
+
+A static type checker reads annotations without running the program. Common
+choices include mypy and pyright. A typical check looks like:
+
+```bash
+python -m mypy src
+```
+
+The checker may report that a function can receive `None` even though its body
+uses a string method. Fix the contract or handle the missing value explicitly:
+
+```python
+def upper_name(name: str | None) -> str:
+    return name.upper() if name is not None else ""
+```
+
+Type checking complements tests. Tests execute selected behavior; a checker
+examines many code paths and catches inconsistent interfaces that tests may miss.
+
+## Type hints are not runtime validation
+
+Annotations do not protect a public API by themselves:
+
+```python
+def add_one(value: int) -> int:
+    return value + 1
+
+add_one("1")  # A type checker warns; Python does not enforce the annotation.
+```
+
+Validate untrusted data at the boundary, using explicit checks or a validation
+library, then pass well-defined values into typed application code.
+
+## Common mistakes
+
+- Assuming annotations automatically convert or validate values.
+- Using `Any` everywhere, which removes useful checking.
+- Annotating implementation details while leaving public interfaces unclear.
+- Ignoring `None` even though a function can return it.
+- Running a type checker with a different Python version or configuration from
+  the project.
+
+::: {.callout-important}
+Treat type hints as an interface contract: make public inputs and outputs clear,
+run a checker in development, and still validate untrusted runtime data.
+:::
+
+## Key takeaways
+
+- Type hints document function interfaces and enable static checking.
+- They do not normally change runtime behavior or validate input.
+- Annotate collection contents and explicitly represent optional values.
+- Type checking complements, rather than replaces, tests.
+- Keep checker configuration and supported Python versions consistent.
+
+## Related topics
+
+- [Python Project Structure](python-project-structure.qmd)
+- [Python Testing](python-testing.qmd)
+- [Python Interview: Project Practices](../../practise/quizzes/python-project-practices.qmd)

@@ -1,0 +1,137 @@
+---
+title: "Python Project Structure"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+A consistent Python project structure keeps application code, tests, configuration,
+and documentation easy to find, run, and maintain.
+
+## Why does it matter?
+
+A script can start as one file, but a growing project becomes difficult to test
+or share when code, data, secrets, and generated output are mixed together. A
+predictable layout makes imports clearer, keeps generated files out of version
+control, and gives collaborators an obvious place to add work.
+
+## Plain-language idea
+
+Think of the project directory as a small workspace. Source code lives in one
+area, tests live in another, and temporary or machine-specific files stay out of
+the shared project. The project has one clear entry point and one documented way
+to install dependencies and run tests.
+
+## A practical layout
+
+```text
+my-project/
+├── pyproject.toml
+├── README.md
+├── src/
+│   └── my_project/
+│       ├── __init__.py
+│       └── calculations.py
+├── tests/
+│   └── test_calculations.py
+└── .gitignore
+```
+
+The `src` layout keeps the importable package separate from project metadata.
+The `tests` directory contains automated tests and mirrors the package structure
+where useful. `README.md` explains setup and common commands. `.gitignore`
+excludes virtual environments, caches, secrets, and build output.
+
+## pyproject.toml
+
+`pyproject.toml` is the modern configuration file for Python projects. It can
+describe project metadata, dependencies, build settings, and tool configuration:
+
+```toml
+[project]
+name = "my-project"
+version = "0.1.0"
+dependencies = [
+  "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+```
+
+The exact dependency syntax depends on the packaging tool you choose. Keep the
+project's declared dependencies in this file rather than relying only on a
+machine-specific environment.
+
+## Imports and package boundaries
+
+Use absolute imports from the package name inside application code:
+
+```python
+from my_project.calculations import mean
+```
+
+Keep modules focused. A calculation module should not also open database
+connections, parse command-line arguments, and print reports. Small boundaries
+make units easier to test and replace.
+
+Avoid running substantial work at import time. Put command-line behavior behind
+an explicit function:
+
+```python
+def main():
+    print("Run the application")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Importing the module then defines functions without unexpectedly starting the
+application.
+
+## Configuration and secrets
+
+Commit safe defaults and example configuration, not credentials:
+
+```text
+.env.example
+config.example.toml
+```
+
+Store real secrets outside version control, such as environment variables or a
+secret manager. Add `.env` and local configuration files to `.gitignore`.
+
+## Common mistakes
+
+- Putting tests, generated files, and source code in one directory.
+- Committing `.venv/`, `__pycache__/`, credentials, or large generated output.
+- Relying on the current working directory instead of package imports.
+- Performing database calls or other side effects during module import.
+- Documenting setup in private notes rather than in `README.md`.
+
+::: {.callout-important}
+A good structure answers three questions immediately: where is the source code,
+where are the tests, and how do I install and run the project?
+:::
+
+## Key takeaways
+
+- Separate source code, tests, documentation, and generated files.
+- Use `pyproject.toml` for project metadata and declared dependencies.
+- Keep imports explicit and module responsibilities focused.
+- Put executable behavior behind `main()` and an `if __name__ == "__main__"`
+  guard.
+- Never commit secrets or machine-specific environments.
+
+## Related topics
+
+- [Python Virtual Environments](python-virtual-environments.qmd)
+- [Python Testing](python-testing.qmd)
+- [Python Type Hints](python-type-hints.qmd)
+- [Python Interview: Project Practices](../../practise/quizzes/python-project-practices.qmd)

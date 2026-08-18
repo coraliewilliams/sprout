@@ -1,4 +1,4 @@
----
+﻿---
 title: "Programming & Computing"
 ---
 
@@ -17,3 +17,4 @@ Planned areas:
 - Reproducible workflows — targets, project structure, renv, pipeline design
 - Git & GitHub — fundamentals, commits, branches, merge/rebase, pull requests, Actions
 - Command line — shell basics, files, pipes, scripts
+
