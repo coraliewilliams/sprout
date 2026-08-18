@@ -1,0 +1,131 @@
+﻿---
+title: "Python Data Visualisation"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Data visualisation turns structured data into charts that make patterns,
+comparisons, uncertainty, and unusual observations easier to inspect.
+
+## Why does it matter?
+
+A summary table can hide trends, skew, clusters, and outliers. A chart is not a
+substitute for analysis, but it is a fast way to discover questions and check
+whether a numerical conclusion is plausible.
+
+## Plain-language idea
+
+Choose a chart based on the question. Use a line chart for change over an
+ordered variable, bars for comparing categories, a histogram for the shape of a
+numeric distribution, and a scatter plot for the relationship between two
+numeric variables. Then label the important context so another reader can
+interpret the figure without guessing.
+
+## Matplotlib basics
+
+Matplotlib is a general-purpose plotting library for Python. A figure is the
+overall canvas, and an axes object is the plotting area inside it. The
+object-oriented interface makes both explicit:
+
+```python
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.plot([1, 2, 3], [10, 15, 12], marker="o")
+ax.set_xlabel("Month")
+ax.set_ylabel("Revenue")
+ax.set_title("Monthly revenue")
+fig.tight_layout()
+plt.show()
+```
+
+A figure is the overall canvas; an axes object is the area containing a plot.
+Keep the axes object and use it to set labels, limits, and annotations.
+
+## Common chart choices
+
+- **Line chart** — trends over time or another ordered sequence.
+- **Bar chart** — comparisons across a small number of categories.
+- **Histogram** — distribution of one numeric variable; choose bin widths
+  deliberately.
+- **Scatter plot** — association between two numeric variables; add transparency
+  when many points overlap.
+- **Box plot** — compact comparison of distributions, including median and
+  potential outliers.
+
+Do not choose a chart because it looks impressive. Choose it because its visual
+encoding matches the question.
+
+## Plotting from pandas
+
+A pandas DataFrame can provide named columns to a plotting method:
+
+```python
+import matplotlib.pyplot as plt
+
+orders.plot.scatter(x="amount", y="delivery_days", alpha=0.6)
+plt.xlabel("Order amount")
+plt.ylabel("Delivery days")
+plt.title("Delivery time and order amount")
+plt.show()
+```
+
+For publication or repeated reporting, make labels, units, ordering, and colour
+choices explicit rather than relying on defaults.
+
+## Scales and honest axes
+
+Bar charts usually should start at zero because the bar length encodes magnitude.
+A truncated axis can make small differences look much larger. For line charts,
+a non-zero lower limit may be reasonable when the purpose and scale are clear,
+but label the axis and avoid implying a stronger change than the data support.
+
+Use the same scale when comparing multiple panels. Avoid three-dimensional charts
+and decorative effects that obscure the values.
+
+## Uncertainty and annotation
+
+A point estimate alone can hide uncertainty. Where appropriate, show confidence
+intervals, prediction intervals, error bars, or the number of observations. State
+whether an interval represents sampling uncertainty, measurement variation, or
+something else.
+
+Annotations should explain a meaningful feature, not repeat every value already
+visible in a table. Include units, a useful title, and a source when the data are
+not self-generated.
+
+## Common mistakes
+
+- Using a line chart for unordered categories.
+- Truncating bar-chart axes to exaggerate differences.
+- Omitting units, sample sizes, or a clear legend.
+- Using colour alone to communicate a distinction.
+- Plotting overplotting-heavy scatter data without transparency or aggregation.
+- Treating a visually apparent association as evidence of causation.
+
+::: {.callout-important}
+A good chart answers a named question. Before plotting, write down the variable
+being compared, the unit of observation, and the visual feature the reader
+should inspect.
+:::
+
+## Key takeaways
+
+- Match chart type to the analytical question and variable types.
+- Use explicit figure and axes objects for reproducible plots.
+- Label units, scales, categories, and uncertainty.
+- Keep comparisons honest and avoid decorative distortion.
+- Visual association is a clue for analysis, not proof of causation.
+
+## Related topics
+
+- [Python pandas DataFrames](python-pandas.qmd)
+- [Python NumPy Arrays](python-numpy.qmd)
+- [Python Interview: Visualisation and Machine Learning](../../practise/quizzes/python-visualisation-ml.qmd)
+

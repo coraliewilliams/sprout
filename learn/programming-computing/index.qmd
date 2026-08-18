@@ -10,7 +10,8 @@ Planned areas:
 - R — fundamentals, data manipulation, functions, iteration, ggplot2, testing
 - Python — [virtual environments](python-virtual-environments.qmd),
   [testing](python-testing.qmd), [NumPy arrays](python-numpy.qmd),
-  [pandas DataFrames](python-pandas.qmd)
+  [pandas DataFrames](python-pandas.qmd), [visualisation](python-visualisation.qmd),
+  [machine learning](python-machine-learning.qmd)
 - Structured Query Language (SQL) — [foundations](sql-fundamentals.qmd),
     [aggregation](sql-aggregation.qmd), [joins](sql-joins.qmd),
   [intermediate queries](sql-intermediate-queries.qmd),
@@ -18,5 +19,6 @@ Planned areas:
 - Reproducible workflows — targets, project structure, renv, pipeline design
 - Git & GitHub — fundamentals, commits, branches, merge/rebase, pull requests, Actions
 - Command line — shell basics, files, pipes, scripts
+
 
 

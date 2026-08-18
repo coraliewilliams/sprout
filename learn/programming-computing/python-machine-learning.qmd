@@ -1,0 +1,148 @@
+﻿---
+title: "Python Machine Learning Foundations"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Machine learning uses data to fit a rule that makes predictions or decisions on
+new cases, while evaluation checks whether that rule generalises beyond the
+training data.
+
+## Why does it matter?
+
+A model can fit the examples it has seen and still fail on future data. The
+important skill is not just calling a library function; it is defining the
+prediction target, separating development from evaluation, choosing a useful
+metric, and checking for leakage. Leakage happens when information that should
+be unavailable during training influences the model or its preprocessing.
+
+## Plain-language idea
+
+Imagine showing a model examples with known answers and asking it to learn a
+pattern. Keep some examples hidden until the end. If the model performs well on
+hidden examples, that is evidence it can generalise. If it only performs well on
+the examples used to fit it, it may have memorised rather than learned a useful
+rule.
+
+## Features and target
+
+A supervised learning dataset has:
+
+- **Features** — input variables used to make a prediction.
+- **Target** — the outcome the model is trained to predict.
+
+For example, features might include order amount and delivery distance, while
+the target is delivery time. Keep the target separate from the feature matrix:
+
+```python
+X = orders[["amount", "distance_km"]]
+y = orders["delivery_days"]
+```
+
+`X` conventionally contains features and `y` contains the target. The exact
+names do not matter; keeping the roles explicit does.
+
+## Train, validation, and test data
+
+A training set fits model parameters. A validation set helps choose between
+models or tune settings. A test set is held back for the final estimate after
+those decisions are complete.
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+```
+
+A fixed `random_state` makes a split reproducible. It does not make the split
+representative by itself; consider time, groups, and the data-generating process.
+
+## A first model
+
+Scikit-learn is a machine learning library with a consistent fit/predict API:
+
+```python
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+error = mean_absolute_error(y_test, predictions)
+```
+
+`fit` learns from training data. `predict` produces outputs for new rows.
+`mean_absolute_error` averages the absolute difference between predictions and
+observed values, so lower is better for the same target units.
+
+## Classification metrics
+
+For classification, predictions are categories such as `paid` or `unpaid`.
+Accuracy is the proportion of correct predictions, but it can be misleading
+when one class is much more common. Precision asks, "Of predicted positives,
+how many were positive?" Recall asks, "Of actual positives, how many did we
+find?" Choose based on the cost of false positives and false negatives.
+
+## Pipelines and leakage
+
+Preprocessing must be learned from training data only. A scikit-learn pipeline
+keeps preprocessing and modelling together:
+
+```python
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+pipeline = make_pipeline(StandardScaler(), LogisticRegression())
+pipeline.fit(X_train, y_train)
+predictions = pipeline.predict(X_test)
+```
+
+The scaler learns its means and scales during `fit` on training data. Applying
+preprocessing to the full dataset before splitting can leak information from the
+test set into training and make evaluation too optimistic.
+
+## Cross-validation
+
+Cross-validation repeatedly creates training and validation folds. It provides a
+more stable estimate for model selection than relying on one split, but it does
+not replace a final untouched test set when an unbiased final estimate is needed.
+For grouped or time-ordered data, use a split strategy that respects those
+structures instead of randomly mixing related observations.
+
+## Common mistakes
+
+- Evaluating on the same rows used to fit the model.
+- Choosing a metric without considering class imbalance or decision costs.
+- Scaling or imputing before the train/test split, causing leakage.
+- Randomly splitting repeated measurements from the same person into both sets.
+- Treating a high score as evidence of causation or a useful deployment model.
+
+::: {.callout-important}
+The test set is a final evaluation resource, not a tuning dataset. Decide the
+split, preprocessing, metric, and analysis plan before repeatedly inspecting test
+performance.
+:::
+
+## Key takeaways
+
+- Separate features from the target and define the prediction task clearly.
+- Fit models on training data and evaluate on held-out data.
+- Use metrics that match the outcome and decision costs.
+- Put learned preprocessing inside a pipeline to reduce leakage risk.
+- Respect groups and time when creating validation splits.
+
+## Related topics
+
+- [Python Data Visualisation](python-visualisation.qmd)
+- [Python pandas DataFrames](python-pandas.qmd)
+- [Python Interview: Visualisation and Machine Learning](../../practise/quizzes/python-visualisation-ml.qmd)
+

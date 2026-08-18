@@ -1,0 +1,107 @@
+---
+title: "Python Interview: Visualisation and Machine Learning"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions cover chart
+choice, honest visual encoding, prediction workflows, metrics, and leakage.
+
+## Questions
+
+### 1. Chart choice
+
+Which chart is usually most appropriate for showing a numeric value changing
+over ordered months?
+
+A. Line chart  
+B. Pie chart with 30 slices  
+C. Random scatter plot with no x-axis  
+D. A table with no labels
+
+### 2. Bar-chart axes
+
+Why should a bar chart comparing magnitudes usually start its value axis at zero?
+
+A. To preserve the visual meaning of bar length  
+B. Because all data values are zero-based  
+C. To make every difference look larger  
+D. Because line charts require it
+
+### 3. Feature and target roles
+
+In supervised learning, what is the target?
+
+A. An input variable used to make a prediction  
+B. The outcome the model is trained to predict  
+C. A random seed  
+D. The test-set row count
+
+### 4. Test-set use
+
+When should the held-out test set be used?
+
+A. Repeatedly while tuning every model setting  
+B. For the final estimate after model choices are complete  
+C. To fit preprocessing parameters before splitting  
+D. Instead of training data
+
+### 5. Classification metrics
+
+When a positive prediction triggers an expensive investigation, which metric asks
+how often predicted positives are actually positive?
+
+A. Recall  
+B. Precision  
+C. Accuracy only  
+D. Mean absolute error
+
+### 6. Leakage
+
+Which workflow risks test-set leakage?
+
+A. Fit an imputer inside a pipeline on training folds  
+B. Split first, then fit a scaler on training data only  
+C. Standardise the full dataset before splitting into train and test  
+D. Evaluate predictions on rows not used for fitting
+
+### 7. Grouped data
+
+If several measurements come from the same person, why might a random row-level
+split be inappropriate?
+
+A. It can put related observations in both sets, making performance optimistic  
+B. It always removes the target column  
+C. It prevents any model from fitting  
+D. It guarantees perfect generalisation
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **A.** A line chart connects values across an ordered variable, making change
+   over time easy to inspect.
+2. **A.** Bar length encodes magnitude, so a truncated baseline can exaggerate
+   differences between categories.
+3. **B.** The target is the known outcome used during training and the outcome
+   the model predicts for new cases.
+4. **B.** Keep the test set untouched while selecting and tuning models; use it
+   for a final estimate after those choices are finished.
+5. **B.** Precision is the proportion of predicted positives that are actually
+   positive. Recall instead asks how many actual positives were found.
+6. **C.** Standardising the full dataset allows test-set information to influence
+   the transformation learned before the split, making evaluation optimistic.
+7. **A.** Related measurements can let the model recognise the person rather
+   than generalise to new people. Group-aware splitting avoids that leakage.
+
+</details>
+
+## Related topics
+
+- [Python Data Visualisation](../../learn/programming-computing/python-visualisation.qmd)
+- [Python Machine Learning Foundations](../../learn/programming-computing/python-machine-learning.qmd)
