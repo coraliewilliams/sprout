@@ -1,0 +1,148 @@
+---
+title: "Python Virtual Environments"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Virtual environments isolate Python packages for each project, preventing version
+conflicts and ensuring reproducibility across machines.
+
+## Why does it matter?
+
+Without isolation, installing a package for one project upgrades or downgrades
+a dependency that another project relies on, breaking that project silently.
+Virtual environments sandbox each project's dependencies, so upgrading for
+project A does not affect project B.
+
+## Plain-language idea
+
+A virtual environment is a folder containing a private copy of Python and a
+list of installed packages. When you activate an environment, your shell
+prioritizes that copy and that package list over the system-wide versions. Each
+project gets its own environment; switching projects means switching
+environments and their package versions.
+
+## Creating a virtual environment
+
+The standard library `venv` (virtual environment) module creates lightweight
+virtual environments:
+
+```python
+python -m venv myproject-env
+```
+
+This creates a folder `myproject-env/` with:
+- A Python executable (`bin/python` on Linux/Mac, `Scripts/python.exe` on Windows)
+- A package manager (`bin/pip` or `Scripts/pip.exe`, where `pip` is the Python
+  package installer)
+- A site-packages directory where installed packages live
+
+The folder is self-contained; you can move it or delete it without side effects.
+
+## Activating and deactivating
+
+After creation, activate the environment:
+
+**Linux/Mac:**
+```bash
+source myproject-env/bin/activate
+```
+
+**Windows (PowerShell):**
+```powershell
+myproject-env\Scripts\Activate.ps1
+```
+
+**Windows (Command Prompt):**
+```cmd
+myproject-env\Scripts\activate.bat
+```
+
+The prompt changes to show the environment name, e.g., `(myproject-env) $`.
+Now `python` and `pip` (the Python package installer) refer to the
+environment's copies, not system versions.
+
+To deactivate:
+
+```bash
+deactivate
+```
+
+The prompt returns to normal.
+
+## Installing packages
+
+Inside an activated environment, `pip install` places packages in that
+environment's site-packages:
+
+```bash
+pip install pandas numpy scikit-learn
+```
+
+These packages are visible only inside that environment. Deactivate, activate a
+different environment, and these packages are gone (until you install them there
+too).
+
+## Capturing dependencies
+
+Record which packages and versions your project uses:
+
+```bash
+pip freeze > requirements.txt
+```
+
+This creates a file listing all installed packages and their exact versions:
+
+```
+pandas==2.0.1
+numpy==1.24.2
+scikit-learn==1.2.1
+```
+
+Later, or on another machine, activate a new environment and reinstall:
+
+```bash
+pip install -r requirements.txt
+```
+
+Pip reads the file and installs the same versions, ensuring reproducibility.
+
+## Common mistakes
+
+- **Not using virtual environments** — Installing everything into the system
+  Python, causing version conflicts and making projects non-reproducible.
+- **Forgetting to activate** — Running `python` or `pip` while the system
+  environment is active, polluting global packages.
+- **Sharing the environment folder** — Committing `myproject-env/` to version
+  control instead of just `requirements.txt`. Environments are machine- and
+  platform-specific; only share `requirements.txt`.
+- **Installing without recording** — Using `pip install` but never running
+  `pip freeze > requirements.txt`, so collaborators or future you do not know
+  which packages are needed.
+- **Deleting an environment without backup** — If `requirements.txt` does not
+  exist and you delete the environment folder, the package list is lost.
+
+::: {.callout-important}
+Every Python project should have a virtual environment. Start new projects by
+running `python -m venv project-env`, then immediately create `requirements.txt`
+with `pip freeze`.
+:::
+
+## Key takeaways
+
+- Virtual environments isolate packages per project.
+- `python -m venv env-name` creates a lightweight environment.
+- Activate to use the environment; deactivate to return to system Python.
+- `pip freeze > requirements.txt` records exact versions for reproducibility.
+- Share `requirements.txt`, not the environment folder.
+
+## Related topics
+
+- [Python Testing](python-testing.qmd)
+- [Python Interview: Basics](../../practise/quizzes/python-interview-basics.qmd)

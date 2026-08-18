@@ -4,6 +4,8 @@ title: "Quizzes"
 
 Short quizzes for checking understanding.
 
+- [Python Interview: Basics](python-interview-basics.qmd) — virtual
+  environments, package management, and testing.
 - [SQL Interview Basics](sql-interview-basics.qmd) — filtering, aggregation,
   joins, NULL, and query interpretation.
 - [SQL Interview: Intermediate Queries](sql-intermediate-queries.qmd) —

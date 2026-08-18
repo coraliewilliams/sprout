@@ -1,0 +1,228 @@
+---
+title: "Python Testing"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Automated tests verify that your code behaves as intended, catching bugs early
+and making refactoring safe.
+
+## Why does it matter?
+
+Without tests, you must manually check every function after every change—error-prone and slow. Tests run automatically, in seconds, verifying hundreds of cases
+at once. They also document expected behavior: a test is a concrete example of
+how to use a function and what it should return.
+
+## Plain-language idea
+
+A test is a small program that calls one of your functions with known inputs,
+checks that the output matches what you expect, and reports pass or fail. Write
+tests before or alongside your code. Run them every time you change something.
+If a test fails, you know you broke something and can fix it immediately.
+
+## Test structure
+
+All testing frameworks follow a similar pattern:
+
+1. **Arrange** — Set up data and objects needed for the test.
+2. **Act** — Call the function or method you are testing.
+3. **Assert** — Check that the result matches your expectation.
+
+```python
+def add(a, b):
+    return a + b
+
+def test_add():
+    # Arrange
+    x, y = 2, 3
+    # Act
+    result = add(x, y)
+    # Assert
+    assert result == 5
+```
+
+## unittest: The standard library
+
+Python's built-in `unittest` module (the unit testing framework) provides a
+framework for organizing tests:
+
+```python
+import unittest
+from mymodule import add
+
+class TestAdd(unittest.TestCase):
+    def test_add_positive(self):
+        self.assertEqual(add(2, 3), 5)
+    
+    def test_add_negative(self):
+        self.assertEqual(add(-1, 1), 0)
+    
+    def test_add_floats(self):
+        self.assertAlmostEqual(add(0.1, 0.2), 0.3, places=7)
+
+if __name__ == '__main__':
+    unittest.main()
+```
+
+Run tests with:
+
+```bash
+python -m unittest mymodule_test.py
+```
+
+Or use discovery to find and run all tests:
+
+```bash
+python -m unittest discover
+```
+
+Assertions (e.g., `assertEqual`, `assertTrue`, `assertRaises`) compare expected
+and actual values. If an assertion fails, the test fails and reports why.
+
+## pytest: A simpler alternative
+
+The third-party `pytest` library (a testing framework) simplifies test syntax:
+
+```python
+from mymodule import add
+
+def test_add_positive():
+    assert add(2, 3) == 5
+
+def test_add_negative():
+    assert add(-1, 1) == 0
+
+def test_add_floats():
+    assert abs(add(0.1, 0.2) - 0.3) < 1e-7
+```
+
+Run with:
+
+```bash
+pytest mymodule_test.py
+```
+
+Pytest discovers files named `test_*.py` or `*_test.py`, finds functions named
+`test_*`, and runs them. It is simpler than `unittest` and works well for most
+projects.
+
+## Fixtures and setup
+
+Tests often need shared data or resources. Fixtures set up state before a test
+and clean up afterward:
+
+**unittest approach:**
+
+```python
+class TestDatabase(unittest.TestCase):
+    def setUp(self):
+        # Called before each test
+        self.db = open_database(':memory:')
+    
+    def tearDown(self):
+        # Called after each test
+        self.db.close()
+    
+    def test_insert(self):
+        self.db.insert('users', {'name': 'Alice'})
+        self.assertEqual(self.db.count('users'), 1)
+```
+
+**pytest approach:**
+
+```python
+import pytest
+
+@pytest.fixture
+def db():
+    database = open_database(':memory:')
+    yield database
+    database.close()
+
+def test_insert(db):
+    db.insert('users', {'name': 'Alice'})
+    assert db.count('users') == 1
+```
+
+Pytest fixtures are more flexible and composable; unittest setUp/tearDown
+work at the class level.
+
+## Common test patterns
+
+**Testing exceptions:**
+
+```python
+def test_divide_by_zero():
+    with pytest.raises(ZeroDivisionError):
+        result = 1 / 0
+```
+
+**Testing with multiple inputs:**
+
+```python
+@pytest.mark.parametrize('x,y,expected', [
+    (2, 3, 5),
+    (0, 0, 0),
+    (-1, 1, 0),
+])
+def test_add(x, y, expected):
+    assert add(x, y) == expected
+```
+
+This runs one test per row of data, useful for edge cases.
+
+**Mocking external dependencies:**
+
+```python
+from unittest.mock import patch
+
+@patch('requests.get')
+def test_fetch_data(mock_get):
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.json.return_value = {'key': 'value'}
+    
+    result = fetch_data('http://api.example.com/data')
+    assert result['key'] == 'value'
+```
+
+Mocking replaces external calls (e.g., HTTP requests, database queries) with
+fake responses, so tests run fast and do not depend on external services.
+
+## Common mistakes
+
+- **Testing implementation instead of behavior** — Testing that a function
+  calls a helper function, rather than testing what the user sees. Tests should
+  not break when you refactor internals.
+- **Not testing edge cases** — Writing tests only for happy paths, missing
+  empty lists, negative numbers, None values, or malformed input.
+- **Slow tests** — Using real databases or making real HTTP requests in tests.
+  Use mocks or in-memory databases to keep tests fast.
+- **Brittle tests** — Tests that break with minor changes to output format
+  (e.g., `str(object)` includes a memory address; assert on structure instead).
+- **No test coverage** — Writing tests for only part of your code, leaving bugs
+  hidden in untested paths. Use a coverage tool (`pytest-cov`) to measure.
+
+::: {.callout-important}
+Aim for tests that exercise all code paths and edge cases. A good test suite
+catches bugs before users do.
+:::
+
+## Key takeaways
+
+- Tests verify that code behaves as expected and document usage.
+- Arrange, act, assert: set up inputs, call the function, check the result.
+- `unittest` is built-in; `pytest` is simpler and more flexible.
+- Fixtures set up and tear down shared state.
+- Mock external dependencies to keep tests fast and isolated.
+- Run tests frequently during development.
+
+## Related topics
+
+- [Python Virtual Environments](python-virtual-environments.qmd)
+- [Python Interview: Basics](../../practise/quizzes/python-interview-basics.qmd)

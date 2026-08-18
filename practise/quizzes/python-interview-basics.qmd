@@ -1,0 +1,192 @@
+---
+title: "Python Interview: Basics"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-18
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions test your
+understanding of virtual environments, package management, and testing
+practices.
+
+## Questions
+
+### 1. Virtual environment isolation
+
+You have two projects: ProjectA and ProjectB. ProjectA requires `pandas==1.5.0`,
+and ProjectB requires `pandas==2.0.0`. Without virtual environments, what
+happens when you install both packages using `pip install`?
+
+A. Both versions coexist; Python imports the correct one based on the project directory  
+B. The second install overwrites the first; only one version exists globally  
+C. Pip automatically creates separate directories for each version  
+D. An error is raised; pip refuses to install conflicting versions
+
+### 2. Activating a virtual environment
+
+You create a virtual environment with `python -m venv myenv` on Windows. Which
+command activates it?
+
+A. `myenv/bin/activate`  
+B. `myenv/Scripts/activate.bat` or `myenv/Scripts/Activate.ps1`  
+C. `activate myenv`  
+D. `python myenv`
+
+### 3. Requirements file reproducibility
+
+You run `pip freeze > requirements.txt` and share it with a collaborator. They
+run `pip install -r requirements.txt` on their machine. What is guaranteed?
+
+A. Their machine will have identical Python version and packages  
+B. Their machine will have the same package versions, but not necessarily the same Python version  
+C. Only the packages you explicitly installed are installed; transitive dependencies are not  
+D. All dependencies of those packages are also installed, but versions are not pinned
+
+### 4. unittest vs. pytest structure
+
+Which is a valid pytest test that checks if `3 + 2` equals 5?
+
+A. 
+```python
+class TestAdd(unittest.TestCase):
+    def test_add(self):
+        self.assertEqual(3 + 2, 5)
+```
+
+B.
+```python
+def test_add():
+    assert 3 + 2 == 5
+```
+
+C.
+```python
+def test_add():
+    check 3 + 2 == 5
+```
+
+D.
+```python
+test_add():
+    == 5 (3 + 2)
+```
+
+### 5. Testing edge cases
+
+You write a function that finds the maximum value in a list. Which test case
+is missing from your test suite?
+
+```python
+def max_value(items):
+    return max(items)
+
+def test_max_value_normal():
+    assert max_value([1, 5, 3]) == 5
+```
+
+A. `assert max_value([5]) == 5`  
+B. `assert max_value([]) raises ValueError` (or similar)  
+C. `assert max_value([1, 2, 3]) == 3`  
+D. `assert max_value(None) == None`
+
+### 6. Mocking external dependencies
+
+You write a function that calls an external API. For testing, you want to avoid
+making real HTTP requests. Which approach is correct?
+
+A. Write the test without calling the API; skip the test when the network is down  
+B. Use `unittest.mock.patch` to replace the API call with a fake response  
+C. Test with a local copy of the API data instead  
+D. Require the test environment to have internet access
+
+### 7. The Arrange-Act-Assert pattern
+
+Which of the following correctly follows the Arrange-Act-Assert pattern?
+
+A.
+```python
+def test_user_creation():
+    user = User('Alice')
+    assert user.name == 'Alice'
+    user.set_age(30)
+```
+
+B.
+```python
+def test_user_creation():
+    user = User('Alice')
+    user.set_age(30)
+    assert user.name == 'Alice'
+    assert user.age == 30
+```
+
+C.
+```python
+def test_user_creation():
+    # Arrange
+    name = 'Alice'
+    # Act
+    user = User(name)
+    # Assert
+    assert user.name == 'Alice'
+```
+
+D.
+```python
+def test_user_creation():
+    assert User('Alice').name == 'Alice'
+```
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **B.** Without isolation, packages are installed globally. Installing
+   `pandas==2.0.0` overwrites `pandas==1.5.0` in the same location. Whichever
+   project runs next gets the newly installed version, breaking the other.
+   Virtual environments prevent this by maintaining separate package lists.
+
+2. **B.** On Windows, the activation script is either `myenv/Scripts/activate.bat`
+   (Command Prompt) or `myenv/Scripts/Activate.ps1` (PowerShell). On Linux/Mac,
+   it is `myenv/bin/activate`. The prompt changes to show the active environment
+   name.
+
+3. **B.** `pip install -r requirements.txt` installs the exact versions recorded
+   in the file, ensuring package version reproducibility. However, Python
+   version is independent; the same `requirements.txt` may work with Python 3.9
+   or 3.11 (depending on compatibility). Transitive dependencies (packages
+   required by your packages) are automatically installed by pip; they do not
+   appear in `requirements.txt` unless you explicitly listed them.
+
+4. **B.** Pytest accepts plain `assert` statements without a class wrapper.
+   Option A is unittest syntax. Options C and D are invalid Python. Pytest
+   automatically discovers functions named `test_*` and runs them.
+
+5. **B.** The function calls `max()` on the list. An empty list raises
+   `ValueError: max() arg is an empty sequence`. This edge case is critical; a
+   test should verify the function raises the expected exception (or handles it
+   gracefully, depending on requirements). Option A tests a single-element list
+   (fine, but less critical). Option C is redundant with the "normal" test.
+   Option D is invalid input; lists do not contain `None` in this context.
+
+6. **B.** Use `unittest.mock.patch` to replace the API call with a fake
+   response. This keeps the test fast and independent of external services.
+   Option A skips the test conditionally (unnecessary if you mock). Option C
+   still requires maintaining test data. Option D makes tests fragile and slow.
+
+7. **C.** This test clearly labels each phase: Arrange (set up data), Act (call
+   the function), Assert (check the result). Option A mixes Act and Assert.
+   Option B checks two things after acting on only one; it is harder to know
+   which assertion failed and why. Option D is terse and mixes all phases into
+   one line, reducing readability.
+
+</details>
+
+## Related topic
+
+- [Python Virtual Environments](../../learn/programming-computing/python-virtual-environments.qmd)
+- [Python Testing](../../learn/programming-computing/python-testing.qmd)

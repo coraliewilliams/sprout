@@ -8,7 +8,8 @@ workflows, and version control.
 Planned areas:
 
 - R — fundamentals, data manipulation, functions, iteration, ggplot2, testing
-- Python — fundamentals, NumPy, pandas, matplotlib, scikit-learn
+- Python — [virtual environments](python-virtual-environments.qmd),
+  [testing](python-testing.qmd)
 - Structured Query Language (SQL) — [foundations](sql-fundamentals.qmd),
     [aggregation](sql-aggregation.qmd), [joins](sql-joins.qmd),
   [intermediate queries](sql-intermediate-queries.qmd),
