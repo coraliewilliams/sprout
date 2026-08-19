@@ -14,6 +14,8 @@ Short quizzes for checking understanding.
   package boundaries, and command-line entry points.
 - [Python Interview: Command-Line Workflows](python-cli-workflows.qmd) — exit
   statuses, logging, configuration, and reproducible commands.
+- [Python Interview: Files and Data I/O](python-file-io.qmd) — paths, encodings,
+  CSV, JSON, validation, and safe output.
 - [Python Interview: Visualisation and Machine Learning](python-visualisation-ml.qmd) —
   chart choice, metrics, validation, and leakage.
 - [SQL Interview Basics](sql-interview-basics.qmd) — filtering, aggregation,
@@ -26,6 +28,7 @@ Short quizzes for checking understanding.
 *In a later version, interactive quizzes may move to a separate Astro/Starlight
 application, with this page linking out to it. For now, quizzes live here as
 simple Quarto pages.*
+
 
 
 

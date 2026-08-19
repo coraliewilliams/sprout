@@ -1,0 +1,169 @@
+﻿---
+title: "Python Files and Data I/O"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-19
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Reliable file input and output makes data workflows reproducible by handling
+paths, encodings, formats, validation, and cleanup explicitly.
+
+## Why does it matter?
+
+A script may work on one computer and fail elsewhere because it assumes a
+current directory, uses the wrong encoding, or accepts malformed data without
+checking it. Explicit file handling turns these assumptions into visible,
+testable decisions.
+
+## Plain-language idea
+
+Treat a file as an external boundary: open it deliberately, read or write it
+with a declared format and encoding, validate what came back, and close it when
+done. An encoding describes how stored bytes become text; a context manager
+sets up a resource for a block and closes it when the block exits, including
+after an exception. Keep paths separate from data-processing logic so the same
+code can work with different inputs.
+
+## Paths with pathlib
+
+`pathlib` represents filesystem paths as objects rather than manually joining
+strings:
+
+```python
+from pathlib import Path
+
+project_root = Path(__file__).resolve().parents[2]
+input_path = project_root / "data" / "input.csv"
+
+if not input_path.exists():
+    raise FileNotFoundError(input_path)
+```
+
+The `/` operator joins path components using the platform's rules. Avoid hard-
+coding a Windows-only separator when a project should run on other systems.
+Resolve paths relative to a known project or configuration location, not an
+undocumented current working directory.
+
+## Text files and encodings
+
+Use a context manager and declare the encoding for text:
+
+```python
+from pathlib import Path
+
+path = Path("notes.txt")
+path.write_text("café\n", encoding="utf-8")
+text = path.read_text(encoding="utf-8")
+```
+
+UTF-8 is a common interoperable choice, but the correct encoding depends on the
+source system. A context manager or `Path` convenience method closes the file
+when the operation finishes, including after an exception.
+
+## CSV files
+
+Comma-separated values (CSV) files represent rows and columns as text. Use the
+standard-library `csv` module when you need explicit control:
+
+```python
+import csv
+from pathlib import Path
+
+with Path("orders.csv").open(newline="", encoding="utf-8") as file:
+    reader = csv.DictReader(file)
+    rows = list(reader)
+```
+
+`DictReader` uses the header row as keys. Values are still strings; convert and
+validate numeric or date fields before analysis. Be cautious with empty strings,
+missing columns, and duplicate headers.
+
+## JSON files
+
+JavaScript Object Notation (JSON) represents nested data using objects, arrays,
+strings, numbers, booleans, and null values:
+
+```python
+import json
+from pathlib import Path
+
+config_path = Path("config.json")
+config = json.loads(config_path.read_text(encoding="utf-8"))
+config_path.write_text(
+    json.dumps(config, indent=2) + "\n",
+    encoding="utf-8",
+)
+```
+
+`json.load` and `json.dump` work with open file objects; `loads` and `dumps` work
+with strings. JSON has no native date or set type, so define how those values
+are represented before serialising.
+
+## Writing safely
+
+For important output, write a temporary file and replace the destination only
+when writing succeeds:
+
+```python
+from pathlib import Path
+
+output = Path("results.txt")
+temporary = output.with_suffix(".tmp")
+temporary.write_text("complete result\n", encoding="utf-8")
+temporary.replace(output)
+```
+
+This reduces the chance of leaving a partially written final file after a
+failure. For concurrent programs, use a platform-appropriate atomic-write
+strategy and document the locking assumptions.
+
+## Validate at the boundary
+
+Check required columns, types, ranges, and row counts before analysis:
+
+```python
+required = {"customer", "amount"}
+if not rows:
+    raise ValueError("Input contains no data rows")
+missing = required - set(rows[0])
+if missing:
+    raise ValueError(f"Missing columns: {sorted(missing)}")
+```
+
+Validation should distinguish a genuinely empty file from a malformed file and
+should produce an actionable error. Do not silently discard invalid rows unless
+that policy is explicit and measured.
+
+## Common mistakes
+
+- Building paths from string concatenation or assuming the current directory.
+- Omitting an encoding when reading or writing text.
+- Treating CSV values as typed numbers without conversion and validation.
+- Using `eval` to parse JSON-like input instead of `json.loads`.
+- Overwriting important output directly and leaving partial files after failure.
+- Accepting missing columns or invalid values and discovering the issue later.
+
+::: {.callout-important}
+File I/O is an external boundary. Make the path, encoding, format, validation
+rules, and failure behavior explicit before trusting the data.
+:::
+
+## Key takeaways
+
+- Use `pathlib` for platform-aware paths.
+- Declare text encodings and close files with context managers.
+- Parse CSV and JSON with dedicated libraries, then convert and validate values.
+- Validate schemas at the boundary before analysis.
+- Write important outputs safely and avoid partial final files.
+
+## Related topics
+
+- [Python Command-Line Workflows](python-cli-workflows.qmd)
+- [Python pandas DataFrames](python-pandas.qmd)
+- [Python Interview: Files and Data I/O](../../practise/quizzes/python-file-io.qmd)
+

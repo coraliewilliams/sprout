@@ -1,0 +1,101 @@
+---
+title: "Python Interview: Files and Data I/O"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-19
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions cover paths,
+encodings, CSV, JSON, validation, and safe output.
+
+## Questions
+
+### 1. Filesystem paths
+
+Which tool is designed for platform-aware filesystem paths?
+
+A. String concatenation with `"/"`  
+B. `pathlib.Path`  
+C. `eval`  
+D. `random`
+
+### 2. Text encoding
+
+Why specify `encoding="utf-8"` when reading a text file?
+
+A. It declares how bytes should be decoded into text  
+B. It compresses the file automatically  
+C. It converts every value to JSON  
+D. It prevents the file from closing
+
+### 3. CSV values
+
+After reading a CSV file with `csv.DictReader`, what type are ordinary field values?
+
+A. Always integers  
+B. Always dates  
+C. Strings that may need conversion and validation  
+D. Python functions
+
+### 4. JSON parsing
+
+Which function parses a JSON string into Python objects?
+
+A. `json.loads`  
+B. `json.compile`  
+C. `csv.loads`  
+D. `eval_json`
+
+### 5. File cleanup
+
+Why use a context manager or `Path.read_text()` for file operations?
+
+A. It ensures the file is closed after the operation  
+B. It prevents all parsing errors  
+C. It changes the file into a directory  
+D. It skips encoding decisions
+
+### 6. Boundary validation
+
+When should required columns and value ranges usually be checked?
+
+A. After publishing the final report  
+B. At the input boundary before analysis  
+C. Only if a chart looks unusual  
+D. Never; CSV guarantees a schema
+
+### 7. Safe output
+
+What is a safer pattern for important output files?
+
+A. Truncate the final file before doing any work  
+B. Write a temporary file, then replace the destination after success  
+C. Ignore write errors  
+D. Write output into the input file while reading it
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **B.** `pathlib.Path` joins and inspects paths using platform-aware behavior.
+2. **A.** An encoding defines how stored bytes are decoded as text; declaring it
+   avoids relying on a machine-specific default.
+3. **C.** CSV is a text format. `DictReader` returns field values as strings, so
+   numeric and date columns need explicit conversion and validation.
+4. **A.** `json.loads` parses a JSON string; `json.load` parses an open file.
+5. **A.** Context-managed or convenience file operations close the file after the
+   operation, including when an exception occurs.
+6. **B.** Validate required structure and values before analysis so malformed input
+   fails close to its source with an actionable message.
+7. **B.** A temporary complete file can replace the destination only after writing
+   succeeds, reducing the risk of a partially written final result.
+
+</details>
+
+## Related topic
+
+- [Python Files and Data I/O](../../learn/programming-computing/python-file-io.qmd)
