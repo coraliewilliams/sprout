@@ -1,0 +1,103 @@
+---
+title: "Python Interview: Database Access"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-19
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions cover parameter
+binding, transactions, result shapes, resource cleanup, and test isolation.
+
+## Questions
+
+### 1. Parameter binding
+
+Which approach safely supplies a user-provided name to a SQLite query?
+
+A. `f"... WHERE name = '{name}'"`  
+B. `"... WHERE name = ?"` with `(name,)` passed separately  
+C. `eval(name)`  
+D. Concatenating `str(name)` into the SQL
+
+### 2. SQL injection
+
+Why is string interpolation dangerous in SQL?
+
+A. It treats input as SQL text, allowing unintended syntax or commands  
+B. It always makes queries slower  
+C. It prevents all database connections  
+D. It converts every value to `NULL`
+
+### 3. Transactions
+
+What is the purpose of a transaction around two related updates?
+
+A. It ensures the changes are committed together or rolled back together  
+B. It makes both updates read-only  
+C. It removes the need for error handling  
+D. It guarantees the query is portable to every database
+
+### 4. No matching row
+
+What can `fetchone()` return when no row matches?
+
+A. Always an empty tuple  
+B. `None`  
+C. The previous row  
+D. A successful transaction object
+
+### 5. Large results
+
+Why might `fetchall()` be inappropriate for a very large query result?
+
+A. It can load all rows into memory at once  
+B. It automatically deletes the table  
+C. It disables parameter binding  
+D. It returns only one row
+
+### 6. Driver differences
+
+What should you check before copying placeholder syntax between database drivers?
+
+A. The driver's parameter style and documentation  
+B. The monitor resolution  
+C. The Python file name only  
+D. The number of comments in the query
+
+### 7. Database tests
+
+What is a good practice for testing database code?
+
+A. Use a shared production database  
+B. Use an isolated temporary or in-memory database with the application schema  
+C. Skip all database tests  
+D. Depend on a developer's existing local rows
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **B.** Parameter binding keeps the value separate from SQL text, so the driver
+   treats it as data rather than executable syntax.
+2. **A.** Interpolation can let input alter the query's structure. Binding values
+   prevents ordinary values from becoming SQL commands.
+3. **A.** A transaction groups related changes so a failure does not leave only
+   half of the intended operation committed.
+4. **B.** `fetchone()` commonly returns `None` when no row matches; define that
+   outcome explicitly in the application contract.
+5. **A.** `fetchall()` materialises every row, which can exhaust memory. Iterate
+   or fetch in batches when results may be large.
+6. **A.** Placeholder syntax is driver-specific; follow the selected driver's
+   parameter style rather than assuming SQLite's `?` works everywhere.
+7. **B.** An isolated database makes tests repeatable and prevents accidental
+   reads or writes against shared developer or production data.
+
+</details>
+
+## Related topic
+
+- [Python Database Access](../../learn/programming-computing/python-database-access.qmd)

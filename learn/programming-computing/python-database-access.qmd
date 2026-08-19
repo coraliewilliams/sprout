@@ -1,0 +1,180 @@
+﻿---
+title: "Python Database Access"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-19
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+Reliable Python database access separates SQL from application logic, binds
+parameters safely, manages transactions, and validates the shape of returned
+data.
+
+## Why does it matter?
+
+A database is an external system with its own failures, concurrency rules, and
+query language. Building SQL with string interpolation can create security bugs;
+leaving transactions open can lock resources or produce partial updates. A small,
+explicit data-access boundary makes these behaviors testable and reviewable.
+
+## Plain-language idea
+
+Treat a database connection like a rented resource. Open it for a defined unit
+of work, send SQL with values bound separately, commit only when the complete
+operation succeeds, roll back when it fails, and close the connection. Keep
+business decisions outside low-level connection code.
+
+## SQLite and the DB-API pattern
+
+Python's standard-library `sqlite3` module provides a lightweight relational
+database and follows the common Database Application Programming Interface
+(DB-API), a Python interface specification used by database drivers:
+
+```python
+import sqlite3
+
+connection = sqlite3.connect("orders.db")
+try:
+    rows = connection.execute(
+        "SELECT order_id, amount FROM orders WHERE customer_id = ?",
+        (customer_id,),
+    ).fetchall()
+finally:
+    connection.close()
+```
+
+The placeholder syntax is database-driver-specific; SQLite uses `?`. The tuple
+contains parameter values and is passed separately from the SQL text.
+
+## Parameterized queries
+
+Never build SQL by concatenating untrusted input:
+
+```python
+# Unsafe: user input becomes part of the SQL text.
+query = f"SELECT * FROM users WHERE name = '{name}'"
+```
+
+Use the driver's parameter binding instead:
+
+```python
+query = "SELECT * FROM users WHERE name = ?"
+rows = connection.execute(query, (name,)).fetchall()
+```
+
+Parameter binding treats the value as data rather than executable SQL. It does
+not make table names or SQL keywords dynamic; those require an allow-list and
+careful query construction.
+
+## Transactions
+
+A transaction groups related writes into one unit. Either all changes become
+visible, or a failure rolls them back:
+
+```python
+connection = sqlite3.connect("orders.db")
+try:
+    with connection:
+        connection.execute(
+            "UPDATE accounts SET balance = balance - ? WHERE account_id = ?",
+            (amount, source_id),
+        )
+        connection.execute(
+            "UPDATE accounts SET balance = balance + ? WHERE account_id = ?",
+            (amount, destination_id),
+        )
+finally:
+    connection.close()
+```
+
+With the connection context manager, successful work is committed and an
+exception causes a rollback for the transaction managed by the connection.
+For `sqlite3`, that context manager does not close the connection, so close
+it explicitly when the connection is no longer needed.
+Check the specific driver's transaction behavior when portability matters.
+
+## Fetching and shaping rows
+
+A connection executes a statement and returns a cursor; the cursor fetch methods
+return rows. SQLite returns tuples by default, while mappings or row objects
+require driver or connection configuration. Make the expected shape clear at
+the boundary:
+
+```python
+row = connection.execute(
+    "SELECT customer_id, name FROM customers WHERE customer_id = ?",
+    (customer_id,),
+).fetchone()
+
+if row is None:
+    raise LookupError(f"Unknown customer: {customer_id}")
+```
+
+`fetchone()` may return `None` when no row matches. `fetchall()` can load a large
+result into memory, so iterate over the cursor or stream in batches when the
+result may be large.
+
+## SQL and business logic boundaries
+
+Keep a query function responsible for obtaining data and translating driver
+errors where appropriate. Keep business logic responsible for decisions about
+what the data means:
+
+```python
+def paid_total(connection, customer_id):
+    row = connection.execute(
+        "SELECT COALESCE(SUM(amount), 0) FROM orders "
+        "WHERE customer_id = ? AND status = ?",
+        (customer_id, "paid"),
+    ).fetchone()
+    return row[0]
+```
+
+Document whether an empty result means `None`, zero, an empty list, or an error.
+Do not let an implicit database default decide the application contract.
+
+## Resource and error handling
+
+Close cursors and connections promptly. Use context managers when the driver
+supports them. Catch database exceptions only where the application can recover,
+translate, or report useful context; do not turn every failure into an empty
+result.
+
+For tests, use an isolated temporary or in-memory database and apply the same
+schema migrations used by the application. Avoid tests that depend on a
+developer's local database state.
+
+## Common mistakes
+
+- Interpolating user input into SQL strings.
+- Assuming placeholder syntax is identical across database drivers.
+- Forgetting to commit writes or leaving a transaction open.
+- Loading an unbounded query result with `fetchall()`.
+- Treating no matching row and a database failure as the same outcome.
+- Testing against a shared database with unknown existing state.
+
+::: {.callout-important}
+Bind values as parameters, define transaction boundaries, close resources, and
+state the shape and empty-result behavior of every data-access function.
+:::
+
+## Key takeaways
+
+- Use a driver and its parameter-binding API rather than interpolating values.
+- Transactions make related writes succeed or fail together.
+- Check for `None` and define result shapes explicitly.
+- Stream or batch large results instead of assuming `fetchall()` is safe.
+- Isolate database tests from developer and production data.
+
+## Related topics
+
+- [SQL Foundations](sql-fundamentals.qmd)
+- [SQL Joins](sql-joins.qmd)
+- [Python Error Handling](python-error-handling.qmd)
+- [Python Interview: Database Access](../../practise/quizzes/python-database-access.qmd)
+
+
