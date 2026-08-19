@@ -1,0 +1,152 @@
+---
+title: "Python HTTP APIs"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-19
+practice: false
+quiz: true
+---
+
+## In one sentence
+
+A reliable Python HTTP client makes requests with explicit timeouts, checks
+responses, validates external data, and handles retries without duplicating work.
+
+## Why does it matter?
+
+An HTTP request crosses a network boundary you do not control. The server may
+be slow, unavailable, rate-limited, or return a response that does not match
+expectations. Code that assumes every request succeeds can hang indefinitely or
+silently process the wrong data.
+
+## Plain-language idea
+
+Treat an API as an unreliable external service. Send a precise request, wait only
+for a bounded time, check the status and content, validate the result, and decide
+whether a failure is safe to retry. Keep credentials out of source code and logs.
+
+## Requests and responses
+
+The standard HTTP request model has a method, URL, headers, and optional body.
+The response has a status code, headers, and content. Common methods include:
+
+- `GET` retrieves a representation.
+- `POST` submits data or requests creation.
+- `PUT` replaces a resource.
+- `PATCH` partially updates a resource.
+- `DELETE` requests removal.
+
+The third-party `requests` library provides a convenient client:
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.example.com/orders",
+    params={"customer_id": customer_id},
+    timeout=(3, 10),
+)
+response.raise_for_status()
+orders = response.json()
+```
+
+The timeout tuple gives separate connection and read limits. A timeout is not a
+failure of the server; it is your client's decision not to wait indefinitely.
+
+## Status codes and content
+
+Check the response before trusting its body:
+
+- `2xx` indicates success.
+- `3xx` indicates redirection, which the client may follow depending on settings.
+- `4xx` indicates a client or request problem, such as unauthorized or not found.
+- `5xx` indicates a server-side failure.
+
+`raise_for_status()` turns unsuccessful status codes into an exception. A
+successful status does not guarantee valid JSON or a valid application payload;
+check the content type and validate required fields too.
+
+## Parameters, headers, and JSON
+
+Pass query parameters with `params` and structured request bodies with `json`:
+
+```python
+response = requests.post(
+    "https://api.example.com/orders",
+    json={"customer_id": customer_id, "amount": amount},
+    headers={"Accept": "application/json"},
+    timeout=10,
+)
+response.raise_for_status()
+```
+
+Using `json=` serialises the body and sets the appropriate content type through
+the client. Do not manually concatenate values into URLs or request bodies.
+
+## Authentication and secrets
+
+Read credentials from a protected environment or secret manager:
+
+```python
+import os
+
+api_key = os.environ["ORDERS_API_KEY"]
+headers = {"Authorization": f"Bearer {api_key}"}
+```
+
+Never commit keys, print authorization headers, or include tokens in exception
+messages. Rotate credentials if they may have been exposed.
+
+## Retries and idempotency
+
+Retry only failures that are likely temporary, such as connection failures,
+timeouts, or selected `429` and `5xx` responses. Use exponential backoff and a
+maximum attempt count. Do not blindly retry a non-idempotent `POST`, because the
+server may have completed it even if the response was lost. Use an idempotency
+key or a server-supported safe retry design when duplicate creation would be
+harmful.
+
+## Validation and pagination
+
+Validate an API response at the boundary:
+
+```python
+payload = response.json()
+if not isinstance(payload, dict) or "orders" not in payload:
+    raise ValueError("API response has an unexpected shape")
+```
+
+Many APIs paginate results. Follow the documented cursor or page token, stop
+when no token remains, and set a maximum page count or result size. Do not assume
+one response contains the complete dataset.
+
+## Common mistakes
+
+- Omitting a timeout and allowing a request to hang indefinitely.
+- Processing a `4xx` or `5xx` body as if it were a successful result.
+- Retrying every error, including permanent validation failures or unsafe writes.
+- Logging tokens, cookies, authorization headers, or sensitive response bodies.
+- Assuming JSON shape, pagination, or time zones without reading the API contract.
+- Creating a new connection for every request instead of reusing a session when
+  many requests go to the same service.
+
+::: {.callout-important}
+For every HTTP call, define the timeout, accepted status codes, response shape,
+retry policy, authentication boundary, and whether repeating the request is safe.
+:::
+
+## Key takeaways
+
+- Use explicit timeouts and check response status before processing content.
+- Separate query parameters, JSON bodies, headers, and credentials.
+- Validate external payloads and handle pagination deliberately.
+- Retry only bounded, temporary, safe-to-repeat failures.
+- Keep secrets out of source, logs, and error messages.
+
+## Related topics
+
+- [Python Files and Data I/O](python-file-io.qmd)
+- [Python Error Handling](python-error-handling.qmd)
+- [Python Command-Line Workflows](python-cli-workflows.qmd)
+- [Python Interview: HTTP APIs](../../practise/quizzes/python-http-apis.qmd)

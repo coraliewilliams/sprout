@@ -1,0 +1,103 @@
+---
+title: "Python Interview: HTTP APIs"
+area: "Programming & Computing"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-19
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions cover timeouts,
+status codes, JSON boundaries, authentication, retries, and pagination.
+
+## Questions
+
+### 1. Timeouts
+
+Why should an HTTP request specify a timeout?
+
+A. To prevent the client from waiting indefinitely  
+B. To guarantee the server returns success  
+C. To encrypt the response automatically  
+D. To disable all network errors
+
+### 2. Response status
+
+What should happen before processing a response body as a successful result?
+
+A. Check the status and handle unsuccessful responses  
+B. Ignore the status code  
+C. Retry every response three times  
+D. Print the authorization header
+
+### 3. Query parameters
+
+Which `requests` argument is intended for URL query parameters?
+
+A. `json`  
+B. `params`  
+C. `headers`  
+D. `timeout`
+
+### 4. Credentials
+
+Where should a production API key normally come from?
+
+A. A committed Python constant  
+B. A protected environment or secret manager  
+C. A public README  
+D. A log message
+
+### 5. Retry safety
+
+Why can blindly retrying a `POST` be dangerous?
+
+A. The completed request may be repeated and create duplicates  
+B. `POST` requests never have responses  
+C. Retries always change a `GET` into a `DELETE`  
+D. Servers cannot receive the same body twice
+
+### 6. Payload validation
+
+Why validate the shape of decoded JSON from an API?
+
+A. A successful HTTP status does not guarantee the payload matches expectations  
+B. JSON always contains every required field  
+C. Validation makes authentication unnecessary  
+D. It prevents all network timeouts
+
+### 7. Pagination
+
+What is a safe approach when an API documents cursor pagination?
+
+A. Follow the cursor until it ends, with a maximum result/page limit  
+B. Assume the first response contains every row  
+C. Request pages forever without a bound  
+D. Ignore the next-page token
+
+## Answers and explanations
+
+<details>
+<summary>Open answers</summary>
+
+1. **A.** A timeout bounds how long the client waits for connection and response
+   data; it does not promise that the server succeeds.
+2. **A.** Check status first, then handle or raise for `4xx` and `5xx` responses
+   instead of treating their bodies as valid successful data.
+3. **B.** `params` encodes query-string parameters. `json` is for a structured
+   request body, while `headers` carries request metadata.
+4. **B.** Protected environment variables or a secret manager keep keys out of
+   source, documentation, and ordinary logs.
+5. **A.** The server may have completed the first request even if the response was
+   lost, so repeating a non-idempotent operation can create duplicates.
+6. **A.** HTTP success describes the request's transport-level outcome, not
+   whether the body has the expected application schema.
+7. **A.** Follow documented cursors and stop at the end, while bounding pages or
+   rows to protect against broken pagination or unexpectedly large data.
+
+</details>
+
+## Related topic
+
+- [Python HTTP APIs](../../learn/programming-computing/python-http-apis.qmd)
