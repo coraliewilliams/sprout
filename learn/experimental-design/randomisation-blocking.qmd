@@ -1,0 +1,45 @@
+---
+title: "Randomisation and Blocking"
+area: "Experimental Design"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Randomisation protects comparisons from systematic allocation bias, while
+blocking removes predictable variation before treatment effects are estimated.
+
+## Randomisation
+
+Assign units to treatments using a stated random procedure. Simple
+randomisation is easy but can create imbalance by chance, especially in small
+experiments. Restricted or stratified randomisation can preserve balance while
+retaining the protection of chance.
+
+## Blocking
+
+Create blocks from units expected to be similar, then randomise treatments within
+each block. A block might be a field, batch, school, or time period. Blocking is
+useful when between-block variation is large and treatment can be applied within
+blocks.
+
+A block should be based on a pre-treatment characteristic, not a consequence of
+the treatment.
+
+::: {.callout-tip}
+Do not confuse blocking with matching after the experiment. The allocation rule
+and analysis should be decided before outcomes are observed.
+:::
+
+## Check your understanding
+
+For a field trial with a north-to-south fertility gradient, propose blocks and a
+within-block allocation plan.
+
+## Further reading
+
+- [NIST: Randomized block designs](https://www.itl.nist.gov/div898/handbook/pri/pri332.htm)

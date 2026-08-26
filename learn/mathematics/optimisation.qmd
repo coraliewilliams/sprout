@@ -1,0 +1,51 @@
+---
+title: "Optimisation"
+area: "Mathematics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Optimisation chooses inputs that minimise a loss or maximise an objective under
+specified constraints.
+
+## Local search
+
+For a differentiable function, an interior stationary point satisfies
+$\nabla f=0$. In one dimension, the second derivative helps classify a point:
+positive curvature suggests a local minimum and negative curvature a local
+maximum.
+
+Gradient descent updates parameters in the direction of decreasing loss:
+
+$$
+\boldsymbol{\theta}_{t+1} = \boldsymbol{\theta}_t - \eta \nabla L(\boldsymbol{\theta}_t)
+$$
+
+The learning rate $\eta$ controls the step size.
+
+## Constraints and global structure
+
+A local optimum need not be the best point globally. Constraints can change the
+answer and may require methods such as Lagrange multipliers. Convex problems
+are especially useful because every local minimum is global under suitable
+conditions.
+
+::: {.callout-tip}
+An optimisation result is only as meaningful as its objective, constraints,
+and scale. Always state what is being optimised and what trade-off it encodes.
+:::
+
+## Check your understanding
+
+For a one-variable loss, sketch how changing the learning rate affects the path
+taken by gradient descent.
+
+## Further reading
+
+- [OpenStax Calculus Volume 3: Multivariable Applications](https://openstax.org/details/books/calculus-volume-3)
+- [Stanford CS229: Optimisation notes](https://cs229.stanford.edu/notes2022fall/cs229-notes1.pdf)

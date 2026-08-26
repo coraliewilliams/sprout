@@ -1,0 +1,45 @@
+---
+title: "Supervised Learning"
+area: "Machine Learning"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Supervised learning estimates a relationship between inputs and known outcomes
+to predict outcomes for new inputs.
+
+## Regression and classification
+
+Regression predicts a numeric outcome. Classification predicts a category or
+probability. Common models include linear regression, logistic regression,
+trees, nearest neighbours, and neural networks.
+
+Model choice should follow the data, target, sample size, interpretability needs,
+and deployment constraints. A more flexible model can reduce training error but
+may increase sensitivity to noise.
+
+## Features and preprocessing
+
+Encode categorical variables, handle missingness, and scale features when the
+algorithm needs it. Learn preprocessing steps from training data only, then
+apply the frozen steps to validation, test, and production data.
+
+::: {.callout-tip}
+Keep a simple baseline. It tells you whether model complexity produces a useful
+improvement rather than merely an impressive training score.
+:::
+
+## Check your understanding
+
+Choose a regression or classification framing for three example questions and
+identify the target, features, and a suitable baseline.
+
+## Further reading
+
+- [An Introduction to Statistical Learning](https://www.statlearning.com/)
+- [scikit-learn User Guide](https://scikit-learn.org/stable/user_guide.html)

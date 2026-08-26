@@ -3,13 +3,18 @@ title: "Machine Learning"
 ---
 
 Notes on supervised and unsupervised learning methods, and how to evaluate them.
+The order emphasises sound problem definition before model complexity.
 
-Planned areas:
+## Learning order
 
-- Foundations
-- Supervised learning
-- Unsupervised learning
-- Model evaluation & validation
-- Practical implementation (R / Python)
+1. [Machine Learning Foundations](ml-foundations.qmd) — targets, losses, and learning settings.
+2. [Supervised Learning](supervised-learning.qmd) — regression, classification, and preprocessing.
+3. [Unsupervised Learning](unsupervised-learning.qmd) — clustering and dimension reduction.
+4. [Model Evaluation and Validation](model-evaluation-validation.qmd) — splits, metrics, and leakage.
+5. [Practical Machine Learning Workflow](practical-ml-workflow.qmd) — reproducibility, deployment, and monitoring.
 
-Pages will be added here gradually as topics are written.
+## Further resources
+
+- [An Introduction to Statistical Learning](https://www.statlearning.com/) — clear, practical theory and examples.
+- [scikit-learn User Guide](https://scikit-learn.org/stable/user_guide.html) — implementation reference.
+- [Google Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course) — practical foundations.

@@ -4,16 +4,20 @@ title: "Statistics"
 
 Notes on probability, inference, and statistical modelling.
 
-Topics:
+Work through the foundations first, then move into modelling and uncertainty.
 
-- [Mean and Variance](mean-and-variance.qmd)
-- [Causal Inference](causal-inference.qmd)
-- [Marginal and Conditional Effects](marginal-and-conditional-effects.qmd)
+## Learning order
 
-Planned areas:
+1. [Probability, Distributions, and Sampling](probability-distributions-sampling.qmd) — populations, samples, random variables, and dependence.
+2. [Mean and Variance](mean-and-variance.qmd) — centre and spread.
+3. [Estimation and Confidence Intervals](estimation-confidence-intervals.qmd) — estimates, standard errors, and interval interpretation.
+4. [Hypothesis Testing](hypothesis-testing.qmd) — null models, errors, power, and p-values.
+5. [Regression, Linear Models, and GLMs](regression-linear-glm.qmd) — prediction, effects, outcome distributions, and diagnostics.
+6. [Causal Inference](causal-inference.qmd) — assumptions needed for causal claims.
+7. [Marginal and Conditional Effects](marginal-and-conditional-effects.qmd) — interpreting effects across subgroups and covariate values.
+8. [Mixed Models and Resampling](mixed-models-resampling.qmd) — clustered data, bootstrap, and permutation methods.
 
-- Foundations — probability, distributions, sampling
-- Statistical inference — estimation, confidence intervals, hypothesis testing
-- Regression — linear models, GLMs, diagnostics
-- Generalised & mixed models
-- Resampling & robust methods — bootstrap, permutation tests
+## Further resources
+
+- [OpenStax Introductory Statistics](https://openstax.org/details/books/introductory-statistics-2e) — accessible core reference.
+- [NIST Engineering Statistics Handbook](https://www.itl.nist.gov/div898/handbook/) — detailed methods and diagnostics.

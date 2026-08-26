@@ -3,8 +3,8 @@ title: "My Notebook"
 toc: false
 ---
 
-Statistics, machine learning, mathematics, data science and programming — notes
-written while learning, one or two topics at a time.
+Statistics, machine learning, mathematics, data science, programming, and
+ecology — notes written while learning, one or two topics at a time.
 
 Use the search box in the sidebar to find a topic quickly.
 
@@ -16,6 +16,7 @@ Use the search box in the sidebar to find a topic quickly.
 - [Data Science](learn/data-science/index.qmd)
 - [Experimental Design](learn/experimental-design/index.qmd)
 - [Programming & Computing](learn/programming-computing/index.qmd)
+- [Ecology](learn/ecology/index.qmd)
 
 ## Practise
 

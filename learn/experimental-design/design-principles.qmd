@@ -1,0 +1,45 @@
+---
+title: "Design Principles"
+area: "Experimental Design"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+A good experiment makes a focused comparison that can answer a causal question
+with transparent uncertainty.
+
+## Start with the question
+
+State the intervention, outcome, target population, and time horizon. Define the
+experimental unit: the smallest unit that can receive a different treatment.
+Specify the estimand, such as an average treatment effect, before collecting
+data.
+
+## The core principles
+
+- **Control:** compare treatment with a meaningful reference condition.
+- **Randomisation:** use chance to balance known and unknown factors on average.
+- **Replication:** use multiple independent experimental units.
+- **Blocking:** group similar units before randomising to improve precision.
+
+These principles solve different problems and work together.
+
+::: {.callout-important}
+A large sample cannot repair a biased comparison. First make the assignment and
+measurement process credible; then use sample size to control precision.
+:::
+
+## Check your understanding
+
+Turn the question "does a new fertiliser improve yield?" into a complete design
+with treatment, control, unit, outcome, and allocation rule.
+
+## Further reading
+
+- [OpenStax Introductory Statistics: Experimental Design](https://openstax.org/details/books/introductory-statistics-2e)
+- [NIST: Engineering Statistics Handbook](https://www.itl.nist.gov/div898/handbook/pri/pri.htm)

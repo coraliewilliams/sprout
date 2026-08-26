@@ -1,0 +1,48 @@
+---
+title: "Mixed Models and Resampling"
+area: "Statistics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Mixed models represent both population-level effects and structured variation
+among groups, while resampling uses the observed data to assess uncertainty.
+
+## Mixed models
+
+A random intercept can let each group have its own baseline:
+
+$$
+Y_{ij} = \beta_0 + b_j + \beta_1 X_{ij} + \varepsilon_{ij}
+$$
+
+where $b_j$ represents group-specific variation. Random effects are useful for
+clusters such as sites, schools, subjects, or batches when groups are viewed as
+arising from a broader population.
+
+## Bootstrap and permutation
+
+The bootstrap repeatedly resamples observations to approximate the sampling
+distribution of an estimator. A permutation test rearranges labels under a null
+of exchangeability. Both methods depend on the resampling scheme matching the
+design; clustered data need cluster-aware resampling.
+
+::: {.callout-important}
+Resampling rows independently can be wrong when rows are repeated measures or
+members of clusters. Preserve the dependence structure in each resample.
+:::
+
+## Check your understanding
+
+Choose whether observations, subjects, or sites should be resampled in a study
+with repeated measurements from several sites, and explain why.
+
+## Further reading
+
+- [NIST: Random effects models](https://www.itl.nist.gov/div898/handbook/pri/pri.htm)
+- [An Introduction to Statistical Learning](https://www.statlearning.com/)

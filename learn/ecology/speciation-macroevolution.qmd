@@ -1,0 +1,53 @@
+---
+title: "Speciation and Macroevolution"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Speciation occurs when populations diverge until gene flow no longer joins their
+gene pools, while macroevolution describes patterns above the species level.
+
+## Reproductive isolation
+
+Prezygotic barriers prevent mating or fertilisation, through differences in
+habitat, timing, behaviour, or reproductive structures. Postzygotic barriers
+reduce hybrid survival or fertility. Isolation can evolve through geographic
+separation, ecological divergence, sexual selection, or chromosome changes.
+
+## Divergence and species concepts
+
+A biological species is often defined as a group whose members can interbreed
+and produce fertile offspring. This definition is useful but does not apply
+cleanly to asexual organisms, fossils, or populations connected by occasional
+hybridisation. Phylogenetic and ecological species concepts emphasise different
+properties and can produce different boundaries.
+
+## Extinction and diversification
+
+Lineages can diversify when new ecological opportunities, innovations, or
+isolating barriers arise. Extinction removes lineages and can be caused by
+persistent environmental change, small population size, interactions, or
+catastrophic events. The fossil record reflects both biological history and
+unequal preservation and sampling.
+
+::: {.callout-tip}
+Do not infer that a trait is "more evolved" because it appears later or looks
+more complex. Evolution has no predetermined direction or ladder.
+:::
+
+## Check your understanding
+
+Describe a plausible route from geographic separation to reproductive isolation.
+Name one observation that would distinguish this explanation from ecological
+specialisation without geographic separation.
+
+## Further reading
+
+- [OpenStax Biology 2e: Speciation](https://openstax.org/books/biology-2e/pages/24-introduction)
+- [OpenStax Biology 2e: The History of Life](https://openstax.org/books/biology-2e/pages/25-introduction)

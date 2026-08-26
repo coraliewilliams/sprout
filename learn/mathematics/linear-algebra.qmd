@@ -1,0 +1,57 @@
+---
+title: "Linear Algebra"
+area: "Mathematics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Linear algebra studies vectors, matrices, and the transformations that connect
+them.
+
+## Vectors and matrices
+
+A vector can represent measurements, coordinates, or a direction. A matrix
+stores numbers in rows and columns and can represent a linear transformation or
+a dataset. Matrix multiplication combines transformations and is not generally
+commutative: $AB$ may differ from $BA$.
+
+The dot product measures alignment:
+
+$$
+\mathbf{x} \cdot \mathbf{y} = \sum_{i=1}^{p} x_i y_i
+$$
+
+Orthogonal vectors have dot product zero. Length and angle are often the most
+useful geometric interpretations.
+
+## Linear systems
+
+A system $A\mathbf{x}=\mathbf{b}$ asks which vector is mapped to $\mathbf{b}$.
+Row reduction reveals whether solutions are unique, multiple, or impossible.
+The columns of $A$ determine the space of possible outputs.
+
+## Eigenvalues and applications
+
+An eigenvector keeps its direction under a transformation:
+$A\mathbf{v}=\lambda\mathbf{v}$. Eigenvalues help describe repeated processes,
+principal components, and long-run behaviour.
+
+::: {.callout-tip}
+Check dimensions before multiplying matrices. If $A$ is $m \times n$, then the
+next matrix must have $n$ rows.
+:::
+
+## Check your understanding
+
+Represent three observations with two measurements as a matrix. Identify its
+rows, columns, and the meaning of a matrix-vector product.
+
+## Further reading
+
+- [OpenStax: Introduction to Linear Algebra](https://openstax.org/details/books/college-algebra-2e)
+- [MIT OpenCourseWare: Linear Algebra](https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/)

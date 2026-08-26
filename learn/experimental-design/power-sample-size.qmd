@@ -1,0 +1,48 @@
+---
+title: "Power and Sample Size"
+area: "Experimental Design"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Power is the probability that a study detects a specified effect under a chosen
+analysis and design.
+
+## The four planning quantities
+
+Sample-size planning links four quantities:
+
+- the smallest effect worth detecting;
+- outcome variability;
+- the false-positive rate $\alpha$;
+- desired power, $1-\beta$.
+
+Changing any one changes the required sample size. Power is not the probability
+that a particular hypothesis is true.
+
+## Practical planning
+
+Define the estimand and primary outcome first. Use pilot or historical data to
+justify variability, but recognise that small pilots estimate it imprecisely.
+Allow for attrition, clustering, and multiple comparisons where relevant.
+
+::: {.callout-important}
+A non-significant result does not prove no effect. Report the estimate and its
+uncertainty, and say whether the study could detect effects that matter in
+practice.
+:::
+
+## Check your understanding
+
+Explain how required sample size changes when the target effect is halved or
+outcome variability doubles.
+
+## Further reading
+
+- [NIST: Sample size determination](https://www.itl.nist.gov/div898/handbook/prc/section2/prc222.htm)
+- [OpenStax Introductory Statistics](https://openstax.org/details/books/introductory-statistics-2e)

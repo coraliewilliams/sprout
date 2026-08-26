@@ -1,0 +1,49 @@
+---
+title: "Machine Learning Foundations"
+area: "Machine Learning"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Machine learning learns a function from examples so it can make predictions or
+represent structure in new data.
+
+## The learning setup
+
+A dataset contains features $X$ and, for supervised learning, a target $Y$. A
+model $f_\theta$ maps features to predictions. Training chooses parameters by
+minimising a loss on observed examples:
+
+$$
+\hat{\theta} = \arg\min_\theta \frac{1}{n}\sum_{i=1}^n L(y_i, f_\theta(x_i))
+$$
+
+The real goal is performance on relevant future data, not memorisation.
+
+## Main learning types
+
+- Supervised learning uses labelled outcomes.
+- Unsupervised learning finds structure without a target.
+- Reinforcement learning learns through actions and rewards.
+
+Start with a clear prediction target and define what a useful error means.
+
+::: {.callout-important}
+A model can be accurate on a test set and still be unsuitable if the test set
+leaks information, the deployment population differs, or the metric is wrong.
+:::
+
+## Check your understanding
+
+Define features, target, training data, and deployment data for a model that
+predicts hospital readmission.
+
+## Further reading
+
+- [An Introduction to Statistical Learning](https://www.statlearning.com/)
+- [OpenStax: Introduction to Data Science](https://openstax.org/details/books/introductory-statistics-2e)

@@ -1,0 +1,49 @@
+---
+title: "Heredity and Phylogeny"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Heredity explains how traits are transmitted, while phylogeny describes
+relationships through common ancestry.
+
+## Genes, alleles, and traits
+
+A gene is a region of hereditary material; alleles are alternative forms of a
+gene. Phenotypes arise from genes and environments, often together. A heritable
+trait is not necessarily fixed: its expression can depend on conditions and
+development.
+
+For a simple diploid locus, an individual's genotype contains two alleles. A
+population's allele frequencies can change through selection, drift, mutation,
+and gene flow. Evolution is measured in populations across generations, not in
+an individual's response during its lifetime.
+
+## Reading a phylogenetic tree
+
+A phylogenetic tree represents hypotheses about branching history. Nodes mark
+inferred common ancestors; sister groups share the most recent common ancestor.
+Rotating a branch around a node does not change relationships. A trait shared
+because of common ancestry is a homology; a similar trait that evolved
+independently is an analogy or homoplasy.
+
+::: {.callout-important}
+The left-to-right order of tips is not a time axis. Read relationships from the
+branching pattern and common ancestors, not from visual proximity alone.
+:::
+
+## Check your understanding
+
+Draw a tree for four taxa. Mark the most recent common ancestor of two sister
+taxa and identify one character that could provide evidence for the tree.
+
+## Further reading
+
+- [OpenStax Biology 2e: Genetics](https://openstax.org/books/biology-2e/pages/12-introduction)
+- [OpenStax Biology 2e: Phylogenies and the History of Life](https://openstax.org/books/biology-2e/pages/26-introduction)

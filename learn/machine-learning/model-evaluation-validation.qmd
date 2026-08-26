@@ -1,0 +1,43 @@
+---
+title: "Model Evaluation and Validation"
+area: "Machine Learning"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Evaluation estimates how well a model will perform on the data and decisions
+that matter after training.
+
+## Splitting data
+
+Use training data to fit models, validation data to choose among approaches, and
+an untouched test set for final assessment. Cross-validation repeatedly rotates
+training and validation folds when data are limited. Time-ordered or grouped
+data require splits that respect their structure.
+
+## Metrics
+
+For classification, accuracy can hide class imbalance; precision, recall,
+ROC-AUC, and calibration answer different questions. For regression, mean
+absolute error is in outcome units, while squared-error metrics emphasise large
+mistakes. Choose a metric before comparing models.
+
+::: {.callout-important}
+Never tune a model on the final test set. Repeatedly checking it turns the test
+set into training information and makes performance look too optimistic.
+:::
+
+## Check your understanding
+
+Choose a metric for a rare-disease screening model and explain the costs of false
+positives and false negatives.
+
+## Further reading
+
+- [An Introduction to Statistical Learning](https://www.statlearning.com/)
+- [scikit-learn Model Evaluation](https://scikit-learn.org/stable/modules/model_evaluation.html)

@@ -13,10 +13,15 @@ Work through these topics in order. Each page introduces a reusable idea and
 points toward the next scale of biological organisation.
 
 1. [Ecological foundations](ecological-foundations.qmd) — levels of organisation, scale, niches, and feedback.
-2. [Evolution and natural selection](evolution-natural-selection.qmd) — variation, inheritance, fitness, and adaptation.
-3. [Population ecology](population-ecology.qmd) — growth, regulation, demography, and life histories.
-4. [Community ecology](community-ecology.qmd) — species interactions, competition, predation, and succession.
-5. [Ecosystems and biodiversity](ecosystems-biodiversity.qmd) — energy flow, biogeochemical cycles, food webs, and conservation.
+2. [Evidence and ecological study](evidence-ecological-study.qmd) — observation, experiments, sampling, and uncertainty.
+3. [Environment and limiting factors](environment-limiting-factors.qmd) — abiotic conditions, resources, tolerance, and climate.
+4. [Species distributions](species-distributions.qmd) — range, dispersal, occupancy, and metapopulations.
+5. [Evolution and natural selection](evolution-natural-selection.qmd) — variation, inheritance, fitness, and adaptation.
+6. [Heredity and phylogeny](heredity-phylogeny.qmd) — genes, traits, common ancestry, and reading trees.
+7. [Speciation and macroevolution](speciation-macroevolution.qmd) — reproductive isolation, divergence, and extinction.
+8. [Population ecology](population-ecology.qmd) — growth, regulation, demography, and life histories.
+9. [Community ecology](community-ecology.qmd) — species interactions, competition, predation, and succession.
+10. [Ecosystems and biodiversity](ecosystems-biodiversity.qmd) — energy flow, biogeochemical cycles, food webs, and conservation.
 
 ## Anchor resource
 

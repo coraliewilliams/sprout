@@ -1,0 +1,53 @@
+---
+title: "Regression, Linear Models, and GLMs"
+area: "Statistics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Regression describes how an outcome changes with predictors while separating
+systematic patterns from unexplained variation.
+
+## Linear regression
+
+A linear model can be written as:
+
+$$
+Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
+$$
+
+Here $\beta_1$ is the expected change in outcome per unit change in $X$ under
+the model and covariate interpretation. Association is not automatically causal.
+
+## Generalised linear models
+
+A GLM combines a distribution for the outcome with a link function. Logistic
+regression models a binary outcome through log-odds; Poisson regression models
+counts through a log link. The link makes the linear predictor compatible with
+the outcome scale.
+
+## Diagnostics
+
+Inspect residuals, leverage, influential observations, calibration, and whether
+the mean-variance relationship is plausible. Validate predictions on data not
+used to fit the model when prediction is the goal.
+
+::: {.callout-tip}
+Choose a model from the outcome-generating question, not only from the shape of
+a scatterplot or the convenience of a software function.
+:::
+
+## Check your understanding
+
+For a binary outcome, explain why ordinary linear regression may predict outside
+$[0,1]$ and how a logistic model addresses that problem.
+
+## Further reading
+
+- [OpenStax Introductory Statistics: Linear Regression](https://openstax.org/details/books/introductory-statistics-2e)
+- [NIST: Regression](https://www.itl.nist.gov/div898/handbook/pmd/pmd.htm)

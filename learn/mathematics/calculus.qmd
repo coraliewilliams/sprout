@@ -1,0 +1,52 @@
+---
+title: "Calculus"
+area: "Mathematics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Calculus describes change with derivatives and accumulation with integrals.
+
+## Derivatives
+
+The derivative is an instantaneous rate of change:
+
+$$
+f'(x) = \lim_{h \to 0} \frac{f(x+h)-f(x)}{h}
+$$
+
+A derivative can be interpreted as a slope, sensitivity, or marginal effect.
+The chain rule handles nested functions and is central to optimisation and
+neural-network training.
+
+## Integrals
+
+An integral accumulates small contributions. The fundamental theorem connects
+change and accumulation: integrating a derivative recovers the net change,
+subject to the starting value.
+
+## Multivariable calculus
+
+For $f(x_1,\ldots,x_p)$, the gradient collects partial derivatives:
+
+$$
+\nabla f = \left(\frac{\partial f}{\partial x_1}, \ldots, \frac{\partial f}{\partial x_p}\right)
+$$
+
+The gradient points toward steepest increase. Directional derivatives describe
+change along a chosen direction.
+
+## Check your understanding
+
+For a simple quadratic function, find the derivative, locate its stationary
+point, and explain what the derivative says on either side.
+
+## Further reading
+
+- [OpenStax Calculus Volume 1](https://openstax.org/details/books/calculus-volume-1)
+- [MIT OpenCourseWare: Single Variable Calculus](https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/)

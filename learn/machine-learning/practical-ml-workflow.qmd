@@ -1,0 +1,45 @@
+---
+title: "Practical Machine Learning Workflow"
+area: "Machine Learning"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+A reliable machine-learning project moves from a defined decision to validated,
+reproducible predictions and monitoring.
+
+## A minimal workflow
+
+1. Define the decision, population, outcome, and time of prediction.
+2. Inspect data quality, missingness, leakage, and sampling.
+3. Create a reproducible train-validation-test split.
+4. Establish a simple baseline.
+5. Fit and tune models using training data and validation only.
+6. Evaluate on the untouched test set and document limitations.
+7. Monitor performance and data drift after deployment.
+
+## Reproducibility
+
+Record data versions, feature definitions, preprocessing, random seeds, model
+settings, metrics, and software environments. A notebook is useful for
+exploration, but reusable code and tests make the workflow dependable.
+
+::: {.callout-tip}
+The hardest part is often defining the target without using information that
+would be unavailable at prediction time. Write the prediction timestamp down.
+:::
+
+## Check your understanding
+
+Audit a proposed model for leakage. List one feature that might be unavailable
+at prediction time and one monitoring signal you would track after deployment.
+
+## Further reading
+
+- [Google Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course)
+- [scikit-learn User Guide](https://scikit-learn.org/stable/user_guide.html)

@@ -1,0 +1,56 @@
+---
+title: "Evidence and Ecological Study"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Ecological evidence connects a measured pattern to a process while accounting
+for sampling, comparison, and uncertainty.
+
+## Observation and experiment
+
+An observation describes what occurs in nature. An experiment changes a factor
+and compares the result with a control or reference condition. Observational
+studies are often essential when manipulation is impossible, but confounding
+factors make causal conclusions harder.
+
+A useful question is: what would we expect to see if the proposed mechanism were
+true, and what alternative mechanism predicts the same pattern?
+
+## Sampling basics
+
+Define the population of interest before sampling. Random or systematic
+selection helps avoid choosing only convenient sites. Replication estimates
+variation; repeated measurements of the same unit are not independent
+replicates. Stratifying by habitat, season, or other known groups can improve
+coverage.
+
+::: {.callout-important}
+Pseudoreplication occurs when several measurements from one experimental unit are
+treated as independent units. The experimental unit is the smallest unit that
+could have received a different treatment.
+:::
+
+## Uncertainty
+
+A sample statistic is an estimate, not the whole population. Report the sample
+size, sampling design, variability, and a measure of uncertainty such as a
+confidence interval. Statistical significance does not automatically imply a
+large or ecologically important effect.
+
+## Check your understanding
+
+Design a study testing whether mowing changes plant richness. Identify the
+experimental unit, treatment, response variable, replication, and one likely
+confounder.
+
+## Further reading
+
+- [OpenStax Biology 2e: The Science of Biology](https://openstax.org/books/biology-2e/pages/1-introduction)
+- [NRES-470 Lecture 1](https://kevintshoemaker.github.io/NRES-470/LECTURE1.html)

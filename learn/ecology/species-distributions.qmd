@@ -1,0 +1,54 @@
+---
+title: "Species Distributions"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+A species distribution is the geographic pattern of where a species occurs,
+produced by environment, movement, history, and interactions.
+
+## Range and occupancy
+
+Range is the geographic extent of a species. Occupancy is whether the species is
+present at a defined set of sites. A species can occupy few sites inside a broad
+range, and detection may be imperfect: absence from a survey is not always true
+absence.
+
+## What shapes a distribution?
+
+Important processes include:
+
+- abiotic suitability, such as temperature, moisture, and soil;
+- resource availability and biotic interactions;
+- dispersal ability and barriers to movement;
+- disturbance and land-use history;
+- evolutionary history and past climate.
+
+A distribution model is therefore a hypothesis about which processes limit a
+range, not a complete explanation by itself.
+
+## Metapopulations
+
+A metapopulation is a set of local populations linked by dispersal. Local
+extinctions can be followed by recolonisation. Connectivity can maintain a
+regional population, while isolated habitat patches can increase extinction risk.
+
+::: {.callout-tip}
+When mapping a species, record survey effort and detection conditions. Maps of
+observations often show where people looked as much as where the species lives.
+:::
+
+## Check your understanding
+
+Compare two habitat patches with the same area but different connectivity.
+Predict how colonisation and local extinction might differ between them.
+
+## Further reading
+
+- [OpenStax Biology 2e: Population Ecology](https://openstax.org/books/biology-2e/pages/45-1-demography-and-population-size)

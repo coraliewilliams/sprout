@@ -2,13 +2,17 @@
 title: "Experimental Design"
 ---
 
-Notes on designing and analysing experiments.
+Notes on designing and analysing experiments. Start with the question and
+design, then plan the sample and choose an analysis that respects the design.
 
-Planned areas:
+## Learning order
 
-- Design principles
-- Randomisation & blocking
-- Power & sample size
-- Analysis of designed experiments
+1. [Design Principles](design-principles.qmd) — causal questions, units, controls, and replication.
+2. [Randomisation and Blocking](randomisation-blocking.qmd) — fair allocation and precision.
+3. [Power and Sample Size](power-sample-size.qmd) — detectable effects and uncertainty.
+4. [Analysis of Designed Experiments](analysis-designed-experiments.qmd) — contrasts, ANOVA, regression, and diagnostics.
 
-Pages will be added here gradually as topics are written.
+## Further resources
+
+- [NIST Engineering Statistics Handbook](https://www.itl.nist.gov/div898/handbook/) — design and analysis reference.
+- [OpenStax Introductory Statistics](https://openstax.org/details/books/introductory-statistics-2e) — accessible statistical foundations.

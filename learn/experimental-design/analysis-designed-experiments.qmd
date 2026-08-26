@@ -1,0 +1,47 @@
+---
+title: "Analysis of Designed Experiments"
+area: "Experimental Design"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Analysis should follow the design so that the estimated treatment contrast matches
+the question the experiment was built to answer.
+
+## Treatment contrasts
+
+A treatment effect is a comparison, such as a difference in means or a ratio of
+risks. With several treatments, planned contrasts can test scientifically
+meaningful comparisons without treating every pair as equally important.
+
+## ANOVA and regression
+
+Analysis of variance partitions outcome variation into treatment and residual
+components. The same comparisons can usually be expressed as a regression model
+with treatment indicators and block terms. The design determines which units
+provide the relevant error term.
+
+Inspect residuals for unequal spread, unusual observations, dependence, and
+nonlinearity. Transformations or alternative models may be appropriate, but
+should be justified by the outcome and design.
+
+::: {.callout-tip}
+Analyse according to the assignment unit. More measurements within one unit can
+improve outcome precision, but they do not create more independent treatment
+replicates.
+:::
+
+## Check your understanding
+
+For a blocked two-treatment experiment, state the treatment contrast, the error
+term, and two residual checks you would make.
+
+## Further reading
+
+- [NIST: Analysis of variance](https://www.itl.nist.gov/div898/handbook/prc/section4/prc4.htm)
+- [OpenStax Introductory Statistics: ANOVA](https://openstax.org/details/books/introductory-statistics-2e)

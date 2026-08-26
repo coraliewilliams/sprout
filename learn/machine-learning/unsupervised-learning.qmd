@@ -1,0 +1,41 @@
+---
+title: "Unsupervised Learning"
+area: "Machine Learning"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Unsupervised learning summarises or groups data without a supplied outcome label.
+
+## Clustering
+
+Clustering assigns observations to groups according to a similarity rule.
+K-means minimises within-cluster squared distance for a chosen number of groups;
+hierarchical methods build a tree of nested groupings. Results depend on
+scaling, distance, algorithm, and the chosen number of clusters.
+
+## Dimension reduction
+
+Principal component analysis finds directions that capture variance in numeric
+data. A low-dimensional representation can help visualise structure, but high
+variance is not always the same as scientific importance.
+
+::: {.callout-important}
+A cluster is a model-based or algorithmic summary, not automatically a natural
+species, subgroup, or causal mechanism. Check stability and external validity.
+:::
+
+## Check your understanding
+
+Run a clustering thought experiment with two features measured in different
+units. Explain why scaling could change the groups.
+
+## Further reading
+
+- [An Introduction to Statistical Learning: Unsupervised Learning](https://www.statlearning.com/)
+- [scikit-learn Clustering](https://scikit-learn.org/stable/modules/clustering.html)

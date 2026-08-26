@@ -2,13 +2,17 @@
 title: "Mathematics"
 ---
 
-The mathematical foundations behind statistics, machine learning, and data science.
+The mathematical foundations behind statistics, machine learning, and data
+science. Work through the pages in order, returning to earlier ideas as needed.
 
-Planned areas:
+## Learning order
 
-- Linear algebra
-- Calculus
-- Probability theory
-- Optimisation
+1. [Linear Algebra](linear-algebra.qmd) — vectors, matrices, systems, and transformations.
+2. [Calculus](calculus.qmd) — rates of change, accumulation, and gradients.
+3. [Probability Theory](probability-theory.qmd) — uncertainty, conditioning, and random variables.
+4. [Optimisation](optimisation.qmd) — objectives, constraints, and gradient-based search.
 
-Pages will be added here gradually as topics are written.
+## Further resources
+
+- [OpenStax Mathematics](https://openstax.org/subjects/math) — free introductory textbooks.
+- [MIT OpenCourseWare](https://ocw.mit.edu/search/?d=Mathematics) — lecture notes and exercises.

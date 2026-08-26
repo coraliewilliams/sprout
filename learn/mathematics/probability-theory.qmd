@@ -1,0 +1,54 @@
+---
+title: "Probability Theory"
+area: "Mathematics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Probability provides a language for uncertain outcomes, events, and random
+quantities.
+
+## Events and conditional probability
+
+For events $A$ and $B$, conditional probability is:
+
+$$
+P(A \mid B) = \frac{P(A \cap B)}{P(B)}
+$$
+
+when $P(B)>0$. Independence means $P(A \mid B)=P(A)$, not merely that two
+events look unrelated in a small sample.
+
+Bayes' rule reverses a conditional probability:
+
+$$
+P(A \mid B) = \frac{P(B \mid A)P(A)}{P(B)}
+$$
+
+The prior and the data both matter.
+
+## Random variables
+
+A random variable assigns numbers to outcomes. Its expectation is a long-run
+average and its variance describes spread. The law of large numbers explains why
+averages become more stable as independent observations accumulate.
+
+::: {.callout-important}
+A probability for a hypothesis and a probability for data given a hypothesis
+are different quantities. Keep $P(H \mid D)$ separate from $P(D \mid H)$.
+:::
+
+## Check your understanding
+
+Write a two-way table for a diagnostic test. Calculate both the sensitivity and
+the probability that a positive result is a true positive.
+
+## Further reading
+
+- [OpenStax Introductory Statistics: Probability Topics](https://openstax.org/details/books/introductory-statistics-2e)
+- [Harvard Stat 110](https://stat110.hsites.harvard.edu/)

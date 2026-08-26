@@ -1,0 +1,53 @@
+---
+title: "Environment and Limiting Factors"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Organisms persist where environmental conditions and resources remain within the
+limits required for survival and reproduction.
+
+## Conditions and resources
+
+Conditions are environmental features an organism tolerates, such as
+ temperature, pH, salinity, or flow. Resources are consumed or used, such as
+water, nutrients, light, space, or prey. A factor can be a condition at one
+scale and a resource at another.
+
+## Tolerance and performance
+
+For many factors, performance is highest within an optimum range and declines
+toward lower and upper tolerance limits. The law of the minimum says that growth
+can be limited by the scarcest essential resource relative to demand. In
+practice, multiple factors interact, so one limiting factor can change as the
+environment changes.
+
+A species response curve is a useful first model:
+
+$$
+\text{performance} = f(\text{environmental factor})
+$$
+
+The curve should be estimated rather than assumed to be symmetric or constant
+through time.
+
+## Climate and microclimate
+
+Climate describes long-term regional patterns; microclimate describes the local
+conditions an organism actually experiences. Shade, soil depth, canopy cover,
+and shelter can make microclimate differ strongly from weather-station data.
+
+## Check your understanding
+
+Choose one species and draw its expected performance across a temperature
+ gradient. Add a second factor and explain why the first curve might shift.
+
+## Further reading
+
+- [OpenStax Biology 2e: An Introduction to Ecology and the Biosphere](https://openstax.org/books/biology-2e/pages/44-1-the-scope-of-ecology)

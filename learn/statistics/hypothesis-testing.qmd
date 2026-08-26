@@ -1,0 +1,45 @@
+---
+title: "Hypothesis Testing"
+area: "Statistics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Hypothesis testing compares data with a reference model to assess whether the
+data are unusually inconsistent with a null claim.
+
+## The workflow
+
+State the estimand and hypotheses, choose a test statistic, specify the null
+reference distribution, and define the decision rule before looking at results.
+A p-value is the probability, under the null model, of data at least as extreme
+as those observed.
+
+A p-value is not the probability that the null hypothesis is true, nor the size
+or importance of an effect.
+
+## Errors and decisions
+
+A Type I error rejects a true null; a Type II error fails to reject a false null.
+The significance level $\alpha$ controls the long-run Type I error rate under the
+specified procedure. Power is the chance of detecting a chosen alternative.
+
+::: {.callout-important}
+"Fail to reject" does not mean "prove no effect." Pair the decision with an
+effect estimate, interval, and sensitivity to assumptions.
+:::
+
+## Check your understanding
+
+Write a null hypothesis and a practically meaningful alternative for a treatment
+that is expected to change mean recovery time.
+
+## Further reading
+
+- [OpenStax Introductory Statistics: Hypothesis Testing](https://openstax.org/details/books/introductory-statistics-2e)
+- [American Statistical Association: P-values](https://www.amstat.org/asa/files/pdfs/P-ValueStatement.pdf)

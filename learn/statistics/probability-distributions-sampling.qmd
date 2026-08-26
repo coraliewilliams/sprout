@@ -1,0 +1,47 @@
+---
+title: "Probability, Distributions, and Sampling"
+area: "Statistics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Probability models describe uncertainty, distributions describe random
+quantities, and sampling connects a population to the data we observe.
+
+## Distributions
+
+A distribution describes which values are plausible and how common they are. A
+probability mass function is used for discrete outcomes; a density describes
+continuous outcomes. The mean gives a centre and the variance gives spread, but
+shape, tails, and dependence also matter.
+
+The normal distribution is often useful as an approximation, not a universal law.
+The central limit theorem says that suitably scaled averages can become
+approximately normal under broad conditions as sample size grows.
+
+## Sampling
+
+A population is the target set; a sample is the observed subset. Random sampling
+supports generalisation when the sampling frame represents the target. A
+convenience sample can be precise about itself while still being biased for the
+population of interest.
+
+::: {.callout-important}
+Independence is a modelling assumption, not a synonym for "different rows." Time
+series, clusters, families, and repeated measurements often contain dependence.
+:::
+
+## Check your understanding
+
+Describe a target population, sampling frame, and possible source of selection
+bias for a survey of student wellbeing.
+
+## Further reading
+
+- [OpenStax Introductory Statistics](https://openstax.org/details/books/introductory-statistics-2e)
+- [Penn State: Sampling distributions](https://online.stat.psu.edu/stat200/lesson/3)

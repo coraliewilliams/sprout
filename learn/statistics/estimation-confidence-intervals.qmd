@@ -1,0 +1,51 @@
+---
+title: "Estimation and Confidence Intervals"
+area: "Statistics"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Estimation uses data to learn about an unknown population quantity and reports
+both an estimate and its uncertainty.
+
+## Estimates and standard errors
+
+An estimator is a rule that maps a sample to a value. Its standard error measures
+how much that estimator would vary across repeated samples under a model. More
+data often reduces standard error, but systematic bias is not fixed by sample
+size alone.
+
+A simple approximate interval is:
+
+$$
+\text{estimate} \pm \text{critical value} \times \text{standard error}
+$$
+
+The critical value depends on the reference distribution and the desired
+coverage.
+
+## Interpreting confidence intervals
+
+A 95% confidence procedure produces intervals that contain the fixed parameter
+in about 95% of repeated samples when its assumptions hold. It does not mean
+there is a 95% probability that this one fixed parameter lies in this interval.
+
+::: {.callout-tip}
+Interpret the interval in the units of the outcome and compare its width with
+effects that would matter in practice.
+:::
+
+## Check your understanding
+
+Explain what would make an interval wider: a smaller sample, greater outcome
+variability, or a higher confidence level.
+
+## Further reading
+
+- [OpenStax Introductory Statistics: Confidence Intervals](https://openstax.org/details/books/introductory-statistics-2e)
+- [NIST: Confidence intervals](https://www.itl.nist.gov/div898/handbook/prc/section2/prc2.htm)
