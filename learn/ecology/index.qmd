@@ -1,0 +1,43 @@
+---
+title: "Ecology"
+---
+
+Ecology explains how living systems are organised and how energy, matter, and
+information move through them. Evolution explains how populations change across
+generations. Together they provide a framework for understanding biodiversity,
+adaptation, and environmental change.
+
+## A step-by-step route
+
+Work through these topics in order. Each page introduces a reusable idea and
+points toward the next scale of biological organisation.
+
+1. [Ecological foundations](ecological-foundations.qmd) — levels of organisation, scale, niches, and feedback.
+2. [Evolution and natural selection](evolution-natural-selection.qmd) — variation, inheritance, fitness, and adaptation.
+3. [Population ecology](population-ecology.qmd) — growth, regulation, demography, and life histories.
+4. [Community ecology](community-ecology.qmd) — species interactions, competition, predation, and succession.
+5. [Ecosystems and biodiversity](ecosystems-biodiversity.qmd) — energy flow, biogeochemical cycles, food webs, and conservation.
+
+## Anchor resource
+
+::: {.callout-tip}
+### Start here
+
+[Lecture 1: Introduction to Ecology](https://kevintshoemaker.github.io/NRES-470/LECTURE1.html)
+is a useful first pass through the central questions and vocabulary of ecology.
+Use it alongside the pages above, then return to it when a concept needs a
+second explanation.
+:::
+
+## How to study this section
+
+For each topic, be able to define the key terms, draw the main diagram from
+memory, explain one example, and identify what would change the prediction.
+Keep examples at more than one scale: an individual, a population, a community,
+and an ecosystem.
+
+## Further resources
+
+- [OpenStax Biology 2e](https://openstax.org/details/books/biology-2e) — accessible chapters on evolution, ecology, populations, and communities.
+- [Nature Education: Scitable](https://www.nature.com/scitable/) — concise biology explanations and references.
+- [OpenStax Concepts of Biology](https://openstax.org/details/books/concepts-biology) — a shorter introduction when the full Biology 2e treatment is too detailed.

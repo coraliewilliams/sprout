@@ -1,0 +1,61 @@
+---
+title: "Evolution and Natural Selection"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Evolution is a change in heritable population-level variation across
+ generations; natural selection is one process that causes that change.
+
+## The logic of natural selection
+
+Natural selection requires four ingredients:
+
+- individuals vary in traits;
+- some variation is heritable;
+- more offspring are produced than can survive;
+- individuals with different traits leave different numbers of surviving offspring.
+
+When these conditions persist, trait frequencies can change. Fitness is always
+relative to an environment and a comparison group; it is not the same as
+strength, health, or intention.
+
+## A simple model
+
+For two alleles with frequencies $p$ and $q$, $p + q = 1$. Under the
+Hardy-Weinberg assumptions of random mating, no selection, no migration, no
+mutation, and a very large population, genotype frequencies are:
+
+$$
+p^2 + 2pq + q^2 = 1
+$$
+
+The model is a baseline. A departure from its expectations tells us that at
+least one assumption may be violated; it does not identify which process is
+responsible.
+
+## Other evolutionary processes
+
+- Genetic drift changes frequencies through chance, especially in small populations.
+- Gene flow moves alleles between populations.
+- Mutation creates new variants.
+- Sexual selection changes reproductive success through mate choice or competition.
+
+Adaptation is a population outcome, not a conscious change made by an
+individual organism.
+
+## Check your understanding
+
+For a population exposed to a new parasite, list a possible heritable trait,
+the selection pressure, and one reason the trait might not become universal.
+
+## Further reading
+
+- [OpenStax Biology 2e: Evolution](https://openstax.org/books/biology-2e/pages/18-introduction)
+- [Nature Education: Natural Selection](https://www.nature.com/scitable/knowledge/library/natural-selection-14074229/)

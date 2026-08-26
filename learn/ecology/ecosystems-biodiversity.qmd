@@ -1,0 +1,61 @@
+---
+title: "Ecosystems and Biodiversity"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Ecosystem ecology follows energy flow and the cycling of matter through living
+communities and their physical environments.
+
+## Energy flow
+
+Most ecosystems receive energy from the sun. Producers convert some of it into
+biomass, which supports consumers and decomposers. Energy is lost as heat at
+each transfer, so food webs generally support less biomass at higher trophic
+levels.
+
+Productivity distinguishes the rate at which biomass is made from the amount
+already present. Gross primary productivity is total photosynthetic capture;
+net primary productivity subtracts plant respiration:
+
+$$
+\mathrm{NPP} = \mathrm{GPP} - R
+$$
+
+## Biogeochemical cycles
+
+Carbon, nitrogen, phosphorus, and water move between organisms, soils, water,
+and the atmosphere. Decomposers return nutrients to available forms. Human
+activities can alter both the size of pools and the speed of transfers, creating
+feedbacks such as eutrophication or climate warming.
+
+## Biodiversity and conservation
+
+Biodiversity includes variation within species, among species, and across
+ecosystems. Conservation decisions should make the value, baseline, spatial
+scale, time horizon, and uncertainty explicit. Habitat loss, overexploitation,
+invasive species, pollution, and climate change often interact rather than act
+independently.
+
+::: {.callout-tip}
+A conservation claim becomes more useful when it includes a measurable outcome:
+for example, occupancy, population growth rate, genetic diversity, or ecosystem
+function.
+:::
+
+## Check your understanding
+
+Choose a local ecosystem. Identify its main energy input, one important nutrient
+cycle, a keystone or foundational species, and one pressure that could change
+its resilience.
+
+## Further reading
+
+- [OpenStax Biology 2e: Ecosystems and Conservation Biology](https://openstax.org/books/biology-2e/pages/46-introduction)
+- [IPBES Global Assessment](https://ipbes.net/global-assessment)

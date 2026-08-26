@@ -28,6 +28,7 @@ website:
           - learn/mathematics/index.qmd
           - learn/data-science/index.qmd
           - learn/experimental-design/index.qmd
+          - learn/ecology/index.qmd
           - learn/programming-computing/index.qmd
       - section: "Practise"
         href: practise/index.qmd

@@ -1,0 +1,66 @@
+---
+title: "Population Ecology"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Population ecology explains changes in abundance through births, deaths,
+immigration, and emigration.
+
+## Population change
+
+A basic accounting identity is:
+
+$$
+\Delta N = B - D + I - E
+$$
+
+where $N$ is abundance, $B$ births, $D$ deaths, $I$ immigration, and $E$
+emigration. Separating these flows prevents a vague statement such as "the
+population increased" from being mistaken for an explanation.
+
+## Growth models
+
+With unlimited resources, exponential growth is:
+
+$$
+\frac{dN}{dt} = rN
+$$
+
+where $r$ is the per-capita rate of increase. Density dependence adds
+competition for limited resources. The logistic model represents this as:
+
+$$
+\frac{dN}{dt} = rN\left(1 - \frac{N}{K}\right)
+$$
+
+Here $K$ is carrying capacity, but in real systems it can change with weather,
+resources, predators, disturbance, and management.
+
+## Demography and life histories
+
+Age structure, survival schedules, and age-specific reproduction often predict
+future abundance better than a single population count. Life-history trade-offs
+arise because energy invested in growth, survival, and reproduction is limited.
+
+::: {.callout-tip}
+A time series of abundance is descriptive. To infer regulation, look for a
+relationship between density and a vital rate such as survival or recruitment,
+while accounting for environmental variation.
+:::
+
+## Check your understanding
+
+Sketch exponential and logistic growth. Mark where density dependence should be
+weakest and strongest, then name one mechanism that could make $K$ vary over
+time.
+
+## Further reading
+
+- [OpenStax Biology 2e: Population and Community Ecology](https://openstax.org/books/biology-2e/pages/45-introduction)

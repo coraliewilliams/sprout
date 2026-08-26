@@ -1,0 +1,52 @@
+---
+title: "Community Ecology"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Community ecology asks how species interactions and the environment shape the
+composition, abundance, and diversity of assemblages.
+
+## Core interactions
+
+- Competition occurs when organisms use a limiting shared resource.
+- Predation includes consumption of animals; herbivory is consumption of plants or algae.
+- Mutualism benefits both partners, while parasitism benefits one and harms the other.
+- Facilitation occurs when one species improves conditions for another.
+
+Interactions depend on context. The same species pair can compete in one season
+and facilitate one another in another environment.
+
+## Food webs and indirect effects
+
+Food webs represent many feeding links rather than a single linear chain. A
+change in one species can affect others indirectly through shared predators,
+prey, or resources. A trophic cascade is a strong top-down effect that travels
+across multiple trophic levels.
+
+## Diversity and succession
+
+Species richness is the number of species. Evenness describes how balanced their
+abundances are. Succession describes changes in community composition through
+time after colonisation or disturbance. There is no single universal endpoint:
+disturbance regime, climate, dispersal, and species interactions all matter.
+
+::: {.callout-important}
+Do not treat diversity as one number. State whether you mean richness, evenness,
+functional diversity, or phylogenetic diversity, and define the sampling unit.
+:::
+
+## Check your understanding
+
+Draw a three-level food web and remove its top predator. Predict two direct and
+two indirect changes, then identify an observation that would test your prediction.
+
+## Further reading
+
+- [OpenStax Biology 2e: Community Ecology](https://openstax.org/books/biology-2e/pages/47-introduction)

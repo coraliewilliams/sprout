@@ -1,0 +1,58 @@
+---
+title: "Ecological Foundations"
+area: "Ecology"
+status: "in progress"
+confidence: 1
+last-reviewed: 2026-08-26
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Ecology studies the distribution and abundance of organisms, and the
+interactions that produce those patterns across space and time.
+
+## The central idea
+
+Ecological questions are about scale. An organism has traits; a population is a
+reproducing group of one species; a community contains interacting species; an
+ecosystem includes those organisms plus physical and chemical processes.
+
+A useful workflow is:
+
+1. Define the focal entity and boundary.
+2. Choose the spatial and temporal scale.
+3. Identify the processes that could cause the pattern.
+4. Measure the pattern and compare it with a prediction.
+
+## Niche and habitat
+
+A habitat is where an organism lives. Its niche is the set of environmental
+conditions and resources under which it can survive and reproduce, including its
+interactions with other organisms. The fundamental niche describes potential
+conditions; the realised niche is narrowed by competition, predation, disease,
+and dispersal limits.
+
+::: {.callout-important}
+A correlation between an organism and an environment does not by itself show
+that the environment causes the pattern. Manipulation, natural experiments, or
+stronger designs are needed to separate competing explanations.
+:::
+
+## Feedback and scale
+
+Negative feedback tends to stabilise a system: crowding can reduce survival or
+birth rates. Positive feedback amplifies change: vegetation loss can increase
+runoff and erosion, making further vegetation loss more likely. The same system
+can be stable at one scale and variable at another.
+
+## Check your understanding
+
+Choose a species near you. Define its habitat, propose its realised niche, and
+name one interaction that could prevent it from occupying every suitable site.
+
+## Further reading
+
+- [OpenStax Biology 2e: Ecology and the Biosphere](https://openstax.org/books/biology-2e/pages/44-introduction)
+- [NRES-470 Lecture 1](https://kevintshoemaker.github.io/NRES-470/LECTURE1.html)
