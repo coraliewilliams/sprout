@@ -10,6 +10,7 @@ website:
   description: >
     A personal technical learning notebook covering statistics, machine learning,
     mathematics, data science, experimental design, and programming.
+  favicon: favicon.svg
   search:
     location: sidebar
     type: overlay
@@ -51,6 +52,12 @@ format:
     code-copy: true
     code-overflow: wrap
     include-after-body: styles/breadcrumb-home.html
+    include-in-header:
+      - text: |
+          <meta name="apple-mobile-web-app-capable" content="yes">
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+          <meta name="apple-mobile-web-app-title" content="My notebook">
+          <link rel="apple-touch-icon" href="favicon.svg">
 
 execute:
   freeze: auto
