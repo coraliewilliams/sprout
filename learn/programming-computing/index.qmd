@@ -12,6 +12,7 @@ Planned areas:
   [error handling](python-error-handling.qmd), [modules and packages](python-modules-packages.qmd),
   [command-line workflows](python-cli-workflows.qmd), [file and data I/O](python-file-io.qmd), [database access](python-database-access.qmd), [HTTP APIs](python-http-apis.qmd),
   [virtual environments](python-virtual-environments.qmd), [testing](python-testing.qmd),
+  [profiling & performance debugging](python-profiling.qmd), [OOP fundamentals & design patterns](python-oop-design-patterns.qmd),
   [NumPy arrays](python-numpy.qmd),
   [pandas DataFrames](python-pandas.qmd), [visualisation](python-visualisation.qmd),
   [machine learning](python-machine-learning.qmd)

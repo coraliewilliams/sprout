@@ -1,0 +1,126 @@
+<!-- Progress Card Component
+
+     Usage in Quarto (index.qmd, track/progress.qmd):
+     
+     <div class="progress-card">
+       <div class="card-header">
+         <span class="card-icon">📊</span>
+         <h3>Statistics</h3>
+       </div>
+       <p class="card-description">Probability, inference, and modelling</p>
+       <div class="progress-bar">
+         <div class="progress-fill" style="width: 60%;"></div>
+       </div>
+       <p class="progress-label">60% complete (12/20 pages)</p>
+       <p class="last-studied">Last studied: 5 days ago</p>
+       <a href="learn/statistics/index.qmd" class="btn btn-outline">Explore</a>
+     </div>
+-->
+
+<style>
+.progress-card {
+  padding: 1.5rem;
+  background: var(--page-bg, #faf9f6);
+  border: 1px solid var(--border-color, #dfdcd3);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.progress-card:hover {
+  border-color: var(--accent-sage, #5b7a6b);
+  box-shadow: 0 2px 8px rgba(91, 122, 107, 0.1);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #2f3437);
+}
+
+.card-description {
+  margin: 0 0 1rem 0;
+  color: var(--text-secondary, #6f7477);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--border-color, #dfdcd3);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, var(--accent-sage, #5b7a6b), #4a6b5c);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.progress-label {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #6f7477);
+  font-weight: 500;
+}
+
+.last-studied {
+  margin: 0 0 1rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #6f7477);
+}
+
+.btn-outline {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--accent-sage, #5b7a6b);
+  color: var(--accent-sage, #5b7a6b);
+  border-radius: 3px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  text-align: center;
+  margin-top: auto;
+}
+
+.btn-outline:hover {
+  background: var(--accent-sage, #5b7a6b);
+  color: white;
+}
+
+/* Grid layout for multiple cards */
+.progress-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+@media (max-width: 768px) {
+  .progress-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .progress-card {
+    padding: 1.25rem;
+  }
+}
+</style>

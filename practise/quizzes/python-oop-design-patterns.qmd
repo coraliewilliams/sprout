@@ -1,0 +1,736 @@
+---
+title: "Quiz: Python OOP Fundamentals & Design Patterns"
+area: "Programming & Computing"
+status: "done"
+confidence: 1
+last-reviewed: "2026-09-09"
+quiz: true
+---
+
+## Overview
+
+This quiz tests your ability to design scalable, maintainable Python systems using SOLID principles and design patterns—skills essential for code review and system design interviews. Screening interviewers ask: *"Design a plugin system." "When would you use Strategy over Factory?" "Why is deep inheritance fragile?"*
+
+Focus on **when** to use patterns (not just what they are), **trade-offs** between approaches, and **recognizing anti-patterns** in existing code.
+
+---
+
+### 1. Inheritance vs. Composition: The Dog & Collar Problem
+
+You're designing a pet management system. A `Dog` is an animal that barks and eats. A `Dog` can wear a collar.
+
+Which design is most maintainable?
+
+```python
+# Option A: Inheritance
+class Animal:
+    def eat(self): pass
+
+class Dog(Animal):
+    def bark(self): pass
+    def wear_collar(self): pass  # What if a collar is shared with a cat?
+
+# Option B: Composition
+class Dog:
+    def __init__(self):
+        self.collar = None
+    def eat(self): pass
+    def bark(self): pass
+    def put_on_collar(self, collar):
+        self.collar = collar
+```
+
+Which statement best explains why Option B is better?
+
+A. Composition is always better than inheritance; inheritance is outdated  
+B. Inheritance creates a tight hierarchy; composition lets Dog use an optional Collar without Dog committing to "is-a" relationship  
+C. Option A doesn't support multiple collars; Option B does  
+D. Option B is more efficient in memory; inheritance wastes space  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+Inheritance says "Dog IS-A Animal." Composition says "Dog HAS-A Collar." The "is-a" vs. "has-a" distinction matters.
+
+**Why B is correct:**
+- In Option A, you're modeling `wear_collar` as part of what a Dog *is*, which is conflating identity (what a Dog is) with behavior (what a Dog can do).
+- A Cat might also wear a collar; modeling it via inheritance creates redundant `Collar` in multiple classes.
+- Composition decouples: `Dog` and `Cat` can independently use a shared `Collar` class.
+- You can add/remove collars at runtime in Option B; they're optional.
+
+**Why others are wrong:**
+- **A:** Inheritance is valid when modeling true taxonomies (Animal → Dog). The issue is using it for optional features (collars).
+- **C:** Option B doesn't inherently support *multiple* collars; both need modification for that. The design flaw in A is about responsibility, not quantity.
+- **D:** Memory efficiency is rarely a reason to choose inheritance; it's a micro-optimization.
+
+**Key insight:** SOLID principle: **Single Responsibility**.
+- Dog's responsibility: bark, eat, move.
+- Collar's responsibility: be wearable, stay secure.
+- Don't inherit Collar behavior into Dog. Compose it.
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>
+
+---
+
+### 2. Liskov Substitution Principle Violation
+
+You have:
+
+```python
+class Bird:
+    def fly(self): return "flying"
+
+class Penguin(Bird):
+    def fly(self):
+        raise NotImplementedError("Penguins can't fly")
+
+# Client code
+def make_bird_fly(bird: Bird):
+    return bird.fly()  # Expects to work for any Bird
+```
+
+Why does this violate LSP, and what's the better design?
+
+A. Penguin should override `fly()` to return "waddling"; LSP requires all subclasses to behave identically  
+B. LSP is violated because Penguin breaks the contract of Bird; better to split: `FlyingBird` and `FlightlessBird`  
+C. You should use Duck Typing and not enforce inheritance; just make Penguin not inherit from Bird  
+D. Penguin should inherit from a separate `Animal` class instead; don't mix flying and non-flying in the same hierarchy  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+LSP (Liskov Substitution Principle): **If class S is a subtype of class T, objects of type S should be substitutable for objects of type T without breaking the program.**
+
+Here, Penguin IS-A Bird, but it *breaks* the contract that birds fly. This violates LSP.
+
+**Why B is correct:**
+- The correct fix: create `FlyingBird` and `FlightlessBird` as separate abstractions.
+- Then `Eagle(FlyingBird)` can safely fly; `Penguin(FlightlessBird)` doesn't pretend to fly.
+- Now `make_bird_fly()` accepts `FlyingBird`, and all are substitutable.
+
+```python
+class FlyingBird:
+    def fly(self): pass
+
+class FlightlessBird:
+    pass
+
+class Penguin(FlightlessBird):
+    def swim(self): return "swimming"
+```
+
+**Why others are wrong:**
+- **A:** LSP doesn't require identical behavior; it requires *compatible* behavior. Penguin returning "waddling" still breaks the `fly()` contract (should return flight, not locomotion).
+- **C:** Duck Typing might work, but it sidesteps the inheritance hierarchy issue. The problem is Penguin inherits from Bird, not that inheritance exists.
+- **D:** Creating a separate Animal class doesn't fix LSP; Penguin still "is" a Bird (biologically). The issue is the *abstraction* (Bird shouldn't imply flight).
+
+**Key insight:** LSP guides inheritance design:
+- Don't inherit unless subclass can honor the parent's contract.
+- "All dogs are animals" ✓ (LSP-safe).
+- "All birds fly" ✗ (Penguin breaks it).
+- Refactor to smaller contracts: FlyingBird, FlightlessBird.
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>
+
+---
+
+### 3. When to Introduce Abstraction
+
+You're writing a payment processor. Initially, you only support credit cards:
+
+```python
+class PaymentProcessor:
+    def process_credit_card(self, card, amount): ...
+```
+
+Later, you add PayPal support:
+
+```python
+class PaymentProcessor:
+    def process_credit_card(self, card, amount): ...
+    def process_paypal(self, email, amount): ...
+```
+
+At what point should you introduce an abstract `PaymentMethod` interface?
+
+A. Immediately, when you write the first `process_credit_card()`; always design for extensibility  
+B. After adding PayPal; now you have 2+ implementations—abstraction starts here  
+C. Only if you plan to add a third payment method (Stripe, Apple Pay, etc.)  
+D. Never; duck typing is sufficient; use protocol checking instead  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+**YAGNI (You Ain't Gonna Need It)**: Don't add abstraction without evidence you need it.
+
+**Why B is correct:**
+- **1 implementation** (credit card) doesn't prove you need abstraction; you might never add PayPal.
+- **2 implementations** (credit card + PayPal) is the signal: pattern exists. Now introduce `PaymentMethod` base class.
+- Example:
+
+```python
+class PaymentMethod(ABC):
+    @abstractmethod
+    def pay(self, amount): pass
+
+class CreditCard(PaymentMethod):
+    def pay(self, amount): ...
+
+class PayPal(PaymentMethod):
+    def pay(self, amount): ...
+
+class PaymentProcessor:
+    def process(self, method: PaymentMethod, amount):
+        method.pay(amount)
+```
+
+**Why others are wrong:**
+- **A:** Premature abstraction adds cognitive load without benefit. Over-engineering is common when designing for "eventual" extensibility. Wait for real demand.
+- **C:** Waiting for a *third* implementation is also reasonable (another variant of "wait for signal"), but 2 is often the practical threshold.
+- **D:** Duck typing works, but with 2+ implementations, an explicit base class documents the contract. Duck typing without abstraction is fragile (what if someone forgets to implement `pay()`?).
+
+**Key insight:** The abstraction Rule of Three:
+- 1 instance: solve it directly (YAGNI).
+- 2 instances: you have a pattern; introduce abstraction.
+- 3+ instances: abstraction is proven valuable.
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>
+
+---
+
+### 4. Design Pattern Selection: Factory vs. Strategy
+
+You need to create different types of database connectors (PostgreSQL, MySQL, SQLite) based on a configuration file. Which pattern is most appropriate?
+
+A. Strategy—define a family of algorithms (connectors) and let the client choose at runtime  
+B. Factory—encapsulate connector *creation* based on config, separate creation from usage  
+C. Both; use Factory to create Strategy instances  
+D. Template Method; define the connector algorithm and let subclasses customize steps  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+**Factory** solves the problem: *How do I create the right connector based on config?* **Strategy** solves a different problem: *How do I swap algorithms at runtime?*
+
+**Why B is correct:**
+- Factory Pattern:
+
+```python
+class DatabaseConnectorFactory:
+    @staticmethod
+    def create(config):
+        if config['type'] == 'postgres':
+            return PostgresConnector(config)
+        elif config['type'] == 'mysql':
+            return MySQLConnector(config)
+        # ...
+
+# Usage
+config = load_config()
+connector = DatabaseConnectorFactory.create(config)
+connector.connect()
+```
+
+- The Factory *encapsulates* creation logic, separating "how do I build the right connector?" from "how do I use a connector?"
+
+**Why others are wrong:**
+- **A:** Strategy is for swapping *behaviors/algorithms* at runtime for the same task. Connectors are different implementations of the same interface (common pattern), but the core problem is *creation*, not behavior swapping.
+- **C:** You *could* use both (Factory creates a Strategy), but that's over-engineering for this case. One Factory suffices.
+- **D:** Template Method is for defining an algorithm's skeleton and letting subclasses fill in details. Connectors don't share a skeleton; each has unique connection logic.
+
+**Key insight:** Pattern selection is about the **problem**, not the structure:
+- **Factory** → "I need to create *different types* of objects based on context."
+- **Strategy** → "I need to swap *algorithms/behaviors* for the same task."
+- **Template Method** → "I need to define a *reusable algorithm skeleton* and let subclasses customize steps."
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>
+
+---
+
+### 5. Anti-Pattern: God Object
+
+You have a `User` class:
+
+```python
+class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+    
+    def validate_email(self): ...
+    def hash_password(self): ...
+    def send_email(self): ...
+    def log_activity(self): ...
+    def process_payment(self): ...
+    def generate_report(self): ...
+```
+
+Why is this a God Object anti-pattern, and what's the fix?
+
+A. Too many methods; split User into UserRepository and UserService  
+B. User is responsible for too many unrelated concerns; each concern should be a separate class  
+C. User shouldn't inherit from multiple base classes; this violates multiple inheritance  
+D. The class is too large to fit in one file; refactor into separate modules  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+A God Object violates **Single Responsibility Principle (SRP)**: one class shouldn't have multiple reasons to change.
+
+**Why B is correct:**
+- User has responsibilities:
+  1. **Identity**: name, email.
+  2. **Authentication**: hash_password.
+  3. **Communication**: send_email.
+  4. **Activity Tracking**: log_activity.
+  5. **Payments**: process_payment.
+  6. **Reporting**: generate_report.
+- Each represents a different reason to change. If email validation logic changes, you edit User. If payment processing changes, you edit User again. This is fragile.
+
+**Better design (separate concerns):**
+
+```python
+class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+class EmailValidator:
+    def validate(self, email): ...
+
+class PasswordHasher:
+    def hash(self, password): ...
+
+class EmailService:
+    def send(self, user, message): ...
+
+class ActivityLogger:
+    def log(self, user, action): ...
+
+class PaymentProcessor:
+    def process(self, user, amount): ...
+
+class ReportGenerator:
+    def generate(self, user): ...
+```
+
+**Why others are wrong:**
+- **A:** UserRepository and UserService are patterns, but they don't solve the root issue (SRP). You're just moving methods to a Service, not clarifying responsibilities.
+- **C:** Multiple inheritance isn't involved here; this is single inheritance or composition.
+- **D:** File size is a code organization detail, not the root issue.
+
+**Key insight:** God Objects happen when you dump related features into one class. Fix by:
+1. Identify each distinct responsibility.
+2. Create a class for each responsibility.
+3. Compose them into User (or inject them).
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>
+
+---
+
+### 6. Anti-Pattern: Tight Coupling
+
+You have:
+
+```python
+class OrderProcessor:
+    def __init__(self):
+        self.payment = PayPalPaymentProcessor()
+        self.logger = FileLogger()
+    
+    def process_order(self, order):
+        self.payment.charge(order.amount)
+        self.logger.log(f"Order {order.id} processed")
+```
+
+Why is OrderProcessor tightly coupled, and what's the solution?
+
+A. OrderProcessor hardcodes PayPal and FileLogger; if you want to use Stripe or email logging, you must edit OrderProcessor  
+B. OrderProcessor has too many responsibilities; split it into OrderService and PaymentService  
+C. OrderProcessor should inherit from a base class; tight coupling is about inheritance  
+D. Tight coupling is fine; this code is clear and simple  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: A**
+
+**Tight Coupling**: OrderProcessor is **hardwired** to specific implementations (PayPal, FileLogger). Changing payment method or logger requires editing OrderProcessor.
+
+**Why A is correct:**
+- The fix: **Dependency Injection**. Pass dependencies as parameters:
+
+```python
+class OrderProcessor:
+    def __init__(self, payment_processor, logger):
+        self.payment = payment_processor
+        self.logger = logger
+    
+    def process_order(self, order):
+        self.payment.charge(order.amount)
+        self.logger.log(f"Order {order.id} processed")
+
+# Usage
+processor = OrderProcessor(StripePaymentProcessor(), EmailLogger())
+# Easily swap implementations without changing OrderProcessor
+```
+
+- Now OrderProcessor *depends on abstractions* (payment interface, logger interface), not concrete classes.
+- Swapping PayPal for Stripe requires 1 line change at instantiation, not modifying OrderProcessor.
+
+**Why others are wrong:**
+- **B:** Splitting responsibilities helps, but it doesn't address the root issue: hardcoded dependencies. Even with separate services, tight coupling remains if you hardcode them.
+- **C:** Tight coupling is about *dependencies*, not inheritance. OrderProcessor doesn't inherit from anything problematic.
+- **D:** Tight coupling is a real problem; this code fails to scale. Small changes (new payment method) cascade (edit OrderProcessor, test, deploy).
+
+**Key insight:** Decouple by inverting dependencies:
+- **Before (tight)**: OrderProcessor creates/uses PayPalPaymentProcessor directly.
+- **After (loose)**: OrderProcessor receives a payment processor (any type) as a dependency.
+- Use **Dependency Injection** (constructor, setter, or factory).
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>
+
+---
+
+### 7. Observer Pattern: When to Use It
+
+You have a data model (User profile) that multiple systems want to be notified about (email notifications, analytics, audit log). Which design is best?
+
+A. Have each system poll the User object periodically to check for changes  
+B. Use the Observer pattern: User notifies all subscribers when profile changes  
+C. Have each system directly call User's methods; User calls back to notify them  
+D. Store all changes in a queue; systems consume from the queue  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+**Observer Pattern** solves this exact problem: decoupled notification of multiple interested parties when an event occurs.
+
+**Why B is correct:**
+- Observer structure:
+
+```python
+class User:
+    def __init__(self):
+        self.observers = []  # EmailNotifier, Analytics, AuditLog
+    
+    def attach(self, observer):
+        self.observers.append(observer)
+    
+    def notify(self):
+        for observer in self.observers:
+            observer.update(self)  # Notify all subscribers
+    
+    def update_profile(self, name):
+        self.name = name
+        self.notify()  # Trigger all notifications
+
+# Usage
+user = User()
+user.attach(EmailNotifier())
+user.attach(Analytics())
+user.attach(AuditLog())
+
+user.update_profile("Alice")  # Automatically notifies all observers
+```
+
+- User doesn't know or care who's listening; subscribers are decoupled.
+- Adding a new observer (SMS notifier) requires no changes to User.
+
+**Why others are wrong:**
+- **A:** Polling is inefficient (wasted checks) and introduces latency (delays between changes and notifications).
+- **C:** Direct calls create tight coupling; User depends on each system's interface. Adding a system requires editing User.
+- **D:** Queue-based (event sourcing) is powerful for complex scenarios, but over-engineered for simple notifications. Observer is simpler.
+
+**Key insight:** Observer is ideal for:
+- **One-to-many** notification patterns.
+- **Decoupling** between event source and event handlers.
+- **Adding/removing** observers at runtime without source code changes.
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>
+
+---
+
+### 8. Inheritance for Reuse (Anti-Pattern)
+
+You have two unrelated classes that share some common methods:
+
+```python
+class Logger:
+    def log(self, msg): print(f"[LOG] {msg}")
+
+class Reporter:
+    def log(self, msg): print(f"[REPORT] {msg}")
+
+# Both log() to stderr/stdout differently
+```
+
+A colleague suggests: *"Create a base class `OutputWriter` with common logging code, and inherit from it."*
+
+Why is inheritance the wrong approach here?
+
+A. Logger and Reporter don't have an "is-a" relationship; they're unrelated classes that happen to share a method  
+B. Inheritance adds unnecessary hierarchy; composition (mixing in common code) is better  
+C. You should use multiple inheritance to avoid deep hierarchies  
+D. base classes slow down performance; avoid them  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: A**
+
+Inheritance should model **is-a** relationships (semantic/conceptual), not just code reuse.
+
+**Why A is correct:**
+- Logger IS-A Logger, not IS-A OutputWriter.
+- Reporter IS-A Reporter, not IS-A OutputWriter.
+- They share a method, but that's not a reason to inherit; it's a reason to **extract** the shared behavior.
+
+**Better design (composition/delegation):**
+
+```python
+class OutputWriter:
+    def write(self, msg): print(msg)
+
+class Logger:
+    def __init__(self):
+        self.writer = OutputWriter()
+    
+    def log(self, msg):
+        self.writer.write(f"[LOG] {msg}")
+
+class Reporter:
+    def __init__(self):
+        self.writer = OutputWriter()
+    
+    def log(self, msg):
+        self.writer.write(f"[REPORT] {msg}")
+```
+
+- OutputWriter is a *utility*, not an ancestor.
+- Logger and Reporter remain independent; no false hierarchy.
+
+**Why others are wrong:**
+- **B:** Composition is right, but "mixing in common code" suggests inheritance. Composition uses delegation (like the example above).
+- **C:** Multiple inheritance (MI) is controversial in Python for good reason (complexity, ambiguity). Avoid for code reuse.
+- **D:** Base classes don't inherently slow things down; performance is negligible. This is a non-issue.
+
+**Key insight:** Use inheritance when:
+- ✓ True is-a relationship (Dog IS-A Animal).
+- ✓ Behavioral contract and polymorphism (Bird interface, multiple implementations).
+
+Don't use inheritance for:
+- ✗ Code reuse alone (leads to fragile hierarchies).
+- ✗ "Sharing methods" without semantic relationship.
+
+Use composition instead: encapsulate reusable behavior in a helper class, compose it into multiple clients.
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>
+
+---
+
+### 9. Plugin System Architecture
+
+You're building a plugin system for a data processing framework. Plugins transform data (e.g., JSON→CSV, JSON→Parquet). Which design is most extensible?
+
+A. Create a `Plugin` base class with a `transform()` method; use a PluginRegistry to load plugins by name  
+B. Hard-code each plugin in a conditional: `if format == 'csv': ...` 
+C. Use duck typing; any class with a `transform()` method is a plugin (no base class)  
+D. Create a PluginFactory that reads plugin files from a directory and dynamically imports them  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: A**
+
+A well-designed plugin system combines **abstraction** (base class/interface), **registration** (registry), and **discovery** (plugin loading).
+
+**Why A is correct:**
+- Architecture:
+
+```python
+from abc import ABC, abstractmethod
+
+class Plugin(ABC):
+    @abstractmethod
+    def transform(self, data): pass
+
+class PluginRegistry:
+    def __init__(self):
+        self.plugins = {}
+    
+    def register(self, name, plugin_class):
+        self.plugins[name] = plugin_class
+    
+    def get(self, name):
+        return self.plugins[name]()
+
+# Plugins
+class JSONToCSV(Plugin):
+    def transform(self, data): return "csv_data"
+
+class JSONToParquet(Plugin):
+    def transform(self, data): return "parquet_data"
+
+# Usage
+registry = PluginRegistry()
+registry.register('csv', JSONToCSV)
+registry.register('parquet', JSONToParquet)
+
+plugin = registry.get('csv')
+result = plugin.transform(data)
+```
+
+- **Extensible**: Adding a new plugin requires:
+  1. Define `class MyPlugin(Plugin)` with `transform()`.
+  2. Register it: `registry.register('my_format', MyPlugin)`.
+  3. No changes to the framework.
+
+**Why others are wrong:**
+- **B:** Hard-coded conditionals don't scale; every new plugin requires editing the framework.
+- **C:** Duck typing works, but lacks documentation (what methods must a plugin implement?). A base class makes the contract explicit.
+- **D:** Dynamic import is *part* of a complete system, but alone it's incomplete. You still need abstraction (base class) and registration (registry).
+
+**Key insight:** Plugin architecture components:
+1. **Base class/interface** → contract (what methods must plugins implement?).
+2. **Registry** → plugin lookup by name.
+3. **Discovery** → dynamic loading (import from directories).
+4. **Decoupling** → framework doesn't know plugin implementations; plugins are separate modules/packages.
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>
+
+---
+
+### 10. Strategy vs. Inheritance: Payment Strategies
+
+You want to support multiple payment methods (credit card, PayPal, Apple Pay) with different validation and processing logic. Compare:
+
+**Option A: Inheritance**
+```python
+class PaymentProcessor:
+    def process(self): pass
+
+class CreditCardPaymentProcessor(PaymentProcessor):
+    def process(self): validate_card(); charge_card()
+
+class PayPalPaymentProcessor(PaymentProcessor):
+    def process(self): validate_email(); charge_paypal()
+```
+
+**Option B: Strategy**
+```python
+class PaymentStrategy:
+    def process(self): pass
+
+class CreditCardStrategy(PaymentStrategy):
+    def process(self): validate_card(); charge_card()
+
+class PayPalStrategy(PaymentStrategy):
+    def process(self): validate_email(); charge_paypal()
+
+class OrderProcessor:
+    def __init__(self, strategy):
+        self.strategy = strategy
+    
+    def process_order(self, order):
+        self.strategy.process()
+```
+
+Why is Strategy better for this use case?
+
+A. Strategy avoids deep inheritance hierarchies; a flat structure is cleaner  
+B. Strategy separates payment *algorithms* from order processing; you can swap strategies at runtime without changing OrderProcessor  
+C. Strategy is always better than inheritance; use it everywhere  
+D. Strategy uses less memory; inheritance wastes space  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+**Strategy** is fundamentally about **decoupling the algorithm from the client that uses it**. In Option A, OrderProcessor would need to know about all payment types; in Option B, it doesn't.
+
+**Why B is correct:**
+- Option A:
+
+```python
+class OrderProcessor:
+    def process_order(self, order, payment_type):
+        if payment_type == 'credit_card':
+            processor = CreditCardPaymentProcessor()
+        elif payment_type == 'paypal':
+            processor = PayPalPaymentProcessor()
+        # ... OrderProcessor knows all payment types
+        processor.process()
+```
+
+- Option B: OrderProcessor *doesn't care* which strategy is used. It accepts any `PaymentStrategy`:
+
+```python
+class OrderProcessor:
+    def __init__(self, payment_strategy):
+        self.strategy = payment_strategy
+    
+    def process_order(self, order):
+        self.strategy.process()  # Works with any strategy
+```
+
+- **Runtime swapping**: Easily change payment method mid-execution:
+
+```python
+processor = OrderProcessor(CreditCardStrategy())
+processor.process_order(order1)
+
+processor.strategy = PayPalStrategy()  # Swap at runtime
+processor.process_order(order2)
+```
+
+- Option A requires creating a new OrderProcessor instance or adding conditional logic to change payment methods.
+
+**Why others are wrong:**
+- **A:** True (Strategy avoids inheritance), but hierarchy depth isn't the main issue. The issue is *coupling* (Option A couples OrderProcessor to payment types).
+- **C:** Inheritance is valid for taxonomies (Animal → Dog). Strategy is for swappable algorithms. Both have roles; use the right tool.
+- **D:** Memory is negligible; this isn't a performance decision.
+
+**Key insight:** Strategy is ideal for:
+- Swapping algorithms/behaviors at runtime.
+- Decoupling client from implementation details.
+- Supporting multiple variations without proliferating subclasses.
+
+Use inheritance for:
+- True taxonomic hierarchies (IS-A relationships).
+- Behavioral contracts across a family of types.
+
+**Related:** [Python OOP Fundamentals & Design Patterns](../../learn/programming-computing/python-oop-design-patterns.qmd)
+
+</details>

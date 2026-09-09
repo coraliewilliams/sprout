@@ -11,7 +11,8 @@ The order emphasises sound problem definition before model complexity.
 2. [Supervised Learning](supervised-learning.qmd) — regression, classification, and preprocessing.
 3. [Unsupervised Learning](unsupervised-learning.qmd) — clustering and dimension reduction.
 4. [Model Evaluation and Validation](model-evaluation-validation.qmd) — splits, metrics, and leakage.
-5. [Practical Machine Learning Workflow](practical-ml-workflow.qmd) — reproducibility, deployment, and monitoring.
+5. [Hyperparameter Tuning & Model Selection](hyperparameter-tuning.qmd) — learning curves, grid search, cross-validation, and systematic tuning workflows.
+6. [Practical Machine Learning Workflow](practical-ml-workflow.qmd) — reproducibility, deployment, and monitoring.
 
 ## Further resources
 

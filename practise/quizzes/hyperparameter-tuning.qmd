@@ -1,0 +1,418 @@
+---
+title: "Quiz: Hyperparameter Tuning & Model Selection"
+area: "Machine Learning"
+status: "done"
+confidence: 1
+last-reviewed: "2026-09-09"
+quiz: true
+---
+
+## Overview
+
+This quiz tests your ability to make practical decisions about hyperparameter tuning, model selection, and debugging learning dynamics—skills essential for screening interviews where interviewers ask: *"Your model plateaued. What's your next step?" "Why does learning rate matter?" "Grid or random search?"*
+
+Focus on **reasoning under constraints**, choosing tools for **specific problems**, and recognizing when **tuning isn't the answer**.
+
+---
+
+### 1. Learning Curve Diagnosis
+
+Your classifier achieves 92% training accuracy but 75% test accuracy. Your learning curves show training loss still decreasing steadily, test loss plateaued at a high value for the last 50 epochs.
+
+Which combination of actions is most likely to improve test performance?
+
+A. Increase model complexity and decrease learning rate  
+B. Collect more training data and reduce model complexity  
+C. Increase regularization strength and train longer  
+D. Use a different optimizer (Adam instead of SGD) and add dropout  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+The learning curve pattern—decreasing training loss but high, flat test loss—signals **overfitting**, not underfitting. You have a capacity–data mismatch: the model is memorizing rather than generalizing.
+
+**Why B is correct:**
+- **More data** directly addresses the core problem: the model has enough complexity to overfit limited training data, but needs more examples to learn robust features.
+- **Reducing model complexity** lowers the model's ability to memorize noise.
+
+**Why others are wrong:**
+- **A (increase complexity):** Worsens overfitting; the model is already too complex for your data.
+- **C (increase regularization, train longer):** Regularization helps, but it's a band-aid on an underdetermined system; more epochs won't fix high test loss if the model can't generalize.
+- **D (new optimizer, dropout):** Dropout is a regularization tool (might help), but switching optimizers doesn't address the data–capacity imbalance. This looks like "throw techniques at it" reasoning.
+
+**Key insight:** Distinguish overfitting (learning curves diverge) from underfitting (both curves high and flat). Different root causes = different solutions.
+
+**Related:** [Hyperparameter Tuning](../../learn/machine-learning/hyperparameter-tuning.qmd)
+
+</details>
+
+---
+
+### 2. Grid vs. Random Search Trade-off
+
+You have a small dataset (5,000 samples), 8 hyperparameters to tune, and 2 hours of compute time. A colleague proposes a grid search over 3 values per parameter.
+
+What is the main risk?
+
+A. Grid search will waste compute time; random search guarantees better coverage  
+B. 3^8 = 6,561 configurations is too many; you'll spend most compute on validation, not training  
+C. Grid search cannot parallelize across GPUs  
+D. Grid search is deterministic; you'll miss overfitting pathologies that randomness would reveal  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+3^8 = 6,561 configurations. With a 2-hour budget and cross-validation, each configuration gets minimal training time. You exhaust compute on **model evaluation**, not actual training.
+
+**Why B is correct:**
+- Grid search is thorough but combinatorially explosive in high dimensions.
+- With 8 parameters and 3 values each, you're evaluating thousands of models in a fixed budget.
+- Each model gets too little training time to converge or show its true performance.
+
+**Why others are wrong:**
+- **A:** Both grid and random search have trade-offs (grid is thorough in sampled regions, random explores widely). The issue isn't which is "better"—it's **budget allocation**. Random search could also burn 2 hours if you run 6,000 random configurations.
+- **C:** Both parallelize. This is implementation-specific, not a fundamental limitation of grid search.
+- **D:** Grid search is deterministic, but that's a feature (reproducibility), not a bug. Randomness doesn't reveal overfitting—validation and test sets do.
+
+**Key insight:** In high-dimensional spaces with limited compute, **random search with fewer total configurations** (e.g., 200–500) is often wiser than exhaustive grid search.
+
+**Related:** [Hyperparameter Tuning](../../learn/machine-learning/hyperparameter-tuning.qmd)
+
+</details>
+
+---
+
+### 3. When to Tune, When to Skip
+
+You train a baseline linear regression model on raw features. R² = 0.58. You then add 50 hand-engineered features. R² jumps to 0.78. 
+
+Now, should you tune the learning algorithm's hyperparameters (e.g., regularization strength)?
+
+A. No—feature engineering solved the problem; hyperparameter tuning is unnecessary  
+B. Yes—always tune hyperparameters for every model  
+C. Yes—feature engineering improved the signal, but regularization strength still needs tuning to prevent overfitting  
+D. No—linear regression has few hyperparameters; tuning is pointless  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: C**
+
+Feature engineering **increased signal** (more predictive information), but it didn't optimize the **bias-variance trade-off** of your model.
+
+**Why C is correct:**
+- Better features → better raw performance, but does **not** automatically set regularization optimally.
+- With more features (especially hand-engineered), regularization strength becomes more critical; the model now has more capacity to overfit.
+- Tuning regularization is quick (regularization path via efficient algorithms) and likely to yield gains.
+
+**Why others are wrong:**
+- **A:** False dichotomy. Feature engineering and hyperparameter tuning are **complementary**, not alternatives. Both matter.
+- **B:** Technically true (tuning usually helps), but doesn't explain *why* in this specific context. This is a "always do it" answer, not reasoning.
+- **D:** While linear regression has fewer tunable knobs than neural networks, regularization strength is one of the most impactful in high-dimensional settings.
+
+**Key insight:** The **order of effort** matters:
+1. Fix your **data and features** first (biggest impact).
+2. Then optimize the model (hyperparameter tuning).
+3. Tuning without good features is often wasted effort.
+
+**Related:** [Hyperparameter Tuning](../../learn/machine-learning/hyperparameter-tuning.qmd)
+
+</details>
+
+---
+
+### 4. Nested Cross-Validation Purpose
+
+You are building a production model selection system. You have 3 candidate algorithms (LogisticRegression, RandomForest, SVM). Each has hyperparameters to tune. You want to report a single, honest estimate of test performance for the *best* algorithm.
+
+Why is nested cross-validation necessary here?
+
+A. To ensure each algorithm trains on different data partitions for fairness  
+B. To estimate both hyperparameter performance (inner loop) and algorithm generalization (outer loop) without data leakage  
+C. To reduce variance in cross-validation by averaging over multiple train-test splits  
+D. To speed up cross-validation by parallelizing inner and outer loops  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+Nested cross-validation separates two distinct evaluation problems:
+- **Inner loop:** Select hyperparameters for each candidate.
+- **Outer loop:** Estimate true test performance of the *selected* model.
+
+**Why B is correct:**
+- If you tune hyperparameters on the entire dataset (even via cross-validation) and then report its cross-validation score as the "final estimate," you're **using the same data to tune and evaluate**. This biases the estimate downward (overly optimistic).
+- Nested CV prevents **data leakage**: the outer loop's test folds never see hyperparameter selection, so the final estimate is honest.
+
+**Why others are wrong:**
+- **A:** All methods use cross-validation, so all use different data partitions. This isn't why nested CV is special.
+- **C:** Nested CV does reduce variance, but that's a side effect, not the primary purpose. The critical reason is **honest performance estimation**.
+- **D:** Nested CV doesn't inherently speed things up—it often slows things down (more training). This is a false benefit.
+
+**Key insight:** If you tune hyperparameters and then evaluate on the same data (even via resampling), your performance estimate is **biased low**. Nested CV is the gold standard for honest model selection estimates.
+
+**Related:** [Model Evaluation & Validation](../learn/machine-learning/model-evaluation-validation.qmd)
+
+</details>
+
+---
+
+### 5. Early Stopping vs. Hyperparameter Tuning
+
+A colleague is training a neural network and notices that validation loss stops improving after epoch 50. They implement early stopping and retrain 10 times, getting consistent validation loss of 0.32.
+
+They then ask: *"Should I now tune the learning rate to get even better performance?"*
+
+What's the most accurate response?
+
+A. Yes—early stopping controls training duration, not learning rate; tuning learning rate is the next logical step  
+B. No—early stopping already optimized training dynamics; further tuning risks overfitting to the validation set  
+C. Maybe—first verify that epoch 50 (when early stopping triggers) is stable across multiple runs; if it varies widely, learning rate is likely a factor  
+D. No—you should have tuned learning rate before implementing early stopping; doing it now wastes compute  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: C**
+
+Early stopping and learning rate serve **different purposes** and interact. C correctly recognizes this interaction and suggests a diagnostic step.
+
+**Why C is correct:**
+- Early stopping prevents overfitting by stopping when validation loss plateaued.
+- Learning rate affects *when* validation loss plateaued (and at what value).
+- If early stopping triggers at epoch 50, but that's unstable across runs (sometimes 40, sometimes 60), learning rate is **likely** too high (noisy updates) or too low (slow convergence).
+- **Diagnosis first:** Check stability. If stable and consistent, learning rate is probably fine. If unstable, tune learning rate.
+
+**Why others are wrong:**
+- **A:** Technically true (early stopping ≠ learning rate tuning), but ignores the **interaction** between them. Tuning learning rate blind might help or hurt.
+- **B:** This reverses causality. Early stopping doesn't optimize learning rate; it just stops training. You can still tune learning rate and get better results.
+- **D:** Learning rate should ideally be tuned *before* early stopping, but the question is about sequence. If you haven't tuned it, tuning now is legitimate (though later than ideal).
+
+**Key insight:** Early stopping and learning rate are **coupled**:
+- High learning rate → noisy convergence → early stopping triggers erratically.
+- Low learning rate → slow convergence → early stopping triggers late (if at all).
+- Diagnose early stopping stability first; that guides whether learning rate tuning is worthwhile.
+
+**Related:** [Hyperparameter Tuning](../../learn/machine-learning/hyperparameter-tuning.qmd)
+
+</details>
+
+---
+
+### 6. Coarse-to-Fine Workflow Decision
+
+You're tuning a gradient boosting model. Your coarse search over 5 hyperparameters (50 configurations) yields a best validation score of 0.91. The second-best score is 0.899. The gap is 0.011.
+
+At the fine-tuning stage, which hyperparameter should you prioritize?
+
+A. Tune the hyperparameter with the widest range in the coarse search (e.g., max_depth: 2–10)  
+B. Tune the hyperparameter that showed the steepest gradient in the coarse search results  
+C. Tune learning_rate; it's almost always the highest-impact hyperparameter  
+D. Run a sensitivity analysis: vary each hyperparameter around the best configuration and measure validation score change  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: D**
+
+Fine-tuning should focus on hyperparameters with **high sensitivity**—those that cause the largest validation score changes when perturbed.
+
+**Why D is correct:**
+- Coarse search gives rough regions; fine-tuning should zoom into high-leverage knobs.
+- A sensitivity analysis (vary each hyperparameter ±1 step around the best config, hold others constant) reveals which ones *actually* move the needle.
+- This is empirical, model-specific, and data-specific—avoiding generic rules (e.g., "learning_rate is always key").
+
+**Why others are wrong:**
+- **A:** Wide range doesn't imply importance. A hyperparameter might have a 2–10 range but barely affect validation score.
+- **B:** "Steepest gradient" is reasonable intuition, but you need to *measure* it. Coarse search results are sparse; inferring gradients is risky.
+- **C:** Learning rate is often important, but "almost always" is overfit-to-your-experience reasoning. This model might be insensitive to learning rate and sensitive to tree depth.
+
+**Key insight:** Coarse-to-fine is systematic:
+1. Coarse search: find promising regions.
+2. Sensitivity analysis: identify high-leverage hyperparameters.
+3. Fine search: zoom into those high-leverage dimensions.
+
+Skipping step 2 often wastes compute on tuning hyperparameters that don't move the needle.
+
+**Related:** [Hyperparameter Tuning](../../learn/machine-learning/hyperparameter-tuning.qmd)
+
+</details>
+
+---
+
+### 7. Plateau Diagnosis: Model Capacity vs. Data Quality
+
+Your model training stabilizes at 85% validation accuracy. The learning curve shows training and validation accuracy converging (both ~85%). You increase model complexity and train longer—no improvement. 
+
+A colleague suggests: *"You need better hyperparameters."*
+
+Why is this diagnosis likely wrong?
+
+A. Hyperparameter tuning cannot improve a model that has reached its capacity ceiling  
+B. The converged learning curve signals that the model has learned all available signal in the data; lack of variance indicates data quality, not hyperparameter choice  
+C. Increasing model complexity should have helped; the fact that it didn't means hyperparameters are definitely the bottleneck  
+D. You should collect more labeled data; hyperparameter tuning is a secondary concern  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+A converged learning curve where training and validation accuracy are **close and both plateau** signals that the model is performing near its ceiling *given the current data*.
+
+**Why B is correct:**
+- When training and validation curves converge, bias is the limiting factor, not variance.
+- Bias → the data itself lacks sufficient signal or examples; the model is learning all the reliable patterns available.
+- Hyperparameter tuning primarily addresses **variance** (overfitting). It won't increase signal in data.
+- The plateau indicates a data-quality or data-quantity issue, not tuning opportunity.
+
+**Why others are wrong:**
+- **A:** Hyperparameter tuning *can* sometimes eke out gains, but the pattern here (convergent curves) suggests it won't. This is too absolute.
+- **C:** Increasing complexity *should* help if the bottleneck is model capacity. The fact that it didn't is evidence the bottleneck is *not* capacity—likely data quality.
+- **D:** Collecting more data is correct intuition, but the question asks why the colleague's hyperparameter diagnosis is wrong. B directly explains the root cause.
+
+**Key insight:** Learn to read learning curves:
+- **Diverging curves** (training 95%, validation 75%) → high variance → tune regularization or reduce complexity.
+- **Converged curves** (training 85%, validation 83%, both flat) → high bias → more/better data or better features; hyperparameter tuning won't help much.
+
+**Related:** [Model Evaluation & Validation](../learn/machine-learning/model-evaluation-validation.qmd)
+
+</details>
+
+---
+
+### 8. Hyperparameter Search Strategy Under Constraints
+
+You have 1 hour of GPU time and 4 hyperparameters to tune. Preliminary estimates suggest each model train+eval takes 45 seconds.
+
+You can fit ~80 configurations in your budget. A colleague proposes a Latin hypercube sample of 80 configurations uniformly across the hyperparameter space.
+
+What's a potential weakness of this approach?
+
+A. Latin hypercube sampling wastes time on low-performing regions; grid search would focus on promising areas  
+B. Uniform sampling may miss important region (e.g., learning rate 1e-5 to 1e-3 is often more important than 0.5 to 0.9)  
+C. 80 configurations is too many; you should only tune 1–2 hyperparameters at a time  
+D. Latin hypercube is deterministic; you need stochastic sampling to escape local optima  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+Uniform sampling treats all regions equally, but **hyperparameter importance is not uniform**.
+
+**Why B is correct:**
+- Learning rate (and many other hyperparameters) often operates on **log scale**. The range 1e-5 to 1e-3 is vastly more sensitive and important than 0.5 to 0.9.
+- Uniform Cartesian sampling wastes budget on uninformative regions.
+- Better approach: use **log-uniform** scaling for learning rate, learning_rate_decay, etc., and uniform for categorical or naturally linear hyperparameters.
+
+**Why others are wrong:**
+- **A:** Grid search wastes time on a pre-chosen grid, which may miss important regions entirely. Latin hypercube (or random search) is often better for exploration.
+- **C:** Tuning 4 hyperparameters together is reasonable if you have 80 configurations. Tuning 1–2 at a time could work but isn't a hard rule.
+- **D:** Determinism is fine for reproducibility. Stochasticity doesn't help escape local optima in hyperparameter search (you're doing exhaustive search over a finite set, not gradient descent).
+
+**Key insight:** Hyperparameter scaling matters more than search strategy:
+- Use **log-uniform** sampling for learning rates, regularization, dropout rates, tree depths.
+- Use **uniform** for fractions, batch sizes (sometimes), counts.
+- Use **categorical** for algorithm choices.
+- Even 80 uniform samples can miss critical regions if scaling is wrong.
+
+**Related:** [Hyperparameter Tuning](../../learn/machine-learning/hyperparameter-tuning.qmd)
+
+</details>
+
+---
+
+### 9. Why Tuning Can Backfire
+
+You train a model on Dataset A, tune hyperparameters using 5-fold cross-validation, and achieve 88% CV accuracy. You then deploy the model to Dataset B (similar distribution). Real-world accuracy drops to 72%.
+
+A colleague blames the hyperparameters: *"They overfit to the cross-validation folds!"*
+
+What's a more likely explanation?
+
+A. Cross-validation hyperparameter estimates are always overly optimistic; this was a predictable result  
+B. Dataset A and Dataset B have different label distributions; the hyperparameters tuned on A are suboptimal for B  
+C. 5-fold cross-validation is insufficient; you should use 10-fold to reduce bias  
+D. The 16-point drop between CV and deployment suggests **dataset shift** (train and test distributions differ), not tuning problems; hyperparameters are usually robust to this  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: D**
+
+A 16-point accuracy drop is too large to be explained by hyperparameter overfitting alone. This pattern screams **dataset shift**.
+
+**Why D is correct:**
+- Hyperparameter tuning usually causes 1–3% overestimation (not 16%).
+- A 16-point gap between CV and real-world performance indicates the model was tuned on data (Dataset A) that differs meaningfully from deployment data (Dataset B).
+- The hyperparameters themselves are usually robust to moderate distribution shift; the issue is that Dataset A and B are statistically different.
+- This is a **data problem**, not a tuning problem.
+
+**Why others are wrong:**
+- **A:** While CV can overestimate, a 16-point gap is extreme. This suggests something systematic is wrong (distribution shift).
+- **B:** Possible, but if Dataset A and B have *different label distributions*, that's part of dataset shift. The root cause is still distributional mismatch, not hyperparameter selection.
+- **C:** 5-fold vs. 10-fold rarely explains 16-point gaps. Both suffer from the same dataset shift if A and B differ.
+
+**Key insight:** Large train-test gaps (>10%) almost always indicate:
+1. **Dataset shift** (train/test distributions differ).
+2. **Label leakage** (test labels accidentally used during training).
+3. Rarely: severe hyperparameter overfitting.
+
+Blame data first, then tuning.
+
+**Related:** [Model Evaluation & Validation](../learn/machine-learning/model-evaluation-validation.qmd)
+
+</details>
+
+---
+
+### 10. Tuning Under Competition Rules
+
+In a Kaggle-style competition, you have:
+- Public leaderboard (small test set).
+- Private leaderboard (revealed only at the end).
+- 100 submission limit per day.
+
+You've tuned a model that scores 0.912 on the public leaderboard. Locally, you estimate it generalizes to 0.908.
+
+A teammate suggests aggressively fine-tuning hyperparameters to push the public score higher. 
+
+Why is this risky?
+
+A. Public leaderboard scores are always higher than private scores; chasing them wastes submissions  
+B. Aggressive tuning based on public leaderboard feedback creates overfitting to the public set; the gap between public and private leaderboards will widen  
+C. You should only submit one model per day to avoid quota exhaustion  
+D. Hyperparameter tuning is prohibited in competitions; you should only engineer features  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+The public leaderboard is a small test set. Tuning specifically to maximize public leaderboard score is a form of **overfitting to the test set**.
+
+**Why B is correct:**
+- The public leaderboard provides feedback, but it's a *partial* view of the private set.
+- Aggressively tuning based on public leaderboard performance causes your model to overfit to public quirks/patterns.
+- Private leaderboard scores—which decide the competition—will diverge downward from public scores.
+- This is **leakage by feedback loop**: you're using test-set feedback (public leaderboard) to optimize, which breaks the train-test split principle.
+
+**Why others are wrong:**
+- **A:** Public scores are sometimes higher, sometimes lower. The specific direction isn't the problem; the problem is using test feedback to tune.
+- **C:** Submission quotas exist, but using them strategically for validation is allowed. The issue is tuning *based on public leaderboard scores*.
+- **D:** Hyperparameter tuning is allowed and essential in competitions. The risk is *how* you tune (based on public feedback) and *when* it overfits.
+
+**Key insight:** In competitions:
+- Use your own validation set (held out from public and private) to estimate generalization.
+- Treat public leaderboard feedback cautiously; a few high-scoring submissions might be noise or overfitting.
+- Compare public and private leaderboard gaps to diagnose overfitting.
+
+**Related:** [Model Evaluation & Validation](../learn/machine-learning/model-evaluation-validation.qmd)
+
+</details>

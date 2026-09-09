@@ -1,0 +1,462 @@
+---
+title: "Quiz: Python Profiling & Performance Debugging"
+area: "Programming & Computing"
+status: "done"
+confidence: 1
+last-reviewed: "2026-09-09"
+quiz: true
+---
+
+## Overview
+
+This quiz tests your ability to diagnose and fix performance bottlenecks in Python—skills essential for production debugging. Screening interviewers ask: *"This batch job runs 10 minutes—debug it." "What's the Pareto principle in profiling?" "How do you verify an optimization helped?"*
+
+Focus on **choosing the right tool** for the problem, **interpreting profiling output**, and **knowing when profiling is overkill**.
+
+---
+
+### 1. CPU vs. Memory Profiling: Which Tool?
+
+You have a Python application that occasionally crashes with `MemoryError` after 30 minutes of runtime. Most of the time it runs fine. You suspect a memory leak.
+
+Which profiling approach should you start with?
+
+A. Use cProfile to find CPU hotspots; CPU-intensive code often correlates with memory issues  
+B. Use a memory profiler (e.g., memory_profiler or Memray) to track object allocation and identify which code paths leak memory  
+C. Run the application under valgrind to catch low-level memory bugs  
+D. Use a line profiler to profile line-by-line; this reveals both CPU and memory issues  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+A `MemoryError` after 30 minutes is a **memory problem**, not a CPU problem. Use memory-specific tools.
+
+**Why B is correct:**
+- Memory profilers (memory_profiler, Memray) track heap allocation, object lifetimes, and retain references.
+- They directly show *which objects* are growing in memory over time—classic leak signature.
+- Memray can even generate flame graphs for memory, showing allocation stacks.
+
+**Why others are wrong:**
+- **A:** CPU hotspots don't necessarily cause memory leaks. A slow loop that leaks is still slow; a fast loop that leaks is still a leak. Conflating CPU and memory is a common mistake.
+- **C:** valgrind is powerful but designed for C/C++ memory safety (segfaults, buffer overruns). Python has automatic memory management; valgrind is overkill for Python memory leaks.
+- **D:** Line profilers show execution time per line, not memory allocation. They won't diagnose leaks.
+
+**Key insight:** Match the tool to the symptom:
+- **Memory leak** → memory profiler (memory_profiler, Memray).
+- **CPU hotspot** → CPU profiler (cProfile, py-spy).
+- **Latency spike** → wall-clock profiler (py-spy, Py-Flame).
+- **Both** → use both tools or a unified profiler like Memray (supports CPU and memory).
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
+
+---
+
+### 2. Flame Graph Interpretation
+
+You profile a CPU-bound application and generate a flame graph. The graph shows a single, very wide bar at the top labeled `calculate_primes()`, with no sub-functions visible below it.
+
+What does this indicate?
+
+A. `calculate_primes()` is a bottleneck; you should optimize it or parallelize it  
+B. `calculate_primes()` is written in C (e.g., NumPy), so the profiler can't see its internal function calls  
+C. `calculate_primes()` spends most time in Python code with few/no function calls; it's compute-heavy and tight  
+D. The profiler is misconfigured; a wide bar with no children is a measurement artifact  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: C**
+
+A wide, flat bar with no sub-functions means the time is spent *inside* that function, not in called functions.
+
+**Why C is correct:**
+- Flame graph widths represent time/samples (CPU time or wall-clock).
+- Height shows the call stack. A wide bar with no children means samples are consistently at that function, with no deeper stack frames.
+- This typically happens with **tight loops** (loops without function calls) doing compute-heavy work: `for i in range(1000000): result += i ** 2`.
+
+**Why others are wrong:**
+- **A:** Identifying a bottleneck is correct, but "optimize or parallelize" is too vague. The next step is understanding *why* it's slow (e.g., algorithm, data structure, Python vs. C boundary). The flame graph tells you it's Python-level compute, not I/O or external calls.
+- **B:** If `calculate_primes()` is a C extension (NumPy, Cython), the profiler often shows the C function name but doesn't drill into C internals—true. However, the flame graph *would* usually show at least one more level (the C function boundary). A completely flat bar suggests pure Python code.
+- **D:** Measurement artifacts are rare with modern profilers. The flat bar is usually a real pattern (tight loop).
+
+**Key insight:** Reading flame graphs:
+- **Wide bar, many children** → time spread across many function calls (call-heavy code).
+- **Wide bar, no children** → time concentrated in one function's compute (tight Python loop).
+- **Tall stack, narrow bar** → deep recursion or many small functions.
+- **Short bar** → negligible contribution to total runtime.
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
+
+---
+
+### 3. cProfile Output: cumtime vs. tottime
+
+You profile a function with cProfile and see the output:
+
+```
+function_a: tottime=0.5, cumtime=3.2
+function_b: tottime=0.1, cumtime=0.15
+```
+
+You also observe that function_a calls function_b 20 times.
+
+What does this tell you about where time is spent?
+
+A. function_a is the bottleneck (cumtime=3.2); optimize function_a  
+B. Most of function_a's cumtime (2.7s) is spent in functions it calls; function_a is a orchestration function, not compute-heavy  
+C. function_b is efficient (low tottime); the problem is function_a's overhead in managing the calls  
+D. Both functions are slow; you should parallelize them together  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+cumtime = tottime (self) + time in called functions.
+
+For function_a:
+- tottime = 0.5s (time in function_a's own code).
+- cumtime = 3.2s (time in function_a + everything it calls).
+- Time in called functions = 3.2 - 0.5 = 2.7s.
+
+This pattern indicates function_a is a **coordinator** that spends most time waiting for or in called functions.
+
+**Why B is correct:**
+- function_a calls function_b 20 times, cumulative time ~0.15s (from function_b's cumtime).
+- But function_a's cumtime is 3.2s, so there's 2.85s unaccounted for.
+- This 2.85s is likely spent in other functions called by function_a, or in function_a's own slow code (0.5s alone is non-trivial).
+- function_a is not CPU-bound; it's orchestration or waiting.
+
+**Why others are wrong:**
+- **A:** While cumtime=3.2 is large, it doesn't mean optimize function_a's own code. Most of the time is in *called* functions.
+- **C:** Overhead of managing 20 calls (0.5s) is moderate. The bottleneck is likely in the called functions or I/O, not call overhead.
+- **D:** Parallelizing doesn't help if the time is in I/O (e.g., function_a makes 20 network calls) or if function_a is single-threaded orchestration.
+
+**Key insight:** cProfile metrics:
+- **tottime** = execution time of the function itself.
+- **cumtime** = tottime + time in all functions it calls.
+- Large cumtime, small tottime → look deeper; the bottleneck is in called functions.
+- Large tottime → the function itself is slow; optimize this function.
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
+
+---
+
+### 4. Flame Graph: CPU vs. Wall-Clock
+
+Your web server handles 100 requests/sec. You profile with:
+- A wall-clock profiler (measures real time).
+- A CPU profiler (measures CPU time).
+
+Wall-clock flame graph shows `handle_request()` taking up 70% of time. CPU flame graph shows `handle_request()` taking up 20% of time.
+
+What's happening?
+
+A. The profiler has a bug; both should show the same percentages  
+B. CPU profiler is double-counting time due to thread context switches  
+C. Most of `handle_request()`'s time is spent **waiting** (I/O, network, locks), not executing Python code  
+D. The server is doing CPU work in a different process; the profiler is missing it  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: C**
+
+Wall-clock time includes *all* elapsed time. CPU time only counts when Python is actually executing.
+
+**Why C is correct:**
+- Wall-clock: `handle_request()` runs for 10ms, but 7ms of that is waiting for database queries (blocked, not executing Python).
+- CPU: `handle_request()`'s Python code only executes 2ms.
+- Wall-clock: 7ms / 10ms = 70%.
+- CPU: 2ms / ~10ms total CPU time = 20%.
+- The gap is I/O-bound time.
+
+**Why others are wrong:**
+- **A:** No bug. Different measurement methods give different perspectives intentionally.
+- **B:** Context switches are part of wall-clock time, but thread scheduling doesn't cause profilers to disagree on *frame responsibility*. Both should attribute the time to the frame waiting.
+- **D:** If CPU work is in a different process, neither profiler (running in one process) would see it, so both would show low CPU. But wall-clock would still be high. This doesn't explain the gap.
+
+**Key insight:** Choose the right profiler:
+- **CPU profiler** (cProfile, py-spy with --mode=cpu): reveals compute bottlenecks; ignores I/O, lock contention, network.
+- **Wall-clock profiler** (py-spy with --mode=wall): reveals *real* latency; includes I/O, networking, scheduler delays.
+- **I/O-bound code** → large gap between wall-clock and CPU profiling; focus on I/O (database, network), concurrency (async, threading).
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
+
+---
+
+### 5. Identifying Bottlenecks vs. Micro-optimizations
+
+Your profiling reveals:
+- `json.dumps()` takes 15% of CPU time.
+- `list.append()` takes 2% of CPU time.
+- `database.query()` takes 35% of CPU time.
+
+You optimize `list.append()` (change from list to deque). The overall runtime improves by 1%.
+
+Why is this result unsurprising?
+
+A. list.append is already O(1) amortized; further optimization wastes effort  
+B. Reducing 2% CPU time saves 2% overall runtime; 1% improvement is measurement noise  
+C. You can't parallelize append; only parallelize database.query()  
+D. You focused on a 2% contributor when 35% of time is in database.query(); Amdahl's law predicts optimization of small contributors yields small gains  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: D**
+
+Amdahl's law: speedup is limited by the fraction of time not optimized.
+
+If 35% is database.query(), optimizing 2% (append) gives at most `1 / (1 - 0.02) = 1.02x` speedup (2% gain). You saw ~1%, which matches.
+
+**Why D is correct:**
+- Optimizing small contributors has diminishing returns.
+- Max possible speedup from optimizing append: `1 / (1 - 0.35 - 0.15) = 1 / 0.50 = 2x` (if you *completely eliminate* append and json.dumps).
+- But database.query (35%) sets a hard ceiling: max speedup is `1 / 0.35 ≈ 2.86x`, and only if you eliminate all other time.
+- This is Amdahl's law: focus on the largest bottlenecks.
+
+**Why others are wrong:**
+- **A:** True (append is nearly O(1)), but this doesn't explain why the optimization yielded only 1% gain. Amdahl's law is the explanation.
+- **B:** No, 2% CPU time should yield ~2% speedup if eliminated entirely. The 1% gain suggests the optimization wasn't complete or there's overhead. Amdahl's law is still the principle.
+- **C:** Parallelization is one strategy, but the question is about bottleneck prioritization, not parallelization.
+
+**Key insight:** The Pareto principle applies to performance:
+- Focus on the top 20% of bottlenecks (usually database, network, serialization).
+- Micro-optimizations on the bottom 80% are rarely worth effort.
+- Use profiling to identify the largest contributors, then focus optimization there.
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
+
+---
+
+### 6. Memory Leak Detection: What's the Red Flag?
+
+You use a memory profiler to track heap allocation in a long-running batch job. Over 1 hour:
+- Heap size at start: 100 MB.
+- Heap size after processing 10k items: 350 MB.
+- Heap size after processing 20k items: 550 MB.
+- Heap size after processing 30k items: 850 MB.
+
+Is this a memory leak?
+
+A. Yes—heap is growing; garbage collection isn't working  
+B. Yes, probably—linear growth with data processed suggests retained references (classic leak pattern)  
+C. No—heap growth is expected when processing more data; collect garbage and check if heap shrinks  
+D. No—the growth rate decreases with each step (250 MB → 200 MB → 300 MB), so it's not linear  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: C**
+
+**Linear growth is suspicious**, but before declaring a leak, always check if garbage collection recovers memory.
+
+**Why C is correct:**
+- It's normal for heap size to grow as you process more data (caches, intermediate results, working sets).
+- The critical question: **after processing each batch, does the heap shrink back toward a baseline?**
+- If you manually call `gc.collect()` after each batch and heap stabilizes (e.g., 150 MB ± 20 MB), there's no leak—just temporary memory use.
+- If heap continues growing even after `gc.collect()`, then you have a leak (retained references preventing garbage collection).
+
+**Why others are wrong:**
+- **A:** Heap growing doesn't mean GC isn't working. Temporary growth during processing is normal. GC cleans up *after* processing.
+- **B:** Linear growth *is* suspicious and should prompt investigation, but jumping to "it's a leak" without testing GC is premature diagnosis.
+- **D:** Growth rates (250 → 200 → 300 MB per 10k items) vary, but they're all substantial per batch. This is actually *consistent* with memory accumulation per batch, not ruling it out.
+
+**Key insight:** Memory leak diagnosis:
+1. **Observe heap growth** → notice if it's monotonic and proportional to input.
+2. **Force garbage collection** → `gc.collect()` and re-measure.
+3. **Check if heap shrinks** → if yes, it's temporary use, not a leak. If no, it's a leak.
+4. **Use memory profiler** → trace back to object allocations and references if leak is confirmed.
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
+
+---
+
+### 7. When Profiling Is Overkill
+
+Your Python script processes a CSV file with 1,000 rows. It runs in 2 seconds. A colleague says: *"Let's profile it to find bottlenecks."*
+
+Which response best captures why profiling might not be worth it here?
+
+A. Profiling adds overhead; on a fast script, the overhead dominates and results are unreliable  
+B. A 2-second script is fast enough; profiling is only useful for scripts that take >10 seconds  
+C. Unless the script runs repeatedly in production (e.g., 1,000x/day), optimizing 2 seconds saves minimal time  
+D. Profiling requires compiled code; Python scripts need bytecode optimization instead  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: C**
+
+Profiling effort should be proportional to impact. Optimizing a 2-second script that runs once saves 2 seconds *once*.
+
+**Why C is correct:**
+- If the script runs daily: optimize from 2s to 1s → save 1s/day ≈ 6 minutes/year. Minimal ROI.
+- If the script runs 1,000x/day (batch job, API call, etc.): 1s saved × 1,000 = 16+ minutes/day → worth profiling.
+- The question is: **total impact = (time saved per run) × (runs per period)**. For a once-off script, the product is small.
+
+**Why others are wrong:**
+- **A:** Profiling overhead is real but usually small (~5–10%). On a 2-second script, overhead is ~100–200ms—noticeable but not "dominates results."
+- **B:** There's no magic threshold. A 5-second script that runs 1,000x/day is worth profiling; a 30-second script that runs once/month might not be.
+- **D:** Profiling doesn't require compiled code or bytecode optimization. These are orthogonal concerns.
+
+**Key insight:** Before profiling, ask:
+- **How often does this code run?** (Once, daily, millions of times/sec?)
+- **What's the time cost of not optimizing?** (Seconds wasted × runs per period)
+- **Is optimization worth the effort?** (Engineering time vs. time saved)
+
+Many scripts aren't worth profiling. Sometimes, "good enough" is actually good enough.
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
+
+---
+
+### 8. Verifying an Optimization Worked
+
+You hypothesize that switching from a list to a NumPy array will speed up your matrix operations. You profile the code before and after and measure wall-clock time. Before: 5 seconds. After: 4.8 seconds. 
+
+Did the optimization work?
+
+A. Yes—you saved 0.2 seconds; this is a 4% improvement  
+B. Unclear—the 0.2-second difference might be measurement noise; you need multiple runs and statistical testing  
+C. No—a 4% improvement is too small to matter in production  
+D. Yes, but you should also run a flame graph to see which functions improved  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+A single measurement is unreliable. System noise (OS processes, cache state, thermal throttling) can vary by ±10%.
+
+**Why B is correct:**
+- Wall-clock time is noisy; you need multiple runs.
+- Best practice: run each version 5–10 times, record all measurements, compute mean and standard deviation.
+- If the distributions overlap, the difference is not statistically significant.
+- Example: version A runs (4.9, 5.0, 5.1, 4.95, 5.05s) ± 0.07s. Version B runs (4.7, 4.8, 4.9, 4.85, 4.75s) ± 0.08s. Even though means differ by 0.2s, the distributions overlap—unclear if real.
+
+**Why others are wrong:**
+- **A:** 4% improvement is good if real, but you haven't confirmed it's real (not noise).
+- **C:** 4% can be significant in production (e.g., 1M requests/day, 4% × 1M operations = 40k operations saved). Don't dismiss without business context.
+- **D:** Flame graphs show *where* time is spent, not whether an optimization is effective. Statistical testing is the right tool.
+
+**Key insight:** Benchmarking best practices:
+1. **Run multiple times** (5–10 minimum) to collect distributions.
+2. **Use a statistical test** (t-test, confidence intervals) to assess significance.
+3. **Control for system noise** (pin CPU, disable power management, close other processes).
+4. **Report mean ± std dev**, not a single measurement.
+5. **Use `timeit` or `pytest-benchmark`** for reproducible measurements.
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
+
+---
+
+### 9. Profiling Under Production Constraints
+
+Your production API receives 1,000 requests/sec. One endpoint is slow (p99 latency = 2 seconds). You want to profile the endpoint to find bottlenecks, but profiling overhead is ~10%, and your SLA is p99 < 1 second.
+
+What's the best approach?
+
+A. Offline profiling—copy production data to a dev environment and profile there  
+B. Live profiling with sampling—use py-spy or a low-overhead profiler with sampling to minimize production impact  
+C. Trace profiling—instrument the slowest 10% of requests in production to capture full traces  
+D. Queue-based profiling—profile requests asynchronously after they complete, outside the request path  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+Live profiling with sampling minimizes overhead while giving production-realistic conditions.
+
+**Why B is correct:**
+- **py-spy** can sample at low frequency (e.g., 10 Hz instead of 100 Hz), reducing overhead to ~1–2%.
+- Sampling captures representative performance data without breaking SLAs.
+- You profile *real* production conditions (cache state, load, data distribution), which dev environment can't replicate.
+- Results directly show bottlenecks as seen by users.
+
+**Why others are wrong:**
+- **A:** Offline profiling misses production behavior (cache misses, contention, real data). Dev environments are rarely truly representative.
+- **C:** Trace profiling (full instrumentation) has high overhead; 10% of 1,000 req/sec = 100 req/sec fully traced. If overhead is 10%, it adds 10 req/sec latency, breaking SLAs.
+- **D:** Asynchronous profiling (post-hoc) adds latency to the request path and doesn't capture the bottleneck *timing* accurately. Also overhead-heavy.
+
+**Key insight:** Production profiling strategies:
+- **Low-traffic services**: live profiling with full instrumentation.
+- **High-traffic services**: sampling profiler (py-spy, Datadog, New Relic) with low frequency.
+- **Critical SLAs**: offline profiling in staging, then verify with live sampling.
+- **Avoid**: tracing every request in production unless overhead is proven <1%.
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
+
+---
+
+### 10. The Pareto Principle in Profiling
+
+You have a batch job that processes 1 million items. Profiling shows:
+- 60% of time: database queries.
+- 25% of time: JSON serialization.
+- 10% of time: Python loops and data structures.
+- 5% of time: everything else.
+
+You have 1 week to optimize. Which optimization provides the best ROI?
+
+A. Optimize the Python loops; they're pure Python and under your control  
+B. Add database query caching; cuts database time by 50% (30% total runtime saved)  
+C. Switch to a faster JSON library (e.g., ujson); 30% speedup of serialization (7.5% total runtime saved)  
+D. Batch database queries and use read replicas; complex but could cut database time by 70% (42% total runtime saved)  
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+ROI = (time saved) / (effort required). Query caching is usually simpler than major architectural changes and yields significant gains.
+
+**Why B is correct:**
+- Database queries (60%) are the largest bottleneck.
+- Caching is relatively straightforward (add Redis, or query result caching).
+- 50% improvement of 60% = 30% total runtime saved.
+- Effort: moderate (setup caching layer, cache invalidation logic).
+- ROI: high effort-to-return ratio.
+
+**Why others are wrong:**
+- **A:** Optimizing 10% time saves at most 10%. Even a 100% speedup (no loops!) saves only 10% total. Poor ROI.
+- **C:** Switching JSON libraries saves 7.5%. Better than loops, but worse than query optimization. ujson is also complex (C extension, compatibility risks).
+- **D:** 42% saving is better than 30%, but batching + replicas is architecturally complex:
+  - Requires schema changes or connection pooling.
+  - Risk of bugs, increased complexity.
+  - Effort is 3–4x higher than caching.
+  - Effort might outweigh gains in a 1-week window.
+
+**Key insight:** Prioritize by impact × ease:
+1. Find the largest bottleneck (60% = database).
+2. Estimate effort (caching: easy; architecture: hard).
+3. Pick the high-impact, low-effort optimization first.
+4. **Pareto principle:** 20% of optimizations usually yield 80% of gains. Focus on big bottlenecks first, then iterate.
+
+In a 1-week window with limited resources, caching 60% → 30% is the pragmatic choice. Once you cap database time, move to the next bottleneck (serialization).
+
+**Related:** [Python Profiling & Performance Debugging](../../learn/programming-computing/python-profiling.qmd)
+
+</details>
