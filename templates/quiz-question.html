@@ -1,0 +1,201 @@
+<!-- Quiz Question Component
+     
+     Usage in Quarto:
+     {{< include templates/quiz-question.html >}}
+     
+     Then populate with your question and options.
+-->
+
+<div class="quiz-question" data-question-id="REPLACE_WITH_ID">
+  <div class="question-wrapper">
+    <p class="question-text">
+      <!-- Question text here -->
+    </p>
+    
+    <div class="options">
+      <!-- Replace with actual options -->
+      <label class="option">
+        <input type="radio" name="QUESTION_ID" value="a" />
+        <span class="option-label">A. Option A</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="QUESTION_ID" value="b" />
+        <span class="option-label">B. Option B</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="QUESTION_ID" value="c" />
+        <span class="option-label">C. Option C</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="QUESTION_ID" value="d" />
+        <span class="option-label">D. Option D</span>
+      </label>
+    </div>
+  </div>
+  
+  <div class="question-actions">
+    <button class="btn btn-primary btn-check-answer">Check Answer</button>
+    <button class="btn btn-secondary btn-skip-question" style="display: none;">Skip</button>
+  </div>
+  
+  <details class="answer-section" open>
+    <summary>Show Answer</summary>
+    
+    <div class="feedback" style="display: none;">
+      <div class="result correct" style="display: none;">
+        <strong>✓ Correct!</strong>
+      </div>
+      <div class="result incorrect" style="display: none;">
+        <strong>✗ Not quite</strong>
+      </div>
+    </div>
+    
+    <div class="explanation">
+      <!-- Explanation text here -->
+      <!-- Include why the correct answer is right, and why distractors are wrong (if helpful) -->
+    </div>
+    
+    <div class="related-page" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--bs-border-color);">
+      <small>
+        <strong>Related:</strong> 
+        <a href="#">[Learning page link]</a>
+      </small>
+    </div>
+  </details>
+</div>
+
+<style>
+.quiz-question {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--surface-bg, #f3f2ed);
+  border: 1px solid var(--border-color, #dfdcd3);
+  border-radius: 4px;
+}
+
+.question-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.question-text {
+  font-weight: 500;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.option:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.option input[type="radio"] {
+  margin-right: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+.option-label {
+  line-height: 1.4;
+}
+
+.question-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 3px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--accent-sage, #5b7a6b);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--accent-sage-dark, #4a6b5c);
+}
+
+.btn-secondary {
+  background: var(--border-color, #dfdcd3);
+  color: var(--text-primary, #2f3437);
+}
+
+.btn-secondary:hover {
+  background: #ccc7be;
+}
+
+.answer-section {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-left: 3px solid var(--accent-sage, #5b7a6b);
+}
+
+.answer-section summary {
+  cursor: pointer;
+  font-weight: 500;
+  padding: 0.5rem 0;
+}
+
+.feedback {
+  margin: 0.75rem 0;
+  font-weight: 500;
+}
+
+.result.correct {
+  color: #2d5a2d;
+}
+
+.result.incorrect {
+  color: #8b3a3a;
+}
+
+.explanation {
+  margin-top: 0.75rem;
+  line-height: 1.6;
+}
+
+.related-page a {
+  color: var(--accent-sage, #5b7a6b);
+  text-decoration: none;
+}
+
+.related-page a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .quiz-question {
+    padding: 1rem;
+  }
+  
+  .question-actions {
+    flex-wrap: wrap;
+  }
+  
+  .btn {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+</style>

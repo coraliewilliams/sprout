@@ -1,0 +1,304 @@
+---
+title: "Progress"
+---
+
+<script src="../styles/progress-tracking.js"></script>
+<script>
+// Load and render progress page on page load
+window.addEventListener("DOMContentLoaded", function() {
+  renderProgressPage();
+});
+
+function renderProgressPage() {
+  // Overall progress section
+  renderOverallProgress();
+  
+  // By topic section
+  renderByTopic();
+  
+  // Quiz history
+  renderQuizHistory();
+  
+  // Areas to revisit
+  renderAreasToRevisit();
+}
+
+function renderOverallProgress() {
+  const progress = loadProgress();
+  const accuracy = getQuizAccuracyByTopic();
+  const completion = getQuizCompletionByTopic();
+  
+  const totalAttempts = progress.quiz_attempts.length;
+  const totalAccuracy = totalAttempts > 0
+    ? Math.round(
+        progress.quiz_attempts.reduce((sum, a) => sum + a.score, 0) /
+        progress.quiz_attempts.reduce((sum, a) => sum + a.total, 0) *
+        100
+      )
+    : 0;
+  
+  let html = '<div class="overall-stats">';
+  html += `<p><strong>Pages explored:</strong> ${progress.pages_visited.length}</p>`;
+  html += `<p><strong>Quizzes completed:</strong> ${totalAttempts}</p>`;
+  html += `<p><strong>Average quiz accuracy:</strong> ${totalAccuracy}%</p>`;
+  html += `<p><strong>Topics with quizzes:</strong> ${Object.keys(completion).length}</p>`;
+  html += `<p><strong>Last active:</strong> ${progress.last_active ? formatRelativeTime(progress.last_active) : "Never"}</p>`;
+  html += '</div>';
+  
+  document.getElementById("overall-progress").innerHTML = html;
+}
+
+function renderByTopic() {
+  const byTopic = getQuizAttemptsByTopic();
+  const accuracy = getQuizAccuracyByTopic();
+  
+  let html = '<div class="by-topic">';
+  
+  if (Object.keys(byTopic).length === 0) {
+    html += '<p class="placeholder">*Complete a quiz to see progress by topic.*</p>';
+  } else {
+    html += '<div class="topic-grid">';
+    Object.keys(byTopic).sort().forEach(topic => {
+      const attempts = byTopic[topic];
+      const acc = accuracy[topic];
+      const lastAttempt = attempts[attempts.length - 1].date;
+      const daysSince = Math.floor((new Date() - new Date(lastAttempt)) / (1000 * 60 * 60 * 24));
+      
+      html += `
+        <div class="topic-card">
+          <h4>${topic}</h4>
+          <p class="topic-stat"><strong>Quizzes:</strong> ${attempts.length}</p>
+          <p class="topic-stat"><strong>Accuracy:</strong> ${acc}%</p>
+          <p class="topic-stat"><strong>Last attempted:</strong> ${daysSince} days ago</p>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+  
+  html += '</div>';
+  document.getElementById("by-topic").innerHTML = html;
+}
+
+function renderQuizHistory() {
+  const progress = loadProgress();
+  
+  if (progress.quiz_attempts.length === 0) {
+    document.getElementById("quiz-history").innerHTML = '<p class="placeholder">*No quiz attempts yet.*</p>';
+    return;
+  }
+  
+  let html = '<table class="quiz-history-table">';
+  html += '<thead><tr><th>Quiz</th><th>Date</th><th>Difficulty</th><th>Score</th><th>Improvement</th></tr></thead>';
+  html += '<tbody>';
+  
+  // Sort by date descending (most recent first)
+  const sorted = [...progress.quiz_attempts].sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  sorted.forEach((attempt, index) => {
+    const dateObj = new Date(attempt.date);
+    const dateStr = dateObj.toLocaleDateString("en-AU", { year: "numeric", month: "short", day: "numeric" });
+    
+    // Check if there's a previous attempt
+    const previousAttempts = sorted.slice(index + 1).filter(a => a.quiz_id === attempt.quiz_id);
+    const previousAccuracy = previousAttempts.length > 0 ? (previousAttempts[0].score / previousAttempts[0].total * 100) : null;
+    const currentAccuracy = (attempt.score / attempt.total * 100);
+    
+    let improvement = "—";
+    if (previousAccuracy !== null) {
+      const change = Math.round(currentAccuracy - previousAccuracy);
+      improvement = change > 0 ? `↑ +${change}%` : (change < 0 ? `↓ ${change}%` : "→");
+    }
+    
+    html += `
+      <tr>
+        <td>${attempt.quiz_title}</td>
+        <td>${dateStr}</td>
+        <td>${attempt.difficulty}</td>
+        <td>${attempt.score}/${attempt.total}</td>
+        <td>${improvement}</td>
+      </tr>
+    `;
+  });
+  
+  html += '</tbody></table>';
+  document.getElementById("quiz-history").innerHTML = html;
+}
+
+function renderAreasToRevisit() {
+  const toRevisit = getAreasToRevisit();
+  
+  if (toRevisit.length === 0) {
+    document.getElementById("areas-to-revisit").innerHTML = '<p class="placeholder">*No areas to revisit — keep going!*</p>';
+    return;
+  }
+  
+  let html = '<div class="revisit-list">';
+  html += '<p class="revisit-intro">Topics with the lowest accuracy or longest time since last attempt:</p>';
+  html += '<ul>';
+  
+  toRevisit.forEach(item => {
+    html += `
+      <li>
+        <strong>${item.topic}</strong>
+        <ul>
+          <li>Accuracy: ${item.accuracy}%</li>
+          <li>Last attempted: ${item.daysSinceLast} days ago</li>
+        </ul>
+      </li>
+    `;
+  });
+  
+  html += '</ul></div>';
+  document.getElementById("areas-to-revisit").innerHTML = html;
+}
+</script>
+
+## Overall Progress
+
+<div id="overall-progress">
+*Loading progress data...*
+</div>
+
+---
+
+## Progress by Topic
+
+<div id="by-topic">
+*Loading topic progress...*
+</div>
+
+---
+
+## Quiz History
+
+<div id="quiz-history">
+*Loading quiz history...*
+</div>
+
+---
+
+## Areas to Revisit
+
+<div id="areas-to-revisit">
+*Loading recommendations...*
+</div>
+
+---
+
+## Managing Your Progress
+
+### Clear Progress
+
+If you want to start fresh, you can clear all stored progress data:
+
+```html
+<button onclick="if(confirm('Clear all progress? This cannot be undone.')) { clearProgress(); location.reload(); }">
+  Clear All Progress
+</button>
+```
+
+Your progress is stored in your browser's local storage. It persists across sessions but is lost if you clear your browser cache.
+
+<style>
+.overall-stats {
+  background: var(--surface-bg, #f3f2ed);
+  padding: 1.5rem;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent-sage, #5b7a6b);
+}
+
+.overall-stats p {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.topic-card {
+  padding: 1rem;
+  background: var(--page-bg, #faf9f6);
+  border: 1px solid var(--border-color, #dfdcd3);
+  border-radius: 4px;
+  border-top: 3px solid var(--accent-sage, #5b7a6b);
+}
+
+.topic-card h4 {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-primary, #2f3437);
+}
+
+.topic-stat {
+  margin: 0.4rem 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #6f7477);
+}
+
+.quiz-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.quiz-history-table th, .quiz-history-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color, #dfdcd3);
+}
+
+.quiz-history-table th {
+  font-weight: 600;
+  background: var(--sidebar-bg, #f1f4ef);
+}
+
+.quiz-history-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.revisit-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.revisit-list li {
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  background: var(--surface-bg, #f3f2ed);
+  border-radius: 3px;
+  border-left: 2px solid var(--accent-terracotta, #b97a5d);
+}
+
+.revisit-list li > strong {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.revisit-list ul ul {
+  margin: 0.4rem 0 0 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #6f7477);
+}
+
+.revisit-list li li {
+  background: transparent;
+  padding: 0.2rem 0;
+  margin: 0.2rem 0;
+  border: none;
+}
+
+.placeholder {
+  color: var(--text-secondary, #6f7477);
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+.revisit-intro {
+  margin-bottom: 1rem;
+  color: var(--text-primary, #2f3437);
+}
+</style>

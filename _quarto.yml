@@ -40,7 +40,7 @@ website:
         href: track/index.qmd
         contents:
           - track/page-tracker/index.qmd
-          - track/learning-tracker/index.qmd
+          - track/progress.qmd
   page-footer:
     center: "Personal technical learning notebook — built with Quarto."
 

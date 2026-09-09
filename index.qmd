@@ -3,36 +3,138 @@ title: "My Notebook"
 toc: false
 ---
 
-Statistics, machine learning, mathematics, data science, programming, and
-ecology — notes written while learning, one or two topics at a time.
+<script src="styles/progress-tracking.js"></script>
+<script src="styles/homepage.js"></script>
 
-Use the search box in the sidebar to find a topic quickly.
+A personal technical learning notebook for statistics, machine learning, mathematics, SQL, and programming. Built for thinking, not cramming.
 
-## Learn
+Use the search box in the sidebar to find a topic quickly, or explore the areas below.
 
-- [Statistics](learn/statistics/index.qmd)
-- [Machine Learning](learn/machine-learning/index.qmd)
-- [Mathematics](learn/mathematics/index.qmd)
-- [Data Science](learn/data-science/index.qmd)
-- [Experimental Design](learn/experimental-design/index.qmd)
-- [Programming & Computing](learn/programming-computing/index.qmd)
-- [Ecology](learn/ecology/index.qmd)
+---
 
-## Practise
+## Continue Learning
 
-- [Worked Examples](practise/worked-examples/index.qmd)
-- [Coding Exercises](practise/coding-exercises/index.qmd)
-- [Quizzes](practise/quizzes/index.qmd)
+<div id="continue-learning" class="section-placeholder">
+*Start exploring to populate this section.*
+</div>
 
-## Track
+---
 
-- [Page Tracker](track/page-tracker/index.qmd)
-- [Learning Tracker](track/learning-tracker/index.qmd)
+## Current Learning Areas
 
-## Today's learning
+<div class="progress-cards-grid">
 
-*Placeholder — this will surface the day's active topic(s) once the tracker (Phase 6) is built.*
+<div class="progress-card">
+<div class="card-header">
+<span class="card-icon">📊</span>
+<h3>Statistics</h3>
+</div>
+<p class="card-description">Probability, inference, causal reasoning, and mixed models.</p>
+<div class="progress-bar">
+<div class="progress-fill" style="width: 60%;"></div>
+</div>
+<p class="progress-label">60% explored</p>
+<p class="last-studied">Last studied: Explore to update</p>
+<a href="learn/statistics/index.qmd" class="btn-outline">Explore</a>
+</div>
 
-## Recently updated
+<div class="progress-card">
+<div class="card-header">
+<span class="card-icon">🗄️</span>
+<h3>SQL</h3>
+</div>
+<p class="card-description">Queries, joins, window functions, and database design.</p>
+<div class="progress-bar">
+<div class="progress-fill" style="width: 75%;"></div>
+</div>
+<p class="progress-label">75% explored</p>
+<p class="last-studied">Last studied: Explore to update</p>
+<a href="learn/programming-computing/index.qmd" class="btn-outline">Explore</a>
+</div>
 
-*Placeholder — this will list the most recently edited topic pages once there is content to show.*
+<div class="progress-card">
+<div class="card-header">
+<span class="card-icon">🤖</span>
+<h3>Machine Learning</h3>
+</div>
+<p class="card-description">Supervised, unsupervised learning, and evaluation.</p>
+<div class="progress-bar">
+<div class="progress-fill" style="width: 45%;"></div>
+</div>
+<p class="progress-label">45% explored</p>
+<p class="last-studied">Last studied: Explore to update</p>
+<a href="learn/machine-learning/index.qmd" class="btn-outline">Explore</a>
+</div>
+
+<div class="progress-card">
+<div class="card-header">
+<span class="card-icon">🐍</span>
+<h3>Python</h3>
+</div>
+<p class="card-description">Best practices, testing, packages, and tooling.</p>
+<div class="progress-bar">
+<div class="progress-fill" style="width: 80%;"></div>
+</div>
+<p class="progress-label">80% explored</p>
+<p class="last-studied">Last studied: Explore to update</p>
+<a href="learn/programming-computing/index.qmd" class="btn-outline">Explore</a>
+</div>
+
+</div>
+
+---
+
+## Quiz Progress
+
+<div id="quiz-progress-table">
+*Complete a quiz to see your progress here.*
+</div>
+
+---
+
+## Suggested Next Activity
+
+<div id="suggested-next">
+*Activity recommendations will appear here after you complete quizzes.*
+</div>
+
+---
+
+## Recent Activity
+
+<div id="recent-activity">
+*Your learning activity will appear here.*
+</div>
+
+---
+
+## Learning Overview
+
+<div id="learning-overview">
+*Overview will update as you explore and complete quizzes.*
+</div>
+
+---
+
+## All Topics
+
+### Learn
+
+- [Statistics](learn/statistics/index.qmd) — Probability, inference, modelling
+- [Machine Learning](learn/machine-learning/index.qmd) — Supervised, unsupervised, evaluation
+- [Mathematics](learn/mathematics/index.qmd) — Calculus, linear algebra, optimization
+- [Data Science](learn/data-science/index.qmd) — Applied statistics, workflows
+- [Experimental Design](learn/experimental-design/index.qmd) — Power, randomization, analysis
+- [Programming & Computing](learn/programming-computing/index.qmd) — Python, SQL, project structure
+- [Ecology](learn/ecology/index.qmd) — Evolutionary biology, population dynamics
+
+### Practise
+
+- [Worked Examples](practise/worked-examples/index.qmd) — Detailed walkthroughs
+- [Coding Exercises](practise/coding-exercises/index.qmd) — Applied problems
+- [Quizzes](practise/quizzes/index.qmd) — Self-assessment and interview prep
+
+### Track
+
+- [Page Tracker](track/page-tracker/index.qmd) — Notebook build status
+- [Progress](track/progress.qmd) — Your learning progress and recommendations

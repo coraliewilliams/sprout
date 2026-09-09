@@ -2,8 +2,7 @@
 title: "Track"
 ---
 
-Keeping tabs on two different things: progress building this notebook, and
-progress learning the material in it.
+Track two aspects of your learning: progress building this notebook, and your personal learning journey.
 
-- [Page Tracker](page-tracker/index.qmd) — which topic pages exist and their build status.
-- [Learning Tracker](learning-tracker/index.qmd) — which areas need review, based on quizzes.
+- [Page Tracker](page-tracker/index.qmd) — which topic pages exist, their build status, and what's planned next.
+- [Progress](progress.qmd) — your learning progress, quiz history, and recommended topics to review. Updates automatically as you explore and complete quizzes.
