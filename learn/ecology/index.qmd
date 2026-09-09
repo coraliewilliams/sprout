@@ -22,6 +22,7 @@ points toward the next scale of biological organisation.
 8. [Population ecology](population-ecology.qmd) — growth, regulation, demography, and life histories.
 9. [Community ecology](community-ecology.qmd) — species interactions, competition, predation, and succession.
 10. [Ecosystems and biodiversity](ecosystems-biodiversity.qmd) — energy flow, biogeochemical cycles, food webs, and conservation.
+11. [Ecological modelling](ecological-modelling.qmd) — abundance estimation, occupancy modelling, and combining space and time.
 
 ## Anchor resource
 
