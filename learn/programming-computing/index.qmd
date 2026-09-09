@@ -18,7 +18,8 @@ Planned areas:
 - Structured Query Language (SQL) — [foundations](sql-fundamentals.qmd),
     [aggregation](sql-aggregation.qmd), [joins](sql-joins.qmd),
   [intermediate queries](sql-intermediate-queries.qmd),
-  [window functions](sql-window-functions.qmd)
+  [window functions](sql-window-functions.qmd),
+  [query optimization & performance](sql-query-optimization.qmd)
 - Reproducible workflows — targets, project structure, renv, pipeline design
 - Git & GitHub — fundamentals, commits, branches, merge/rebase, pull requests, Actions
 - Command line — shell basics, files, pipes, scripts

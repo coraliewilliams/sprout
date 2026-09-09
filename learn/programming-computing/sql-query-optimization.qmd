@@ -1,0 +1,446 @@
+---
+title: "SQL Query Optimization & Performance"
+area: "Programming & Computing"
+status: "in-progress"
+confidence: 4
+last-reviewed: 2026-09-09
+practice: false
+quiz: false
+---
+
+## In one sentence
+
+Optimization means understanding what your query actually does (via EXPLAIN), then reducing disk I/O, memory use, and CPU time through strategic indexing, join order, and early filtering.
+
+## Why does it matter?
+
+A query returning 1000 rows correctly but scanning 1 million is not a success — it wastes disk I/O, CPU, memory, and blocks other queries. Slow queries cascade: dashboard timeouts break analyst workflow, data pipelines back up, dashboards fail to refresh. At scale, the difference between `O(n)` and `O(n log n)` is the difference between a 3-second query and a 45-minute report. Optimization is not premature if you profile first and identify real bottlenecks.
+
+## Core idea
+
+Every SQL query has a **physical execution plan**: the database decides which table to scan first, whether to use an index, how to join tables, and in what order. Your job is to write SQL that encourages good plans (small result sets early, indexed lookups, minimal sorting) and to read EXPLAIN output to catch bad plans before they slow production.
+
+---
+
+## Reading EXPLAIN and Understanding Query Plans
+
+**What EXPLAIN reveals:**
+
+- **Sequential Scan vs. Index Scan**: Does the database read every row (expensive) or jump to matching rows (cheap)?
+- **Join strategy**: Hash Join (fast for large tables), Nested Loop (slow for big data), Sort-Merge (stable, predictable).
+- **Cardinality estimates**: How many rows does the optimizer think will flow through each step? Estimates off by orders of magnitude mean bad plan choice.
+- **Cost model**: Different databases expose costs differently. PostgreSQL shows startup cost (time before first row) + per-row cost; DuckDB uses its own internal metrics. Consult your database documentation to interpret costs, but the principle is universal: lower cost = faster query.
+
+**DuckDB EXPLAIN example:**
+
+```sql
+-- Create sample data
+CREATE TABLE customers (customer_id INT, name VARCHAR, country VARCHAR);
+CREATE TABLE orders (order_id INT, customer_id INT, amount DECIMAL(10,2), order_date DATE);
+
+INSERT INTO customers VALUES 
+  (100, 'Alice', 'USA'), (101, 'Bob', 'UK'), (102, 'Charlie', 'Canada');
+INSERT INTO orders VALUES 
+  (1, 100, 50.00, '2026-01-01'), (2, 100, 75.00, '2026-01-05'), 
+  (3, 101, 200.00, '2026-01-02');
+
+-- See the plan WITHOUT an index
+EXPLAIN SELECT * FROM orders WHERE customer_id = 100;
+```
+
+DuckDB output (without index):
+```
+Seq Scan on orders
+  Filter: (customer_id = 100)
+```
+
+This shows a **Seq Scan** (reads all rows) with a filter condition. Now with an index:
+
+```sql
+CREATE INDEX idx_orders_customer ON orders(customer_id);
+
+-- See the plan WITH an index
+EXPLAIN SELECT * FROM orders WHERE customer_id = 100;
+```
+
+Output shows an **Index Scan** (jumps directly to matching rows). Cost drops dramatically. The first plan is fine for 6 rows; at 1 million rows, the difference is seconds vs. milliseconds.
+
+**Anatomy of a plan:**
+
+- **Seq Scan**: Start-to-finish table read. Cost: proportional to table size.
+- **Index Scan**: Jump to matching entries. Cost: logarithmic in index size.
+- **Hash Join**: Load smaller table into memory, stream larger table. Cost: O(n + m) memory and time.
+- **Nested Loop Join**: For each row in outer table, search inner table. Cost: O(n × m) — slow if inner is unindexed.
+- **Sort**: Materialized sort in memory or on disk. Cost: O(n log n), memory-intensive.
+
+---
+
+## Indexes: Types, Design, and Trade-offs
+
+### B-tree Fundamentals
+
+A B-tree index on column `c` sorts values of `c` in a balanced tree. Lookup is $\log_B(n)$ where $B$ is the branching factor (typically 100–1000) and $n$ is the number of rows. For 1 million rows, a lookup is ~3 disk seeks instead of 1 million. On disk, a seek is 10–100 ms; an in-memory row fetch is nanoseconds. Index seeks win.
+
+### When Indexes Help
+
+- **High-cardinality columns**: `customer_id` (millions of unique values) benefits; `gender` (2 unique values) doesn't. Why? If an index says "rows 10–20 are female," you still read many rows; the index adds overhead.
+- **WHERE and JOIN predicates**: Index on `WHERE customer_id = ?` or `JOIN ON customer_id` prevents full scans.
+- **ORDER BY**: Index on `ORDER BY created_date DESC` avoids a sort.
+
+### Multicolumn Indexes
+
+An index on `(customer_id, order_date)` is sorted first by `customer_id`, then by `order_date` within each customer.
+
+- `WHERE customer_id = ? AND order_date = ?` uses both columns. ✓
+- `WHERE customer_id = ?` uses the index (leading column). ✓
+- `WHERE order_date = ?` does **not** use the index; the index is sorted by customer_id first. ✗
+
+**Leading column matters.** Put your most selective filters first.
+
+### Covering Indexes
+
+If you `SELECT customer_id, COUNT(*) FROM orders WHERE customer_id = 100`, the database needs to look up the table to count rows. But if you create a **covering index** that includes all needed columns, the engine can answer the query from the index alone without touching the table—called an **Index-Only Scan**. DuckDB, PostgreSQL, and SQLite support this with different syntax; consult your database documentation for covering index syntax (e.g., PostgreSQL uses `INCLUDE`, while some databases use filtered indexes or multi-column indexes).
+
+### Cost of Indexes
+
+- **Storage**: Indexes duplicate data. Every index consumes disk.
+- **Maintenance**: INSERT, UPDATE, DELETE must update all relevant indexes. Heavy write workloads + many indexes = contention.
+- **Rule of thumb**: Index high-cardinality columns in WHERE, JOIN, and ORDER BY. Skip indexes on low-cardinality columns or columns rarely queried.
+
+---
+
+## Common Bottlenecks and Anti-patterns
+
+### N+1 Queries: The Subquery Trap
+
+```sql
+-- SLOW: Subquery executes for EVERY customer row
+SELECT 
+  customer_id, name,
+  (SELECT COUNT(*) FROM orders WHERE customer_id = c.id) AS order_count
+FROM customers c;
+```
+
+If there are 10,000 customers, the subquery runs 10,000 times. For 1 million customers, you execute 1 million subqueries. Cost: $O(n)$ subqueries.
+
+**Fix: Use JOIN and GROUP BY:**
+
+```sql
+-- FAST: One pass through orders, grouped by customer
+SELECT c.id, c.name, COUNT(o.order_id) AS order_count
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id
+GROUP BY c.id, c.name;
+```
+
+Cost: One table scan + one GROUP BY. $O(n)$ time, not $O(n^2)$.
+
+### Full Table Scans from Missing WHERE Clauses
+
+```sql
+-- SLOW: No WHERE clause, scans every order
+SELECT COUNT(*) FROM orders;
+```
+
+If `orders` has 100 million rows, this scans 100 million rows to count them. Indexes don't help (no predicate to filter on). **Solution**: Update table statistics so the optimizer makes good decisions. In DuckDB, run `ANALYZE table_name` after bulk INSERT/UPDATE. In PostgreSQL, run `ANALYZE`. Databases do **not** cache `COUNT(*)` results by default; they rely on recent statistics for optimization.
+
+### Correlated Subqueries: Per-Row Evaluation
+
+```sql
+-- SLOW: For every employee, compute average salary in their department
+SELECT emp_id, salary, 
+  (SELECT AVG(salary) FROM employees e2 WHERE e2.dept = e1.dept) AS dept_avg
+FROM employees e1;
+```
+
+The subquery runs for every row. If there are 50,000 employees, you compute the department average 50,000 times (even though there are only 10 departments).
+
+**Fix: Use a window function:**
+
+```sql
+-- FAST: Compute department average once per department
+SELECT emp_id, salary, 
+  AVG(salary) OVER (PARTITION BY dept) AS dept_avg
+FROM employees;
+```
+
+Same result, one pass through the data.
+
+### Poor Join Order: Largest Table First
+
+```sql
+-- POTENTIALLY SLOW: Join orders (1M rows) to customers (10k rows)
+SELECT * FROM orders o
+INNER JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.country = 'USA';
+```
+
+If the optimizer doesn't filter `customers` first, it may create a large intermediate result (1M rows) before filtering. Better query:
+
+```sql
+-- Explicit join order: Filter, then join
+SELECT * FROM customers c
+INNER JOIN orders o ON c.customer_id = o.customer_id
+WHERE c.country = 'USA';
+```
+
+Filter the 10,000 customers to ~2,000 (USA only), then join 2,000 rows to orders. Intermediate result is 2,000 rows, not 1 million.
+
+### Data Type Mismatches
+
+```sql
+-- SLOW: varchar column compared to integer
+SELECT * FROM orders WHERE customer_id = '100';  -- string '100', not int 100
+```
+
+Databases must convert '100' to integer 100 for comparison. This conversion applies to **every row** and disables the index on `customer_id`. Use correct types:
+
+```sql
+SELECT * FROM orders WHERE customer_id = 100;  -- correct type
+```
+
+---
+
+## Optimization Strategies
+
+### 1. Predicate Pushdown
+
+Filter as early as possible. Let the database ignore irrelevant rows before joining or aggregating.
+
+```sql
+-- SLOW: Aggregate first, filter after
+SELECT dept, avg_salary FROM (
+  SELECT dept, AVG(salary) AS avg_salary FROM employees
+) GROUP BY dept
+WHERE avg_salary > 50000;
+
+-- FAST: Filter individual rows, then aggregate
+SELECT dept, AVG(salary) AS avg_salary FROM employees
+WHERE salary > 50000
+GROUP BY dept;
+```
+
+The second query filters ~80% of rows before aggregation.
+
+### 2. Join Order
+
+Start with the most selective condition or smallest intermediate result. Build up.
+
+```sql
+-- SLOW: Join large order table to small customers table
+SELECT * FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.country = 'USA';
+
+-- FAST: Reduce customers first
+SELECT * FROM customers c
+WHERE c.country = 'USA'
+JOIN orders o ON o.customer_id = c.customer_id;
+```
+
+### 3. Column Projection
+
+SELECT only columns you need, especially when fetching large result sets.
+
+```sql
+-- SLOW: Fetch all columns (wasteful for large result sets)
+SELECT * FROM orders WHERE year(order_date) = 2024;
+
+-- FAST: Fetch only needed columns
+SELECT order_id, amount FROM orders WHERE year(order_date) = 2024;
+```
+
+Fewer columns = smaller I/O, better cache behavior, faster network transfer. This matters most when your result set is large (1000+ rows).
+
+### 4. Avoid Functions on Indexed Columns
+
+```sql
+-- SLOW: Function on indexed column disables index
+SELECT * FROM orders WHERE YEAR(order_date) = 2024;
+
+-- FAST: Use range predicate
+SELECT * FROM orders WHERE order_date >= '2024-01-01' AND order_date < '2025-01-01';
+```
+
+Index on `order_date` is used in the second query.
+
+### 5. Materialization and CTE Optimization
+
+Some databases compute a CTE (WITH clause) multiple times if it's referenced multiple times. Use materialization hints:
+
+```sql
+-- May recompute CTE if referenced twice
+WITH big_orders AS (
+  SELECT * FROM orders WHERE amount > 1000
+)
+SELECT (SELECT COUNT(*) FROM big_orders) AS cnt,
+       (SELECT AVG(amount) FROM big_orders) AS avg;
+
+-- Force materialization (database-specific)
+-- Most databases now optimize this automatically
+```
+
+---
+
+## Query Refactoring Examples (Before/After)
+
+### Example 1: N+1 Subquery to JOIN
+
+**Before (N+1 problem):**
+
+```sql
+EXPLAIN SELECT 
+  c.customer_id, c.name,
+  (SELECT COUNT(*) FROM orders WHERE customer_id = c.customer_id) AS orders
+FROM customers c;
+```
+
+Plan shows: Seq Scan on customers → for each row, execute Seq Scan on orders (N+1 sequential scans).
+
+**After (Aggregation + JOIN):**
+
+```sql
+EXPLAIN SELECT 
+  c.customer_id, c.name, 
+  COUNT(o.order_id) AS orders
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name;
+```
+
+Plan shows: Seq Scan on customers + Seq Scan on orders → Hash Aggregate. Single pass through both tables.
+
+**Cost reduction**: From $O(n \cdot m)$ to $O(n + m)$.
+
+### Example 2: Correlated Subquery to Window Function
+
+**Before (correlated subquery):**
+
+```sql
+EXPLAIN SELECT 
+  emp_id, 
+  salary, 
+  (SELECT AVG(salary) FROM employees e2 WHERE e2.dept_id = e1.dept_id) AS dept_avg
+FROM employees e1;
+```
+
+Subquery executes for each row. Cost: $O(n)$ subqueries.
+
+**After (window function):**
+
+```sql
+EXPLAIN SELECT 
+  emp_id, 
+  salary, 
+  AVG(salary) OVER (PARTITION BY dept_id) AS dept_avg
+FROM employees;
+```
+
+Single table scan, aggregation in one pass. Cost: $O(n)$.
+
+### Example 3: Full Table Scan to Indexed Lookup
+
+**Before (no index):**
+
+```sql
+CREATE TABLE orders (order_id INT, customer_id INT, order_date DATE);
+-- Insert 1 million rows
+
+EXPLAIN SELECT * FROM orders WHERE customer_id = 100;
+```
+
+Plan: Seq Scan, filter condition. Scans all 1 million rows.
+
+**After (index created):**
+
+```sql
+CREATE INDEX idx_orders_cust ON orders(customer_id);
+
+EXPLAIN SELECT * FROM orders WHERE customer_id = 100;
+```
+
+Plan: Index Scan on `idx_orders_cust`, returns ~10 rows without scanning the table. Cost reduction: 1 million rows → 10 rows.
+
+---
+
+## When NOT to Optimize
+
+### Premature Optimization
+
+Profile first. Use EXPLAIN, measure response time, log slow queries. Don't guess.
+
+```sql
+-- Do NOT optimize based on intuition
+-- DO measure: How many rows? How long does it actually take?
+```
+
+### Diminishing Returns
+
+Reducing query time from 100ms to 10ms is worthwhile. Reducing from 1ms to 0.1ms may not be, especially if it adds complexity.
+
+### Readability Matters
+
+A slightly slower query that your team understands is often better than a cryptic, fast query nobody can maintain.
+
+```sql
+-- Readable
+SELECT c.name, COUNT(o.order_id) AS order_count
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name;
+
+-- Cryptic alternative: Don't use unless the readable version is actually too slow
+-- (Example: complex window functions or materialized CTEs with tricks)
+```
+
+### One-Time Queries
+
+A data export you run once per month doesn't need optimization. Focus on queries that run thousands of times per day.
+
+### Trade-off Decision Tree
+
+- **Query runs 1000+ times per day?** → Optimize.
+- **Query scans <10,000 rows?** → Probably fine as-is.
+- **Optimization adds code complexity?** → Ensure the performance gain justifies it.
+- **Current response time is <100ms?** → Don't touch unless there's a real complaint.
+
+---
+
+## Common Mistakes
+
+- **Assuming indexes always help**: Low-cardinality columns and read-heavy fact tables often don't benefit.
+- **Using SELECT \* in production**: You fetch columns you don't need, wasting I/O and bandwidth.
+- **Applying functions to indexed columns**: `WHERE YEAR(date) = 2024` disables the index; use a range instead.
+- **Ignoring index maintenance cost**: Heavy INSERT/UPDATE/DELETE workloads suffer with many indexes. Monitor and tune.
+- **Trusting outdated statistics**: Update table statistics regularly so the optimizer makes good plans.
+- **Not testing with realistic data volume**: A query fast on 1,000 rows may crawl on 10 million.
+
+---
+
+## Remember
+
+::: {.callout-tip}
+Optimization is driven by **EXPLAIN** (understand the plan), **cardinality** (how many rows flow through each step?), and **I/O** (disk seeks are expensive; minimize them through indexes and early filtering).
+:::
+
+---
+
+## Test Yourself
+
+1. **You have a slow query that SELECTs 1,000 rows but EXPLAIN shows a Seq Scan across 1 million rows. What's likely wrong, and what's a concrete fix?**
+   - Likely: Missing WHERE clause filter or the WHERE column isn't indexed. Concrete fix: Add an index on the WHERE clause column (e.g., `CREATE INDEX idx_orders_customer ON orders(customer_id)`), then ANALYZE. Index scans are logarithmic; sequential scans are linear.
+
+2. **A report queries a customer table (10k rows) and runs a subquery for each customer to count their orders. The subquery is itself fast (0.1ms), but the report takes 30 seconds. Why, and how do you fix it?**
+   - Why: N+1 scaling. 10k × 0.1ms = 1 second of subquery time, but there's also context switching overhead, and the pattern doesn't scale. How: Refactor to a single JOIN + GROUP BY (see Example 1 above).
+
+3. **An index on `(country, city, name)` doesn't help a query `WHERE city = 'London'`. Why?**
+   - The index is sorted by country first. A WHERE clause on city alone can't use a leading-column-dependent index effectively. To optimize this query, create an index on `(city)` or `(city, country)`.
+
+---
+
+## Related Topics
+
+- [SQL Fundamentals](sql-fundamentals.qmd)
+- [SQL Joins](sql-joins.qmd)
+- [SQL Window Functions](sql-window-functions.qmd)
+- [Python Database Access](python-database-access.qmd)

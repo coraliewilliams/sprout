@@ -26,6 +26,8 @@ Short quizzes for checking understanding.
   joins, NULL, and query interpretation.
 - [SQL Interview: Intermediate Queries](sql-intermediate-queries.qmd) —
   subqueries, common table expressions (CTEs), set operations, and `EXISTS`.
+- [SQL Interview: Query Optimization & Performance](sql-query-optimization.qmd) —
+  EXPLAIN plans, index design, join optimization, and query refactoring.
 - [SQL Interview: Window Functions](sql-window-functions.qmd) —
   ranking, aggregation, and analysis over partitions and frames.
 

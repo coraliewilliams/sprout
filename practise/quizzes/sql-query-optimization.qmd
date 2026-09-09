@@ -1,0 +1,412 @@
+---
+title: "SQL Interview: Query Optimization & Performance"
+area: "Programming & Computing"
+status: "in-progress"
+confidence: 1
+last-reviewed: 2026-09-09
+practice: false
+quiz: true
+---
+
+Attempt each question before opening the answers. These questions test your ability
+to read EXPLAIN output, design indexes, spot anti-patterns, and refactor slow queries
+into fast ones. You'll see scenarios from real screening interviews.
+
+## Questions
+
+### 1. Reading an EXPLAIN plan
+
+You run:
+
+```sql
+CREATE TABLE orders (order_id INT, customer_id INT, amount DECIMAL(10,2), order_date DATE);
+INSERT INTO orders VALUES (1, 100, 50.00, '2026-01-01'), ... [1 million more rows];
+
+EXPLAIN SELECT * FROM orders WHERE customer_id = 100;
+```
+
+Output shows: `Seq Scan on orders` with `Filter: (customer_id = 100)`.
+
+What does this tell you?
+
+A. The database is using an index on `customer_id` and retrieving rows efficiently.  
+B. The database is scanning the entire table and filtering each row, not using an index.  
+C. The query is impossible to optimize further.  
+D. The filter condition is applied before the scan starts.
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+A Seq Scan (sequential scan) means the database reads every row in the table linearly. The filter is applied during the scan, not before. If an index existed on `customer_id`, you'd see "Index Scan" or "Index Only Scan" instead. This is a sign that either no index exists or the optimizer chose not to use it (perhaps because the query processor thinks too many rows will match). For a high-cardinality column like `customer_id`, creating an index would typically reduce this to an Index Scan and improve performance by 100-1000x.
+
+Why the distractors are wrong:
+- **A** is the opposite of what's shown.
+- **C** is false; adding an index would typically help significantly.
+- **D** is wrong; the filter is applied *during* the scan, not before it starts.
+
+**Related:** [SQL Query Optimization: Reading EXPLAIN and Understanding Query Plans](../../learn/programming-computing/sql-query-optimization.qmd#reading-explain-and-understanding-query-plans)
+
+</details>
+
+### 2. Interpreting join strategy in EXPLAIN
+
+You run:
+
+```sql
+EXPLAIN SELECT o.order_id, c.name, o.amount
+FROM orders o (1 million rows)
+INNER JOIN customers c (10,000 rows)
+  ON o.customer_id = c.customer_id
+WHERE c.country = 'USA';
+```
+
+The EXPLAIN output shows: `Seq Scan on customers` → `Hash Join` → `Seq Scan on orders`.
+
+What does this plan tell you?
+
+A. The optimizer is filtering customers first (good), then hash-joining to orders.  
+B. The optimizer is scanning orders first, which is inefficient.  
+C. The optimizer is using a Nested Loop join, which will be slow.  
+D. The query is impossible to optimize because both tables are being scanned.
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: A**
+
+The plan shows: Filter customers (WHERE country = 'USA') → load filtered customers into memory → hash-join to orders. This is the optimal order: reduce 10,000 customers to maybe 2,000 (USA), then join 2,000 rows to the 1 million orders. The Hash Join is appropriate for joining a smaller filtered result to a larger table. The key insight is that customers is processed *first* with the WHERE filter, producing a smaller intermediate result.
+
+Why the distractors are wrong:
+- **B** is false; the plan shows customers is the left side of the join and is filtered first.
+- **C** is false; it explicitly says Hash Join, not Nested Loop.
+- **D** is false; sequential scans can be efficient, especially when one input is filtered early.
+
+**Related:** [SQL Query Optimization: Join Order and Strategy](../../learn/programming-computing/sql-query-optimization.qmd#poor-join-order-largest-table-first)
+
+</details>
+
+### 3. Multicolumn index design
+
+You have a table:
+
+```sql
+CREATE TABLE sales (
+  sale_id INT, region VARCHAR, product_id INT, amount DECIMAL, sale_date DATE
+);
+```
+
+Queries often run:
+
+- `SELECT * FROM sales WHERE region = 'North' AND product_id = 5;`
+- `SELECT * FROM sales WHERE product_id = 5;`
+- `SELECT * FROM sales WHERE sale_date = '2026-01-01';`
+
+You can afford one multicolumn index. Which is best?
+
+A. `(region, product_id, sale_date)`  
+B. `(sale_date, region, product_id)`  
+C. `(region, product_id)`  
+D. `(product_id)`
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: C**
+
+A multicolumn index is sorted by the first column, then by the second within that, etc. So `(region, product_id)` allows:
+
+- Query 1 (`region = 'North' AND product_id = 5`): Uses both columns. ✓
+- Query 2 (`product_id = 5`): The index is sorted by region first, so this query cannot use it efficiently without reading all regions. ✗
+
+However, Query 1 is more specific and more commonly the performance bottleneck. Query 2 could use a separate index if needed, but a single index should prioritize the most frequently run or most selective query. Query 3 doesn't use region or product_id, so it won't benefit from an index on those columns.
+
+Why the distractors are wrong:
+- **A** includes `sale_date`, which doesn't help Query 1 or 2 (they don't filter on it). Extra columns waste storage and slow writes.
+- **B** has `sale_date` first; Query 1 and 2 don't filter by date first, so they can't use the index effectively.
+- **D** is too narrow; it doesn't help Query 1.
+
+**Related:** [SQL Query Optimization: Multicolumn Indexes](../../learn/programming-computing/sql-query-optimization.qmd#multicolumn-indexes)
+
+</details>
+
+### 4. N+1 subquery anti-pattern
+
+You are asked to list all departments and the number of employees in each. Your colleague writes:
+
+```sql
+SELECT dept_id, dept_name,
+  (SELECT COUNT(*) FROM employees WHERE dept_id = d.dept_id) AS emp_count
+FROM departments d;
+```
+
+There are 1,000 departments and 500,000 employees. Why is this slow?
+
+A. The subquery must be executed once for each department row, resulting in 1,000 separate queries.  
+B. The database cannot optimize subqueries, so all employees are loaded into memory.  
+C. COUNT(*) is inefficient; you should use COUNT(1) instead.  
+D. The WHERE clause in the subquery prevents index usage.
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: A**
+
+This is the classic N+1 problem. For each of the 1,000 department rows, the correlated subquery executes a separate COUNT(*) on the employees table. That's 1,000 subqueries, each scanning the 500,000 employee rows (or an index if it exists). Cost: O(1,000 × 500,000) evaluations. The fix is to use a JOIN and GROUP BY:
+
+```sql
+SELECT d.dept_id, d.dept_name, COUNT(e.emp_id) AS emp_count
+FROM departments d
+LEFT JOIN employees e ON d.dept_id = e.dept_id
+GROUP BY d.dept_id, d.dept_name;
+```
+
+This scans both tables once, joins them, and groups in a single pass: O(1,000 + 500,000) cost.
+
+Why the distractors are wrong:
+- **B** is incorrect; modern databases can optimize subqueries, but the N+1 evaluation is still an issue here.
+- **C** is incorrect; COUNT(*) vs. COUNT(1) is a minor semantic difference; this doesn't fix the N+1 problem.
+- **D** is incorrect; the WHERE clause in the subquery is fine and indexes can be used; the problem is the repetition, not the index.
+
+**Related:** [SQL Query Optimization: N+1 Queries: The Subquery Trap](../../learn/programming-computing/sql-query-optimization.qmd#n1-queries-the-subquery-trap)
+
+</details>
+
+### 5. Correlated subquery refactoring
+
+Your company runs this query every hour to report employee salary vs. department average:
+
+```sql
+SELECT emp_id, salary,
+  (SELECT AVG(salary) FROM employees e2 WHERE e2.dept = e1.dept) AS dept_avg
+FROM employees e1;
+```
+
+With 100,000 employees across 50 departments, this is slow. What's the primary reason?
+
+A. The subquery uses a JOIN, which is slower than aggregation.  
+B. The subquery executes for every employee row; even though there are only 50 departments, you're computing the average 100,000 times.  
+C. The AVG() function is inefficient; you should cache averages separately.  
+D. The correlation forces a sort, which is O(n log n) instead of O(n).
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+For each of the 100,000 employee rows, the correlated subquery runs and computes the average salary for that employee's department. Even though there are only 50 departments (and thus only 50 unique averages), you're computing the average 100,000 times. Each computation requires scanning or indexing the employees table.
+
+The fix is a window function:
+
+```sql
+SELECT emp_id, salary, AVG(salary) OVER (PARTITION BY dept) AS dept_avg
+FROM employees;
+```
+
+The database computes the average once per department, then attaches it to each row. Single table scan, O(n) cost.
+
+Why the distractors are wrong:
+- **A** is wrong; the subquery doesn't use a JOIN—it's a simple AVG() aggregate.
+- **C** is wrong; storing averages separately would require maintenance and wouldn't solve the core N+1 problem.
+- **D** is wrong; sorting isn't the issue here; the problem is subquery repetition.
+
+**Related:** [SQL Query Optimization: Correlated Subqueries: Per-Row Evaluation](../../learn/programming-computing/sql-query-optimization.qmd#correlated-subqueries-per-row-evaluation)
+
+</details>
+
+### 6. Function on indexed column
+
+You need to find all orders placed in 2024. You have an index on `order_date`. You write:
+
+```sql
+SELECT order_id, amount FROM orders WHERE YEAR(order_date) = 2024;
+```
+
+EXPLAIN shows a Seq Scan, not an Index Scan. Why?
+
+A. The index is corrupt; rebuild it.  
+B. The YEAR() function is applied to every row, preventing index usage.  
+C. The WHERE clause is too selective; the optimizer chose a Seq Scan because most rows match.  
+D. The SELECT clause includes amount, which is not indexed.
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+Applying a function to an indexed column disables the index. The database cannot directly look up "YEAR(order_date) = 2024" in the B-tree index; it must scan every row, extract the year, and compare. The fix is to use a range predicate:
+
+```sql
+SELECT order_id, amount FROM orders 
+WHERE order_date >= '2024-01-01' AND order_date < '2025-01-01';
+```
+
+The index on `order_date` can now seek directly to the range, and the cost drops dramatically.
+
+Why the distractors are wrong:
+- **A** is unlikely; a corrupt index would cause errors, not optimizer choices.
+- **C** is backwards; if most rows match, the optimizer might actually choose Seq Scan over many index lookups (correct behavior), but that's not why the index isn't being used. The issue is the function.
+- **D** is wrong; the SELECT clause doesn't affect whether an index is used for the WHERE clause.
+
+**Related:** [SQL Query Optimization: Avoid Functions on Indexed Columns](../../learn/programming-computing/sql-query-optimization.qmd#avoid-functions-on-indexed-columns)
+
+</details>
+
+### 7. Data type mismatch
+
+Your application stores `customer_id` as an integer in the database. You run:
+
+```sql
+SELECT * FROM orders WHERE customer_id = '100';
+```
+
+(Note: `'100'` is a string, not an integer.)
+
+EXPLAIN shows: Seq Scan with Filter, no Index Scan. Why?
+
+A. String literals are always scanned sequentially in SQL.  
+B. The integer column `customer_id` must be converted to a string for comparison, which disables the index.  
+C. The string literal `'100'` cannot match integer 100 because of type mismatch.  
+D. The query is syntactically invalid and will fail.
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+Most databases perform implicit type conversion. The condition `customer_id = '100'` is converted to `customer_id = CAST('100' AS INT)` or similar. This conversion is applied to every row during the scan, disabling the index. The correct query is:
+
+```sql
+SELECT * FROM orders WHERE customer_id = 100;
+```
+
+(Use an integer literal, not a string.)
+
+Modern ORMs and prepared statements help avoid this; parameterized queries with the correct type ensure the index is used.
+
+Why the distractors are wrong:
+- **A** is false; string literals don't cause sequential scans by default; the issue is the implicit type conversion disabling the index.
+- **C** is false; the conversion allows `'100'` to match integer 100, but the cost is an index bypass.
+- **D** is false; the query is valid and will execute (but slowly).
+
+**Related:** [SQL Query Optimization: Data Type Mismatches](../../learn/programming-computing/sql-query-optimization.qmd#data-type-mismatches)
+
+</details>
+
+### 8. Optimization strategy: predicate pushdown
+
+You need the average order amount for customers in the USA:
+
+```sql
+-- Query A
+SELECT country, AVG(amount) FROM (
+  SELECT c.country, o.amount 
+  FROM customers c
+  JOIN orders o ON c.customer_id = o.customer_id
+) sub
+WHERE country = 'USA'
+GROUP BY country;
+
+-- Query B
+SELECT c.country, AVG(o.amount) FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+WHERE c.country = 'USA'
+GROUP BY c.country;
+```
+
+Assuming 1 million orders and 10,000 customers (500 in the USA), which is faster and why?
+
+A. Query A is faster because the subquery pre-filters the data.  
+B. Query B is faster because the WHERE clause filters customers before the join, reducing the join size.  
+C. Both are equally fast; the optimizer converts them to the same plan.  
+D. Query A is faster because it aggregates in a separate subquery.
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: B**
+
+Query B applies the WHERE filter on `customers` before joining to `orders`. This reduces 10,000 customers to 500 (USA only), so the join processes 500 × 1 million = 500 million row comparisons instead of 10,000 × 1 million = 10 billion. The filter is "pushed down" before the expensive join.
+
+Query A joins first (10,000 customers × 1 million orders = large intermediate result), then filters. The aggregate is then applied, but the intermediate join is larger.
+
+In theory, a very smart optimizer *might* rewrite Query A to match Query B, but you can't rely on that. Query B makes the intent clear: filter early, join small.
+
+Why the distractors are wrong:
+- **A** is false; the subquery doesn't reduce data; filtering happens *after* the join in Query A.
+- **C** is false; while some smart optimizers can reorder clauses, you shouldn't rely on it.
+- **D** is false; separating the aggregate into a subquery doesn't make it faster.
+
+**Related:** [SQL Query Optimization: Predicate Pushdown](../../learn/programming-computing/sql-query-optimization.qmd#predicate-pushdown)
+
+</details>
+
+### 9. Screening scenario: fixing a slow dashboard query
+
+A dashboard query runs every minute and often times out:
+
+```sql
+SELECT customer_id,
+  (SELECT COUNT(*) FROM orders WHERE customer_id = c.id) AS order_cnt,
+  (SELECT AVG(amount) FROM orders WHERE customer_id = c.id) AS avg_amt,
+  (SELECT MAX(order_date) FROM orders WHERE customer_id = c.id) AS last_order
+FROM customers c;
+```
+
+There are 100,000 customers and 10 million orders. What is the primary issue and how would you fix it?
+
+A. The subqueries execute 100,000 times each. Refactor to use one JOIN and GROUP BY with window functions or aggregation.  
+B. The dashboard is querying the live `orders` table; move it to a pre-aggregated summary table.  
+C. The SELECT clause has too many columns; reduce to only needed columns.  
+D. The customers table is not indexed; add a primary key.
+
+<details>
+<summary>Show answer</summary>
+
+**Correct answer: A**
+
+This is a classic N+1 problem combined with redundant subqueries. For each of 100,000 customers, you execute 3 subqueries (COUNT, AVG, MAX), and each subquery scans the 10 million orders table (or an index). That's 300,000 subquery executions.
+
+The fix:
+
+```sql
+SELECT c.customer_id,
+  COUNT(o.order_id) AS order_cnt,
+  AVG(o.amount) AS avg_amt,
+  MAX(o.order_date) AS last_order
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id;
+```
+
+Single join, single GROUP BY. All aggregations computed in one pass. Cost drops from O(300,000 subqueries × 10M rows) to O(100K + 10M rows).
+
+If the dashboard still times out after this fix, then (B) is your next step: pre-aggregate into a summary table updated periodically. But refactor the query first—it's the quickest win.
+
+Why the distractors are wrong:
+- **B** is not wrong in general (pre-aggregation is often necessary for dashboards), but it's premature here. Fix the query first; that alone often solves the timeout.
+- **C** is irrelevant; column selection doesn't explain the timeout.
+- **D** is incorrect; `customers.customer_id` should already be a primary key or unique index.
+
+**Related:** [SQL Query Optimization: N+1 Queries and Query Refactoring Examples](../../learn/programming-computing/sql-query-optimization.qmd#example-1-n1-subquery-to-join)
+
+</details>
+
+## Answers and explanations
+
+All answers and explanations are hidden above. Read each question carefully, form your answer, then click "Show answer" to check your reasoning.
+
+## Next steps
+
+- **Master EXPLAIN output**: Practice reading query plans on your database (PostgreSQL, DuckDB, MySQL—the principles are similar). Learn your database's cost model.
+- **Index discipline**: Build a mental model of when indexes help (high-cardinality WHERE/JOIN filters, ORDER BY) and when they don't (low-cardinality, functions on indexed columns).
+- **Refactor anti-patterns**: Replace N+1 subqueries with JOINs and GROUP BY. Replace correlated subqueries with window functions. Apply predicate pushdown to filter early.
+- **Benchmark iteratively**: EXPLAIN is a tool, not a guarantee. Run the actual query, time it, then optimize. Measure before and after.
+
+## Related topics
+
+- [SQL Query Optimization & Performance](../../learn/programming-computing/sql-query-optimization.qmd)
+- [SQL Joins](../../learn/programming-computing/sql-joins.qmd)
+- [SQL Window Functions](../../learn/programming-computing/sql-window-functions.qmd)
+- [SQL Aggregation & GROUP BY](../../learn/programming-computing/sql-aggregation.qmd)
