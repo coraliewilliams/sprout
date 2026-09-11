@@ -1,5 +1,5 @@
 ---
-title: "My Notebook"
+title: "Sprout Notebook"
 toc: false
 ---
 
