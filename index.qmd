@@ -6,7 +6,7 @@ toc: false
 <script src="styles/progress-tracking.js"></script>
 <script src="styles/homepage.js"></script>
 
-A personal technical learning notebook for statistics, machine learning, mathematics, SQL, and programming. Built for thinking, not cramming.
+Sprout Notebook is a personal technical learning notebook for statistics, machine learning, mathematics, SQL, and programming. Built for thinking, not cramming.
 
 Use the search box in the sidebar to find a topic quickly, or explore the areas below.
 
@@ -136,5 +136,5 @@ Use the search box in the sidebar to find a topic quickly, or explore the areas 
 
 ### Track
 
-- [Page Tracker](track/page-tracker/index.qmd) — Notebook build status
+- [Page Tracker](track/page-tracker/index.qmd) — Sprout Notebook build status
 - [Progress](track/progress.qmd) — Your learning progress and recommendations

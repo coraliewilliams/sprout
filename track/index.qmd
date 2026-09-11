@@ -2,7 +2,7 @@
 title: "Track"
 ---
 
-Track two aspects of your learning: progress building this notebook, and your personal learning journey.
+Track two aspects of your learning: progress building Sprout Notebook, and your personal learning journey.
 
 - [Page Tracker](page-tracker/index.qmd) — which topic pages exist, their build status, and what's planned next.
 - [Progress](progress.qmd) — your learning progress, quiz history, and recommended topics to review. Updates automatically as you explore and complete quizzes.
