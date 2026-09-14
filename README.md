@@ -1,7 +1,7 @@
-# My notebook
+# My sprout notebook 🪴
 
-A personal technical learning notebook covering statistics, machine learning,
-mathematics, data science, experimental design, and programming. Built with
+My learning technical notebook covering statistics, machine learning,
+mathematics, data science, experimental design, and programming (and other stuff that I'm interested in). Built with
 [Quarto](https://quarto.org) and published with GitHub Pages.
 
 ## Site structure
