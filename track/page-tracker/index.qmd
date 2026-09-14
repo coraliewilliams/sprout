@@ -17,7 +17,7 @@ listing:
   filter-ui: false
 ---
 
-Tracks the build-out of this notebook itself: which topic pages exist, which
+Tracks the build-out of Sprout Notebook itself: which topic pages exist, which
 are still stubs, and what's planned next. Generated automatically from each
 topic page's frontmatter (`status`, `area`, `confidence`, `last-reviewed`) —
 new topic pages appear here as soon as they're added, no manual updates needed.

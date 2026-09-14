@@ -2,9 +2,9 @@
 title: "About"
 ---
 
-This site is a personal technical learning notebook — a long-term knowledge base
-covering statistics, machine learning, mathematics, data science, experimental
-design, and programming.
+Sprout Notebook is a personal technical learning notebook — a long-term
+knowledge base covering statistics, machine learning, mathematics, data
+science, experimental design, and programming.
 
 It is built gradually, usually one or two topics at a time, and is intended as a
 calm, organised reference rather than a blog, portfolio, or online textbook.
